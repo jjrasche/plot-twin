@@ -3,7 +3,6 @@ package plottwin.oppipeline
 import java.time.LocalDate
 import plottwin.solvers.Constraint
 import plottwin.solvers.FlowFieldCache
-import plottwin.solvers.TerrainGrid
 import plottwin.worldstate.Meters
 import plottwin.worldstate.OpRow
 import plottwin.worldstate.OpStatus
@@ -15,7 +14,6 @@ import plottwin.worldstate.WriterRole
 
 class OpPipeline(
     private val log: WorldLog,
-    private val terrain: TerrainGrid,
     private val date: LocalDate,
     private val constraints: List<Constraint>,
     private val candidateSpacing: Meters = Meters(1.0),
@@ -27,7 +25,7 @@ class OpPipeline(
     }
 
     private fun resolveOp(opSeq: Long, op: OpRow) {
-        val world = PlacementWorld(log.currentState(), terrain, date, constraints, candidateSpacing, flowFields)
+        val world = PlacementWorld(log.currentState(), date, constraints, candidateSpacing, flowFields)
         val verdict = resolvePlacement(world, op)
         val resolutionSeq = appendVerdict(verdict, opSeq)
         log.append(

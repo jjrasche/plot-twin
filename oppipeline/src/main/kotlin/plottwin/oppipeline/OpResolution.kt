@@ -3,7 +3,6 @@ package plottwin.oppipeline
 import java.time.LocalDate
 import plottwin.solvers.Constraint
 import plottwin.solvers.FlowFieldCache
-import plottwin.solvers.TerrainGrid
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.LockKind
@@ -19,7 +18,6 @@ val DEFAULT_ROOM_HEIGHT: Meters = metersOf(feet = 9)
 
 data class PlacementWorld(
     val projection: CurrentState,
-    val terrain: TerrainGrid,
     val date: LocalDate,
     val constraints: List<Constraint>,
     val candidateSpacing: Meters,

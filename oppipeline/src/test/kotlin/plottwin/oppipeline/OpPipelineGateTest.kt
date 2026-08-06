@@ -182,7 +182,6 @@ class OpPipelineGateTest {
     private fun attachPipeline(log: WorldLog, candidateSpacing: Meters = Meters(1.0)) {
         OpPipeline(
             log = log,
-            terrain = ToyPlotFixture.terrainWithSwale(),
             date = ToyPlotFixture.toyDate,
             constraints = pipelineConstraints(),
             candidateSpacing = candidateSpacing,
@@ -196,7 +195,7 @@ class OpPipelineGateTest {
     )
 
     private fun runToyConstraintSolvers(log: WorldLog) = runSolvers(
-        SolverWorld(log.currentState(), ToyPlotFixture.terrainWithSwale(), ToyPlotFixture.toyDate),
+        SolverWorld(log.currentState(), ToyPlotFixture.toyDate),
         pipelineConstraints(),
     )
 

@@ -66,6 +66,25 @@ data class PositionDiffRow(
 ) : WorldRow
 
 @Serializable
+@SerialName("base_terrain")
+data class BaseTerrainRow(
+    val columns: Int,
+    val rows: Int,
+    val cellSize: Meters,
+    val heightsBase64: String,
+) : WorldRow
+
+@Serializable
+@SerialName("terrain_diff")
+data class TerrainDiffRow(
+    val firstColumn: Int,
+    val firstRow: Int,
+    val columns: Int,
+    val rows: Int,
+    val heightsBase64: String,
+) : WorldRow
+
+@Serializable
 @SerialName("op_status")
 data class OpStatusRow(
     val status: OpStatus,
@@ -85,9 +104,10 @@ data class RejectionRow(
     val violations: List<RejectedViolation>,
 ) : WorldRow
 
-// D-013: capture measures (footprints), the optimizer places (position diffs)
+// D-013: capture measures (footprints, ground), the optimizer places (position diffs)
 fun geometryWriterFor(row: WorldRow): WriterRole? = when {
     row is PositionDiffRow -> WriterRole.OPTIMIZER
     row is EntityRow && row.footprint.isNotEmpty() -> WriterRole.CAPTURE
+    row is BaseTerrainRow || row is TerrainDiffRow -> WriterRole.CAPTURE
     else -> null
 }

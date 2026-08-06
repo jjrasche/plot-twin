@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import plottwin.worldstate.Meters
+import plottwin.worldstate.TerrainGrid
 
 class D8FlowTest {
 

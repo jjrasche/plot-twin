@@ -1,18 +1,20 @@
 package plottwin.solvers
 
+import plottwin.worldstate.ProjectedTerrain
+
 fun interface UpslopeFieldSource {
-    fun upslopeCellCountsOf(terrain: TerrainGrid): IntArray
+    fun upslopeCellCountsOf(terrain: ProjectedTerrain): IntArray
 }
 
 val UNCACHED_UPSLOPE_FIELD: UpslopeFieldSource =
-    UpslopeFieldSource { terrain -> computeUpslopeCellCounts(computeFlowTargets(terrain)) }
+    UpslopeFieldSource { terrain -> computeUpslopeCellCounts(computeFlowTargets(terrain.grid)) }
 
-// TerrainGrid keeps reference equality, so the map keys by terrain identity: one field per terrain version
+// keyed on the terrain row seq: one field per logged terrain version
 class FlowFieldCache(
     private val source: UpslopeFieldSource = UNCACHED_UPSLOPE_FIELD,
 ) : UpslopeFieldSource {
-    private val upslopeCountsByTerrain = mutableMapOf<TerrainGrid, IntArray>()
+    private val upslopeCountsByVersion = mutableMapOf<Long, IntArray>()
 
-    override fun upslopeCellCountsOf(terrain: TerrainGrid): IntArray =
-        upslopeCountsByTerrain.getOrPut(terrain) { source.upslopeCellCountsOf(terrain) }
+    override fun upslopeCellCountsOf(terrain: ProjectedTerrain): IntArray =
+        upslopeCountsByVersion.getOrPut(terrain.versionSeq) { source.upslopeCellCountsOf(terrain) }
 }
