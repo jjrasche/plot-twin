@@ -1,7 +1,4 @@
-package plottwin.solvers
-
-import plottwin.worldstate.GroundPoint
-import plottwin.worldstate.Meters
+package plottwin.worldstate
 
 class TerrainGrid(
     val columns: Int,
@@ -27,4 +24,13 @@ class TerrainGrid(
         east = Meters((columnOf(index) + 0.5) * cellSize.value),
         north = Meters((rowOf(index) + 0.5) * cellSize.value),
     )
+
+    override fun equals(other: Any?): Boolean =
+        other is TerrainGrid &&
+            columns == other.columns &&
+            rows == other.rows &&
+            cellSize == other.cellSize &&
+            surfaceHeights.contentEquals(other.surfaceHeights)
+
+    override fun hashCode(): Int = ((columns * 31 + rows) * 31 + cellSize.hashCode()) * 31 + surfaceHeights.contentHashCode()
 }

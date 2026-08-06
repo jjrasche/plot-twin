@@ -5,7 +5,6 @@ import plottwin.worldstate.CurrentState
 
 data class SolverWorld(
     val state: CurrentState,
-    val terrain: TerrainGrid,
     val date: LocalDate,
     val upslopeFields: UpslopeFieldSource = UNCACHED_UPSLOPE_FIELD,
 )

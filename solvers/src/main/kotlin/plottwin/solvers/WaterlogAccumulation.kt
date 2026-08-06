@@ -4,16 +4,18 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import plottwin.geometry.isInsidePolygon
 import plottwin.worldstate.GroundPoint
+import plottwin.worldstate.TerrainGrid
 
 object WaterlogAccumulation : LeafSolver {
     override fun findViolations(world: SolverWorld, constraint: Constraint): List<Violation> {
         if (constraint !is WaterlogConstraint) return emptyList()
+        val terrain = world.state.terrain ?: return emptyList()
         val footprintRing = world.state.entities[constraint.entityName]?.footprint ?: return emptyList()
         if (footprintRing.size < 3) return emptyList()
-        val upslopeCounts = world.upslopeFields.upslopeCellCountsOf(world.terrain)
-        val wettestCell = wettestCellInside(world.terrain, upslopeCounts, footprintRing)
+        val upslopeCounts = world.upslopeFields.upslopeCellCountsOf(terrain)
+        val wettestCell = wettestCellInside(terrain.grid, upslopeCounts, footprintRing)
         if (wettestCell == NO_FLOW) return emptyList()
-        return listOfNotNull(excessViolation(world, constraint, wettestCell, upslopeCounts[wettestCell]))
+        return listOfNotNull(excessViolation(world, terrain.grid, constraint, wettestCell, upslopeCounts[wettestCell]))
     }
 }
 
@@ -41,16 +43,17 @@ private fun wettestCellInside(terrain: TerrainGrid, upslopeCounts: IntArray, foo
 
 private fun excessViolation(
     world: SolverWorld,
+    grid: TerrainGrid,
     constraint: WaterlogConstraint,
     wettestCell: Int,
     upslopeCellCount: Int,
 ): Violation? {
-    val cellArea = world.terrain.cellSize.value * world.terrain.cellSize.value
+    val cellArea = grid.cellSize.value * grid.cellSize.value
     val excessSquareMeters = upslopeCellCount * cellArea - constraint.maxUpslopeSquareMeters
     if (excessSquareMeters <= 0.0) return null
     return Violation(
         ruleName = constraint.ruleName,
-        location = world.terrain.centerOf(wettestCell),
+        location = grid.centerOf(wettestCell),
         magnitude = excessSquareMeters,
         severity = ruleWeightOf(world.state, constraint.ruleName) * excessSquareMeters / constraint.maxUpslopeSquareMeters,
     )
