@@ -2,7 +2,7 @@ package plottwin.render
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.solvers.ToyPlotFixture
 import plottwin.worldstate.Meters
 

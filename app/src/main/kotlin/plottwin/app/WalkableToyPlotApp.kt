@@ -12,7 +12,7 @@ import plottwin.solvers.runSolvers
 
 fun toyPlotSceneSpec(): WalkableSceneSpec {
     val world = ToyPlotFixture.toyWorld()
-    return projectWalkableScene(world.state, world.terrain, runSolvers(world, ToyPlotFixture.toyConstraints()))
+    return projectWalkableScene(world.state, runSolvers(world, ToyPlotFixture.toyConstraints()))
 }
 
 fun main() {

@@ -2,7 +2,7 @@ package plottwin.render
 
 import ai.factoredui.compose.scene3d.Scene3dMesh
 import kotlin.math.min
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 
 fun terrainMeshOf(terrain: TerrainGrid, frame: SceneFrame): Scene3dMesh {
     val vertexCountX = terrain.columns + 1

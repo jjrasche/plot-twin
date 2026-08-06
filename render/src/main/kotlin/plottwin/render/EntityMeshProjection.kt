@@ -2,7 +2,7 @@ package plottwin.render
 
 import ai.factoredui.compose.scene3d.Scene3dMesh
 import kotlin.math.hypot
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity

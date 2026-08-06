@@ -1,7 +1,7 @@
 package plottwin.render
 
 import kotlin.math.min
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.Meters
 
 // Decimates the RENDER grid only (solver grid stays full-res) into the batched painter's proven ~100K-triangle band.

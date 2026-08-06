@@ -2,15 +2,17 @@ package plottwin.render
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import plottwin.solvers.ToyPlotFixture
 import plottwin.solvers.runSolvers
+import plottwin.worldstate.CurrentState
 
 class WalkableSceneProjectionTest {
 
     private val toySpec: WalkableSceneSpec by lazy {
         val world = ToyPlotFixture.toyWorld()
-        projectWalkableScene(world.state, world.terrain, runSolvers(world, ToyPlotFixture.toyConstraints()))
+        projectWalkableScene(world.state, runSolvers(world, ToyPlotFixture.toyConstraints()))
     }
 
     @Test
@@ -83,5 +85,12 @@ class WalkableSceneProjectionTest {
     @Test
     fun spec_round_trips_through_json() {
         assertEquals(toySpec, walkableSceneSpecFromJson(toySpec.toJson()))
+    }
+
+    @Test
+    fun projection_before_any_base_terrain_row_fails_loudly() {
+        assertFailsWith<IllegalArgumentException> {
+            projectWalkableScene(CurrentState.EMPTY, emptyList())
+        }
     }
 }

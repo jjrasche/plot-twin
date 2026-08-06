@@ -1,7 +1,7 @@
 package plottwin.render
 
 import ai.factoredui.compose.scene3d.Scene3dMesh
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.solvers.Violation
 
 const val VIOLATION_MARKER_HEIGHT_METERS = 3.5f

@@ -1,6 +1,6 @@
 package plottwin.render
 
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.GroundPoint
 
 // scene3d frame: x = east, y = up, z = north, centered on the plot midpoint. z ascends

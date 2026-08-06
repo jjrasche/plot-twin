@@ -7,7 +7,7 @@ import ai.factoredui.compose.scene3d.Scene3dWorldState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import plottwin.solvers.TerrainGrid
+import plottwin.worldstate.TerrainGrid
 import plottwin.solvers.Violation
 import plottwin.worldstate.CurrentState
 
@@ -21,7 +21,8 @@ data class WalkableSceneSpec(
     @SerialName("meshes_by_entity") val meshesByEntity: Map<String, Scene3dMesh>,
 )
 
-fun projectWalkableScene(state: CurrentState, terrain: TerrainGrid, violations: List<Violation>): WalkableSceneSpec {
+fun projectWalkableScene(state: CurrentState, violations: List<Violation>): WalkableSceneSpec {
+    val terrain = requireNotNull(state.terrain) { "cannot project a walkable scene before a base-terrain row is logged" }.grid
     val frame = sceneFrameOf(terrain)
     val meshes = LinkedHashMap<String, Scene3dMesh>()
     meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame)
