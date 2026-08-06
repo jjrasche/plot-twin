@@ -5,8 +5,8 @@ import java.sql.Connection
 import java.sql.DriverManager
 import kotlinx.serialization.json.Json
 
-class GeometryWriteRejected(row: WorldRow, writer: WriterRole) :
-    IllegalArgumentException("geometry rows are optimizer-only; $writer tried to append ${row::class.simpleName}")
+class GeometryWriteRejected(row: WorldRow, writer: WriterRole, requiredWriter: WriterRole) :
+    IllegalArgumentException("${row::class.simpleName} is $requiredWriter-only; $writer tried to append it")
 
 data class LoggedRow(
     val seq: Long,
@@ -86,7 +86,8 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
     }
 
     private fun requireGeometryWriter(row: WorldRow, writer: WriterRole) {
-        if (carriesGeometry(row) && writer != WriterRole.OPTIMIZER) throw GeometryWriteRejected(row, writer)
+        val requiredWriter = geometryWriterFor(row) ?: return
+        if (writer != requiredWriter) throw GeometryWriteRejected(row, writer, requiredWriter)
     }
 
     private fun insertRow(row: WorldRow, writer: WriterRole): Long {

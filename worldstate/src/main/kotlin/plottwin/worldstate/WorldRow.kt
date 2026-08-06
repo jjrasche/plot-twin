@@ -3,7 +3,7 @@ package plottwin.worldstate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-enum class WriterRole { OWNER, LLM, OPTIMIZER }
+enum class WriterRole { OWNER, LLM, OPTIMIZER, CAPTURE }
 
 enum class Hardness { HARD, SOFT }
 
@@ -72,8 +72,9 @@ data class RejectionRow(
     val violations: List<RejectedViolation>,
 ) : WorldRow
 
-fun carriesGeometry(row: WorldRow): Boolean = when (row) {
-    is PositionDiffRow -> true
-    is EntityRow -> row.footprint.isNotEmpty()
-    is RuleRow, is LockRow, is OpRow, is RejectionRow -> false
+// D-013: capture measures (footprints), the optimizer places (position diffs)
+fun geometryWriterFor(row: WorldRow): WriterRole? = when {
+    row is PositionDiffRow -> WriterRole.OPTIMIZER
+    row is EntityRow && row.footprint.isNotEmpty() -> WriterRole.CAPTURE
+    else -> null
 }

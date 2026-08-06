@@ -127,8 +127,8 @@ class OpPipelineGateTest {
 
     private fun stageToyPlotWithRegions(log: WorldLog) {
         ToyPlotFixture.appendToyPlot(log)
-        log.append(EntityRow("north terrace", rectangleRing(24.0, 40.0, 66.0, 80.0), Meters(0.0)), WriterRole.OPTIMIZER)
-        log.append(EntityRow("swale terrace", rectangleRing(26.0, 34.0, 56.0, 64.0), Meters(0.0)), WriterRole.OPTIMIZER)
+        log.append(EntityRow("north terrace", rectangleRing(24.0, 40.0, 66.0, 80.0), Meters(0.0)), WriterRole.CAPTURE)
+        log.append(EntityRow("swale terrace", rectangleRing(26.0, 34.0, 56.0, 64.0), Meters(0.0)), WriterRole.CAPTURE)
     }
 
     private fun attachPipeline(log: WorldLog, candidateSpacing: Meters = Meters(1.0)) {

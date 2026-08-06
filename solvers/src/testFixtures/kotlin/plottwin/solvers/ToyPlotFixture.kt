@@ -48,9 +48,9 @@ object ToyPlotFixture {
     }
 
     fun appendToyPlot(log: WorldLog) {
-        log.append(greenhouseRow(), WriterRole.OPTIMIZER)
-        log.append(pergolaRow(), WriterRole.OPTIMIZER)
-        log.append(gardenPathRow(), WriterRole.OPTIMIZER)
+        log.append(greenhouseRow(), WriterRole.CAPTURE)
+        log.append(pergolaRow(), WriterRole.CAPTURE)
+        log.append(gardenPathRow(), WriterRole.CAPTURE)
         log.append(RuleRow("path-clearance", Hardness.HARD, 1.0, "paths keep 4' of walking clearance"), WriterRole.LLM)
         log.append(RuleRow("pergola-drainage", Hardness.SOFT, 1.0, "pergola floor stays out of runoff paths"), WriterRole.LLM)
         log.append(RuleRow("greenhouse-drainage", Hardness.HARD, 1.0, "greenhouse floor stays out of runoff paths"), WriterRole.LLM)
