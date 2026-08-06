@@ -2,12 +2,17 @@
 kotlin = "2.3.21"
 kotlinxSerializationJson = "1.11.0"
 sqliteJdbc = "3.45.3.0"
+compose = "1.10.3"
+factoredUi = "0.17.2-batched-SNAPSHOT"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+factoredui-kotlin-compose = { module = "ai.factoredui:kotlin-compose", version.ref = "factoredUi" }
 
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
