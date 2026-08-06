@@ -42,25 +42,7 @@ private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = whe
     is OpRow -> state.copy(pendingOpsBySeq = state.pendingOpsBySeq + (logged.seq to row))
     is OpStatusRow -> consumeOp(state, logged)
     is RejectionRow -> state.copy(rejections = state.rejections + row)
-    is BaseTerrainRow -> state.copy(terrain = ProjectedTerrain(logged.seq, terrainGridOf(row)))
-    is TerrainDiffRow -> patchTerrain(state, logged.seq, row)
-}
-
-private fun patchTerrain(state: CurrentState, diffSeq: Long, diff: TerrainDiffRow): CurrentState {
-    val baseTerrain = state.terrain ?: return state
-    val baseGrid = baseTerrain.grid
-    require(diff.firstColumn >= 0 && diff.firstColumn + diff.columns <= baseGrid.columns) { "diff columns outside the base grid" }
-    require(diff.firstRow >= 0 && diff.firstRow + diff.rows <= baseGrid.rows) { "diff rows outside the base grid" }
-    val patchedHeights = baseGrid.surfaceHeights.copyOf()
-    val regionHeights = decodeHeightsBase64(diff.heightsBase64, diff.columns * diff.rows)
-    for (regionRow in 0 until diff.rows) {
-        for (regionColumn in 0 until diff.columns) {
-            val cell = baseGrid.indexOf(diff.firstColumn + regionColumn, diff.firstRow + regionRow)
-            patchedHeights[cell] = regionHeights[regionRow * diff.columns + regionColumn]
-        }
-    }
-    val patchedGrid = TerrainGrid(baseGrid.columns, baseGrid.rows, baseGrid.cellSize, patchedHeights)
-    return state.copy(terrain = ProjectedTerrain(diffSeq, patchedGrid))
+    is BaseTerrainRow, is TerrainDiffRow -> state.copy(terrain = foldTerrain(state.terrain, logged))
 }
 
 private fun consumeOp(state: CurrentState, statusLogged: LoggedRow): CurrentState {
