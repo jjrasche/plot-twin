@@ -5,7 +5,13 @@ only a pointer here.
 
 - role: lead — holds goal, charters build subagents, verifies by running, lands merges
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
-- when: 2026-08-06T20:30Z
+- when: 2026-08-06T21:40Z
+- handoff: seat open for a fresh pt-head — claim it, run /overnight-build on the confirmed batch:
+  1. EYES (confirmed by Jim): charter staged at .claude/charters/overnight-9-eyes.md — camera-drive capability in factored-ui (worktree off il-scene-render-harness @ 8936e5d, one camera two drivers, headless capture) + plot-twin view harness w/ contact sheet the lead reviews by eye. Rewrite the charter if you see better.
+  2. EARTHWORKS DESIGN DIG (confirmed — "dig deeper and fill my mental model"): charter it yourself. Scope from tonight's ruling talk: regrade op slots; cut/fill volume as solver outputs; spoil is conserved mass the optimizer must PLACE (pond dig → berm/fill placement scored by viewshed+watershed rules like any entity); proposed-ground vs measured-ground row types; whether purpose changes the op or just the rules. Ends in a proposal Jim ratifies; code only the uncontroversial row types.
+  3. SNAPSHOT/COMPACTION ROWS (proposed, not struck — confirm-by-silence): terrain projection cache + snapshot-row design; doubles as a memo to gen-head on change-based lenses (patch-folds vs replace-folds, snapshot rows, cache keyed on last-seq). Jim's framing: lens = folded blob in read memory; ordering is the conflict rule.
+- release quirk to know: kotlin-compose-v0.18.0 tag push did NOT auto-fire CI (cause unknown; July tags fired fine) — manual `gh workflow run "kotlin-compose publish" --ref <tag>` worked; Pages CDN build then hung "building", fixed by `gh api -X POST repos/jjrasche/factoredui/pages/builds`. Watch for repeat next release.
+- prior state (first two runs, all merged):
 - SECOND overnight run COMPLETE — charters 5-8 all lead-verified by fresh re-runs and MERGED (merge authority ruled to lead); main @ 94afcfd holds the full loop:
   - charter 5 headed fps: **PASS** — 131fps @ 100K triangles on GPU-backed window (headless was 17.6) — batched-painter rebuild graded PASS, no escape hatch needed; kotlin-compose 0.17.2-batched-SNAPSHOT published to mavenLocal; branch build/scene3d-batched-painter @ c0ad6b2 stays UNMERGED in factored-ui (owner's merge)
   - charter 7 provenance+cost: **PASS, merged** — Genesis-shaped refs (role-tagged RowRef on the later row), op-status rows, position-diffs cite their op; D8 flow-field cache (placement test 6.5s→0.08s); shared geometry module; CAPTURE writer role (D-013)
