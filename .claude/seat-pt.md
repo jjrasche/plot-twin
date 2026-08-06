@@ -7,6 +7,14 @@ only a pointer here.
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
 - when: 2026-08-06T22:35Z
 - seat: CLAIMED 2026-08-06 by pt-head (third overnight run in flight)
+- RUN 3 IN FLIGHT (started 2026-08-06 ~22:40Z), base main @ e3ec7cb:
+  - parallel now: eyes+CV (`build/eyes`, charter 9) · earthworks design (`design/earthworks`,
+    charter 11) · capture pipeline research (`research-capture-pipeline`, charter 12)
+  - chained: light/sky BUILD (charter 10) on eyes — the contact sheet is how it gets judged;
+    snapshot rows (charter 13) on earthworks — both touch the schema
+  - critical path is eyes: it is the instrument every later render lane is graded by
+  - worktrees at ../.git-worktrees/pt-{eyes,earthworks,capture}
+  - note: branch `research` already exists, so the capture lane's branch has no slash
 - handoff: prior head's batch, now this run's scope:
   1. EYES (confirmed by Jim): charter staged at .claude/charters/overnight-9-eyes.md — camera-drive capability in factored-ui (worktree off il-scene-render-harness @ 8936e5d, one camera two drivers, headless capture) + plot-twin view harness w/ contact sheet the lead reviews by eye. Rewrite the charter if you see better.
   2. EARTHWORKS DESIGN DIG (confirmed — "dig deeper and fill my mental model"): charter it yourself. Scope from tonight's ruling talk: regrade op slots; cut/fill volume as solver outputs; spoil is conserved mass the optimizer must PLACE (pond dig → berm/fill placement scored by viewshed+watershed rules like any entity); proposed-ground vs measured-ground row types; whether purpose changes the op or just the rules. Ends in a proposal Jim ratifies; code only the uncontroversial row types.

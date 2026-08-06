@@ -1,0 +1,5 @@
+seat: run 3 lanes in flight; snapshot-rows chartered to chain on earthworks
+
+Three lanes spawned in isolated worktrees. Charter 13 staged for the snapshot/compaction
+row design, which also carries a memo to the Genesis lead on change-based lenses — same
+problem in two repos.
