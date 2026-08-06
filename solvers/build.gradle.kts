@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
+    `java-test-fixtures`
 }
 
 repositories {
