@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
-    `java-test-fixtures`
 }
 
 repositories {
@@ -9,7 +8,6 @@ repositories {
 
 dependencies {
     api(project(":worldstate"))
-    implementation(project(":geometry"))
     testImplementation(libs.kotlin.test)
 }
 

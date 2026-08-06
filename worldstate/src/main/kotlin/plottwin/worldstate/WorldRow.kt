@@ -3,7 +3,7 @@ package plottwin.worldstate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-enum class WriterRole { OWNER, LLM, OPTIMIZER }
+enum class WriterRole { OWNER, LLM, OPTIMIZER, CAPTURE }
 
 enum class Hardness { HARD, SOFT }
 
@@ -12,6 +12,13 @@ enum class LockKind { LOCK, MASK }
 enum class OpVerb { ADD_ROOM, MOVE, RESIZE, REROUTE, RELAX, LOCK }
 
 enum class OpSlot { SUBJECT, ROOM_KIND, DESTINATION, RELATION, RULE_NAME, EXTENT_TEXT }
+
+enum class OpStatus { RESOLVED, REJECTED }
+
+enum class RefRole { OP, RESOLUTION }
+
+@Serializable
+data class RowRef(val role: RefRole, val seq: Long)
 
 @Serializable
 data class GroundPoint(val east: Meters, val north: Meters)
@@ -59,6 +66,12 @@ data class PositionDiffRow(
 ) : WorldRow
 
 @Serializable
+@SerialName("op_status")
+data class OpStatusRow(
+    val status: OpStatus,
+) : WorldRow
+
+@Serializable
 data class RejectedViolation(
     val ruleName: String,
     val location: GroundPoint,
@@ -72,8 +85,9 @@ data class RejectionRow(
     val violations: List<RejectedViolation>,
 ) : WorldRow
 
-fun carriesGeometry(row: WorldRow): Boolean = when (row) {
-    is PositionDiffRow -> true
-    is EntityRow -> row.footprint.isNotEmpty()
-    is RuleRow, is LockRow, is OpRow, is RejectionRow -> false
+// D-013: capture measures (footprints), the optimizer places (position diffs)
+fun geometryWriterFor(row: WorldRow): WriterRole? = when {
+    row is PositionDiffRow -> WriterRole.OPTIMIZER
+    row is EntityRow && row.footprint.isNotEmpty() -> WriterRole.CAPTURE
+    else -> null
 }

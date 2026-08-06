@@ -9,6 +9,7 @@ repositories {
 dependencies {
     api(project(":worldstate"))
     api(project(":solvers"))
+    implementation(project(":geometry"))
     testImplementation(libs.kotlin.test)
     testImplementation(testFixtures(project(":solvers")))
 }

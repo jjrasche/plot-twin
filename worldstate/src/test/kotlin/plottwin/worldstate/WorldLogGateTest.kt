@@ -67,7 +67,7 @@ class WorldLogGateTest {
     @Test
     fun position_diff_from_owner_is_rejected() {
         WorldLog.openInMemory().use { log ->
-            log.append(greenhouseEntity(), WriterRole.OPTIMIZER)
+            log.append(greenhouseEntity(), WriterRole.CAPTURE)
 
             assertFailsWith<GeometryWriteRejected> {
                 log.append(greenhouseMovedEast(), WriterRole.OWNER)
@@ -76,9 +76,38 @@ class WorldLogGateTest {
     }
 
     @Test
+    fun measured_footprint_from_capture_lands_in_projection() {
+        WorldLog.openInMemory().use { log ->
+            log.append(greenhouseEntity(), WriterRole.CAPTURE)
+
+            assertTrue(log.currentState().entities.containsKey("greenhouse"))
+        }
+    }
+
+    @Test
+    fun position_diff_from_capture_is_rejected() {
+        WorldLog.openInMemory().use { log ->
+            log.append(greenhouseEntity(), WriterRole.CAPTURE)
+
+            assertFailsWith<GeometryWriteRejected> {
+                log.append(greenhouseMovedEast(), WriterRole.CAPTURE)
+            }
+        }
+    }
+
+    @Test
+    fun measured_footprint_from_optimizer_is_rejected() {
+        WorldLog.openInMemory().use { log ->
+            assertFailsWith<GeometryWriteRejected> {
+                log.append(greenhouseEntity(), WriterRole.OPTIMIZER)
+            }
+        }
+    }
+
+    @Test
     fun position_diff_from_optimizer_moves_the_entity_in_projection() {
         WorldLog.openInMemory().use { log ->
-            log.append(greenhouseEntity(), WriterRole.OPTIMIZER)
+            log.append(greenhouseEntity(), WriterRole.CAPTURE)
             val moved = greenhouseMovedEast()
             log.append(moved, WriterRole.OPTIMIZER)
 
@@ -112,7 +141,7 @@ class WorldLogGateTest {
     @Test
     fun lock_row_marks_the_entity_locked_in_projection() {
         WorldLog.openInMemory().use { log ->
-            log.append(greenhouseEntity(), WriterRole.OPTIMIZER)
+            log.append(greenhouseEntity(), WriterRole.CAPTURE)
             log.append(LockRow(targetName = "greenhouse", kind = LockKind.LOCK), WriterRole.OWNER)
 
             assertEquals(LockKind.LOCK, log.currentState().locks["greenhouse"])
@@ -120,7 +149,7 @@ class WorldLogGateTest {
     }
 
     private fun appendToyPlotHistory(log: WorldLog) {
-        log.append(greenhouseEntity(), WriterRole.OPTIMIZER)
+        log.append(greenhouseEntity(), WriterRole.CAPTURE)
         log.append(RuleRow("greenhouse-setback", Hardness.HARD, 1.0, "10' from the line"), WriterRole.LLM)
         log.append(OpRow(OpVerb.MOVE, mapOf(OpSlot.SUBJECT to "greenhouse", OpSlot.RELATION to "closer to the well")), WriterRole.OWNER)
         log.append(greenhouseMovedEast(), WriterRole.OPTIMIZER)

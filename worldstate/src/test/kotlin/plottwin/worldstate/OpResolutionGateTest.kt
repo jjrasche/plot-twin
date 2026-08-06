@@ -10,7 +10,7 @@ class OpResolutionGateTest {
     fun op_append_fires_the_op_trigger() {
         WorldLog.openInMemory().use { log ->
             val triggeredOps = mutableListOf<OpRow>()
-            log.onOpAppended { op -> triggeredOps.add(op) }
+            log.onOpAppended { _, op -> triggeredOps.add(op) }
 
             val addGreenhouse = OpRow(OpVerb.ADD_ROOM, mapOf(OpSlot.ROOM_KIND to "greenhouse"))
             log.append(addGreenhouse, WriterRole.LLM)
@@ -23,7 +23,7 @@ class OpResolutionGateTest {
     fun rule_append_does_not_fire_the_op_trigger() {
         WorldLog.openInMemory().use { log ->
             val triggeredOps = mutableListOf<OpRow>()
-            log.onOpAppended { op -> triggeredOps.add(op) }
+            log.onOpAppended { _, op -> triggeredOps.add(op) }
 
             log.append(RuleRow("path-clearance", Hardness.HARD, 1.0, "paths keep 4' clear"), WriterRole.LLM)
 

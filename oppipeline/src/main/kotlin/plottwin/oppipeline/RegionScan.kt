@@ -1,5 +1,6 @@
 package plottwin.oppipeline
 
+import plottwin.geometry.isInsidePolygon
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 
@@ -42,4 +43,4 @@ private fun rectangleFootprintAt(anchorEast: Double, anchorNorth: Double, extent
     )
 
 private fun isFootprintInsideRegion(footprint: List<GroundPoint>, regionRing: List<GroundPoint>): Boolean =
-    footprint.all { corner -> isInsideRegion(corner, regionRing) }
+    footprint.all { corner -> isInsidePolygon(corner, regionRing) }
