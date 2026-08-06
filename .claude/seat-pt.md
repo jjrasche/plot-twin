@@ -17,7 +17,18 @@ only a pointer here.
   - note: branch `research` already exists, so the capture lane's branch has no slash
   - LANDED: earthworks design PASS, merged at b261702 (docs only, schema untouched). Snapshot
     lane chained on it and told to land no schema change — the surface id waits on Jim.
+  - LANDED: snapshot/lens design PASS, merged — terrain projection cache shipped with five
+    tests (lead re-ran fresh gate: 81 tests, 0 failures), no schema change. Genesis memo on the
+    board at ~/.claude/brothers/messages/change-based-lenses-for-gen-head.md
 - NEEDS JIM (run 3, growing):
+  - snapshot forks, deliberately not defaulted: (a) do snapshots live IN the log or in a store
+    beside it? if in the log, the log stops being uniformly append-only and row types need a
+    truth-vs-derived mark; (b) may an oversized truth row's payload move to cold storage with a
+    hash left in the log? that is the shape the terrain ruling already rejected once
+  - the log has no observation time — a March flight ingested in July outranks a June survey.
+    Schema change, flagged not landed
+  - conflict DETECTION (an expected-baseline sequence at append) — both design lanes reached
+    this independently from opposite directions, which is a strong signal
   - earthworks proposal to ratify: one `regrade` verb (subject/form/prose extent — no
     coordinates); cut/fill as an earthwork ledger projection rather than a violation type;
     spoil conserved as a hard invariant with `haul-off` as the named escape; ONE terrain row

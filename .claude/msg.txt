@@ -1,1 +1,1 @@
-seat: earthworks landed; snapshot lane chained with schema changes held for ratify
+seat: snapshot lane landed; two storage forks and observation-time held for Jim
