@@ -3,7 +3,7 @@ id: Q-001
 status: open
 trigger: decision
 spawned-by: D-003
-feeds: D-003 D-004
+feeds: D-003
 ---
 
 # How should the LLM and classical solvers split the layout-optimization work?
