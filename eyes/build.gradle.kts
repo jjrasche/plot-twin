@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
-    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 repositories {
@@ -11,11 +12,10 @@ repositories {
 }
 
 dependencies {
-    api(project(":solvers"))
-    api(libs.factoredui.kotlin.compose)
-    implementation(libs.kotlinx.serialization.json)
+    api(project(":render"))
+    implementation(testFixtures(project(":solvers")))
+    implementation(compose.desktop.currentOs)
     testImplementation(libs.kotlin.test)
-    testImplementation(testFixtures(project(":solvers")))
 }
 
 kotlin {

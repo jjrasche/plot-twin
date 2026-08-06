@@ -3,7 +3,7 @@ kotlin = "2.3.21"
 kotlinxSerializationJson = "1.11.0"
 sqliteJdbc = "3.45.3.0"
 compose = "1.10.3"
-factoredUi = "0.18.0"
+factoredUi = "0.18.1-eyes-SNAPSHOT"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

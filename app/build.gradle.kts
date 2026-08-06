@@ -5,14 +5,14 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     maven("https://jjrasche.github.io/factoredui/")
     mavenCentral()
     google()
 }
 
 dependencies {
-    implementation(project(":render"))
-    implementation(testFixtures(project(":solvers")))
+    implementation(project(":eyes"))
     implementation(compose.desktop.currentOs)
     testImplementation(libs.kotlin.test)
 }
