@@ -5,12 +5,13 @@ only a pointer here.
 
 - role: lead — holds goal, charters build subagents, verifies by running, lands merges
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
-- when: 2026-08-06T04:35Z
-- overnight run COMPLETE — all 4 charters lead-verified by fresh gate re-runs (clean --no-build-cache --rerun-tasks), nothing merged to main, branches await Jim's review:
-  - charter 1 schema: **PASS** — build/schema @ ddcbb27 (worktree plot-twin-build-schema), 12/12 tests, replay deterministic, projection a pure fold, geometry guard mutation-checked
-  - charter 2 solvers: **PASS** — build/solvers @ 59ae907 (worktree plot-twin-build-solvers), 23/23 tests, both leaves pure, 810K-cell toy plot end-to-end deterministic
-  - charter 3 op pipeline: **PASS** (one named letter-caveat) — build/op-pipeline @ 2da0f5d (worktree plot-twin-build-op-pipeline), 32/32 tests across all modules, charter 1+2 gates intact; caveat: optimizer also takes terrain+date+typed constraints via constructor because terrain/compiled-constraints aren't log rows yet
-  - charter 4 scene3d: **WEAK as forecast** — build/scene3d-batched-painter @ 33d37b4 (worktree factored-ui-build-scene3d, based a2af0a1), 126 tests green (2 pre-existing skips), 17.6fps@100K headless (baseline 6.9); CPU killers gone (sort+assembly 63ms → 4.4ms); remaining 52ms is Skia CPU raster fill — memo says only a headed GPU surface removes it
-- defaults taken overnight: charter 4 based off a2af0a1 not pin 26a096c (picks up scene3d test fix); memo path corrected to research/questions/Q-003-scene3d-rebuild/ANSWER.md; charter 3 moved its impossible-op fixture downslope (physics was right, fixture wasn't)
-- NEEDS JIM: (1) headed-GPU fps measurement to grade scene3d PASS/keep-WEAK; (2) geometry writer role for survey/LiDAR ingestion (OPTIMIZER is sole geometry pen — both workers hit this); (3) terrain + compiled constraints as log rows or referenced artifacts
-- status: stopping place — review branches, then merge order: schema → solvers → op-pipeline (fast-forward chain)
+- when: 2026-08-06T20:30Z
+- SECOND overnight run COMPLETE — charters 5-8 all lead-verified by fresh re-runs and MERGED (merge authority ruled to lead); main @ 94afcfd holds the full loop:
+  - charter 5 headed fps: **PASS** — 131fps @ 100K triangles on GPU-backed window (headless was 17.6) — batched-painter rebuild graded PASS, no escape hatch needed; kotlin-compose 0.17.2-batched-SNAPSHOT published to mavenLocal; branch build/scene3d-batched-painter @ c0ad6b2 stays UNMERGED in factored-ui (owner's merge)
+  - charter 7 provenance+cost: **PASS, merged** — Genesis-shaped refs (role-tagged RowRef on the later row), op-status rows, position-diffs cite their op; D8 flow-field cache (placement test 6.5s→0.08s); shared geometry module; CAPTURE writer role (D-013)
+  - charter 8 terrain rows: **PASS, merged** — BaseTerrainRow + TerrainDiffRow, grid is a projection, solver side-channel deleted; toy log w/ terrain = 4.3MB; cell resolution ratified into D-011 (fixed 10cm, adaptivity stays in optimizer search)
+  - charter 6 walkable: **PASS, merged** — render module (pure projection→scene3d spec, violation markers), desktop app w/ orbit camera (:app:run), receipt PNG verified twice (pre- and post-terrain-merge, identical scene); render decimation factor 4 → 101K triangles at the painter's proven band
+- run stats: 76/76 tests green on final main gate; 6 lanes over 2 nights, 0 rejected, 2 steered (walkable post-merge adaptation, terrain chained on provenance agent)
+- NEEDS JIM: (1) merge/keep decision on factored-ui branch build/scene3d-batched-painter (Jim's repo, Jim's merge); (2) optimizer-PROPOSED regrades — measured ground is CAPTURE-only today; design-time earthworks need a ruling (distinct row type?); (3) smaller: standing render decimation factor, per-family violation-marker scaling, RejectionRow's embedded op now redundant w/ refs, int16 terrain quantization parked in favor of exact replay
+- worktrees still up: plot-twin-build-{schema,solvers,op-pipeline,provenance,walkable}, factored-ui-build-scene3d — prune after Jim reviews
+- status: stopping place — walk the toy plot: `bash gradlew :app:run` on main
