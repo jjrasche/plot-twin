@@ -1,27 +1,58 @@
 # Decisions
 
-- 2026-08-05 — World state is event-sourced (append-only typed diffs, projected views). Decade provenance + Genesis portability.
-- 2026-08-05 — Loop before capture: prove edit-verify-render cycle on toy state before photos→state.
-- 2026-08-05 — Standalone repo, not built inside Genesis; Genesis-shaped data so the port is row-writing.
-- 2026-08-05 — LLM operates outer loop only: intent→constraints, room-level ops, relaxations, violation interpretation. No geometry arithmetic (FloorplanQA: accuracy collapses with complexity).
-- 2026-08-05 — Inner loop is classical: solvers verify, optimizer places (Formalize-Don't-Optimize, arXiv 2605.12421).
-- 2026-08-05 — Terrain 10cm grid, 2.5D heightmap; entities exact vectors with heights. Full voxels rejected.
-- 2026-08-05 — Renderer v1 = factored-ui scene3d (exists: Scene3dView/Mesh/WorldState + headless render tests). three.js only as perf fallback.
-- 2026-08-05 — Repo public on GitHub.
-- 2026-08-05 — One Rule class, `hardness` field: hard (gates) or soft (weighted score). Same rule can flip by source — permit stipulation = hard, taste = soft. Severity is a violation's output; weight is a rule's input.
-- 2026-08-05 — Optimizer objective = soft rules with configurable, versioned weights (rows in the log). No randomness: objective decides, deterministic tie-break settles.
-- 2026-08-05 — Solvers take a date; sun/shade/deciduous are seasonal functions.
-- 2026-08-05 — Landmarks Jim references ("the big tree") become named entity rows; anything referenced twice earns a name.
-- 2026-08-05 — Architecture diagram: docs/architecture.drawio (inner/outer loop, op-vocabulary waist, relaxation edge).
-- 2026-08-05 — Ops are LOG ROWS, not calls (zero-based review): every LLM op appends through the waist; provenance ("why is the greenhouse here" = timestamped op row + intent), and appends reactively trigger the optimizer. No orchestrator node — the event loop is substrate.
-- 2026-08-05 — Gate has one owner: solvers measure (violations per candidate), optimizer gates on their results and scores the rest.
-- 2026-08-05 — SOLVERS = runner (fan-out, aggregate, rank) + pure leaf solvers. Ranking is the runner's.
-- 2026-08-05 — Projections are plural (current-state, render view, seasonal, plan overlays); all reads leave projections, only appends touch the log.
-- 2026-08-05 — Renderer draws violation overlays (location + magnitude); LLM reads projection read-only to resolve names. Neither breaks LLM-never-geometry.
-- 2026-08-05 — Tap-to-lock vs intent-only is UX policy, not architecture: every writer terminates as the same typed row.
-- 2026-08-05 — Units: feet/inches in every Jim-facing surface, meters internal.
-- 2026-08-05 — Toy-loop rooms: greenhouse + pergola.
-- 2026-08-05 — Terrain: USGS/Eaton County LiDAR first (parcel is Delta Twp, Eaton Co, MI); phone-survey fallback procedure only if data's missing.
-- 2026-08-05 — Data spine: common-ground ingests constraint layers (wetland/flood/parcel/zoning); plot-twin's land solvers read them as files. No duplicate collectors here; generic ETL only when pulling on a schedule.
-- 2026-08-05 — plot-twin generalizes to one-model-per-plot: Jim's 2 acres first, common-ground corridor parcels next.
-- 2026-08-05 — rationale ADOPT runs before any code lands.
+## D-001 — world state is an event-sourced append-only log (2026-08-05, locked) #state #provenance
+Typed rows (entity · rule · lock · weight · op · position-diff); current state is a projection; projections are plural.
+| option | decade provenance | Genesis-portable | verdict |
+|---|---|---|---|
+| append-only log + projections | yes — every change has a why | yes — port = row-writing | CHOSEN |
+| mutable state DB | no — history lost | no | rejected — "why is the greenhouse here in 2028" becomes unanswerable |
+
+## D-002 — LLM operates at room/constraint altitude, never geometry (2026-08-05, locked) #llm #altitude
+The LLM compiles intent to typed rules and ops, interprets ranked violations, proposes relaxations; it reads projections but never computes or emits coordinates.
+| option | geometric accuracy | verdict |
+|---|---|---|
+| LLM queries solvers, speaks ops | exact (solvers measure) | CHOSEN |
+| LLM computes geometry from JSON | collapses 42–80% with complexity (FloorplanQA); coordinates ≈ random (Holodeck ablation) | rejected |
+
+## D-003 — inner loop is classical: solvers measure, optimizer gates and places (2026-08-05, locked) #optimizer #gate
+One gate owner: solvers return violations per candidate; the optimizer rejects hard-rule violators, scores the rest by weighted soft rules, breaks ties deterministically. Q-001 refines the internals: constraint compile → coarse CP-SAT → seeded local search, warm-started coarse-to-fine, with a deterministic contradiction pre-check before every solve.
+| option | verdict |
+|---|---|
+| classical solver inner loop, LLM proposes neighborhoods | CHOSEN |
+| LLM-written heuristics in the inner loop | rejected — the heuristic trap (Formalize-Don't-Optimize) |
+| pure brute force, no LLM pruning | rejected — can't know "the maple matters"; wasteful at scale |
+
+## D-004 — ops are log rows through the op-vocabulary waist (2026-08-05, locked) #ops #provenance
+Every LLM op appends through the schema waist (add_room · move · resize · reroute · relax · lock — slot-filled, no coordinates); appends reactively trigger placement. The LLM's only other write path is non-geometric rows (rule · weight · name). No orchestrator node — the event loop is substrate.
+| option | provenance | verdict |
+|---|---|---|
+| ops as appended rows | intent-to-position chain fully logged | CHOSEN |
+| ops as direct function calls | causally significant events lost to the ether | rejected — zero-based review |
+
+## D-005 — solvers = runner + pure leaves, ranked emit, date-parameterized (2026-08-05, locked) #solvers
+Runner fans out, aggregates, ranks by severity (ranking is the runner's); leaves are pure `f(state, rule) -> [violations]` in four families (geometry · propagation-sheds · accumulation/D8 · land+zoning). Solvers take a date — sun/shade/deciduous are seasonal.
+
+## D-006 — one Rule class with a hardness field; objective = weighted soft rules (2026-08-05, locked) #rules
+hard → gates, soft → scores; the same rule can flip by source (permit = hard, taste = soft). Weights are configurable, versioned rows. Weight is a rule's input; severity is a violation's output. Nothing is random: objective decides, deterministic tie-break settles. Landmarks the owner references become named entity rows (anything referenced twice earns a name).
+
+## D-007 — terrain is 2.5D: 10cm grid + vector entities with heights; LiDAR-first (2026-08-05, locked) #terrain
+~810K cells for 2 acres; entities are exact polygons carrying heights (80ft tree = trunk cylinder + canopy ellipsoid). Q-002 confirmed free QL2 LiDAR + 1m DEM + NAIP cover the parcel (Delta Twp, Eaton Co, MI); phone-survey fallback only if data's missing. Units: feet/inches at every owner-facing surface, meters internal. Toy-loop rooms: greenhouse + pergola.
+| option | verdict |
+|---|---|
+| 2.5D heightmap + entity heights | CHOSEN — covers shadows/viewshed/drainage |
+| full 3D voxels | rejected — needed only for interiors/overhangs, none planned |
+| 1cm grid | rejected — 81M cells, wasteful; vectors give exactness where it matters |
+
+## D-008 — renderer: factored-ui scene3d, rebuilt as a batched painter (2026-08-05, locked) #renderer
+Reads state, draws, owns no truth; violation overlays at location+magnitude. Q-003 measured current scene3d at 6.9fps @ 100K triangles (FAIL); rebuild = chunked float[] buffers through Skiko drawVertices inside the Compose Canvas, O(n) grid-order traversal, effort M.
+| option | headless-verifiable | verdict |
+|---|---|---|
+| batched painter in Compose Canvas | yes | CHOSEN |
+| GPU interop under Compose | no — captureToImage sees only the Compose surface | rejected (kept as escape hatch; buffer layer is shared) |
+| three.js | yes (differently) | rejected — factored-ui is the one UI; fallback only if the rebuild fails its bands |
+
+## D-009 — standalone repo, Genesis-shaped, common-ground data spine (2026-08-05, locked) #scope
+Not built inside Genesis (no dependency); typed rows + log make the eventual port row-writing. common-ground ingests constraint layers (wetland · flood · parcel · zoning); this repo's land solvers read them as files — no duplicate collectors; a generic ETL earns existence only when pulling on a schedule. plot-twin generalizes: one model per plot — the home 2 acres first, corridor parcels next.
+
+## D-010 — process rules (2026-08-05, locked) #process
+Loop before capture. rationale governance adopted before any code. Tap-to-lock vs intent-only is UX policy, not architecture — every writer terminates as the same typed row. Repo is public. Never cite decision/question IDs at the owner — say the thing itself.

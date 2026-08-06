@@ -39,35 +39,17 @@ shovel moves. First plot: the home 2 acres. Next: the common-ground corridor par
 design tool that turns "which land" (common-ground's job) into "what grows here." Success = a
 plot's next decade of decisions each ran through the loop first.
 
-## Roadmap
-
-1. World-state schema + append-only log (entity · rule · lock · weight · op rows)
-2. Toy parcel + solver kit v1 (runner, clearance, D8 flow) — the loop, proven
-3. Op pipeline: intent → op rows → optimizer v0 → gated appends
-4. Top-down 2D projection view (cheap first truth-view, violations overlaid)
-5. scene3d GPU rebuild (pt-research design) → first-person walkthrough
-6. Real terrain + real rooms (DEM/survey ingest, the actual parcel)
-7. Optimizer v1: LLM-proposed neighborhoods, solver-scored search
-8. Capture agent: photos/GPS/satellite → entity rows
-9. AR on-site walkthrough; cinematic skin last
-
 ## Rules
 
-- Decisions live in DECISIONS.md, one line each, dated.
 - Never cite decision/question IDs at Jim — he doesn't author them; say the thing itself.
 - No quick fixes: features may be sliced thin, but every slice lands on the locked architecture (log rows, pure solvers, LLM altitude) — never around it.
-- Docs are extremely concise. Future features are one line in docs/future.md.
+- Docs are extremely concise.
 - Standards: `~/.claude/references/coding-standards.md`.
 
-## Pending: adopt rationale governance (Jim-approved direction, 2026-08-05)
+## Governance
 
-Read `~/.claude/skills/rationale/SKILL.md` and run its ADOPT mode on this repo: inventory
-every doc, present the full migration table to Jim BEFORE moving anything, migrate on a
-branch, lint clean, `.rationale` marker goes on LAST. Notes for the migration: DECISIONS.md
-upgrades from one-line entries to the skill's entry standard (option tables, rejected
-options keep kill reasons — the locked architecture bullets above are decisions to
-retrofit); docs/future.md content likely becomes TASKS.md Later; the "docs are extremely
-concise" rule survives — the taxonomy enforces it. Sister repo: workspace/common-ground
-(first adopter, reference migration in its git history). Data relationship: common-ground
-ingests/selects land data anywhere-wide; this repo's land/regulatory solver family PULLS
-constraint layers from it — do not build duplicate collectors here.
+This repo runs `rationale` governance (`.rationale` marker; see that skill). Stores:
+README (orientation) · DECISIONS.md (choices + kill reasons) · research/RESEARCH.md (live
+conclusions) · TASKS.md (the one work list). Nothing outside the taxonomy. Data spine:
+common-ground ingests/selects land data; this repo's land solvers PULL its constraint
+layers — never build duplicate collectors here.
