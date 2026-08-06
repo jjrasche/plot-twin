@@ -5,6 +5,8 @@ import plottwin.worldstate.Meters
 
 private const val COORDINATE_EPSILON = 1e-9
 
+data class RoomExtent(val widthEast: Meters, val depthNorth: Meters)
+
 fun scanCandidateFootprints(
     regionRing: List<GroundPoint>,
     extent: RoomExtent,

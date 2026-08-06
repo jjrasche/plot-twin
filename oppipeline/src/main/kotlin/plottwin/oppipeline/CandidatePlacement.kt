@@ -13,6 +13,15 @@ import plottwin.worldstate.PositionDiffRow
 import plottwin.worldstate.RejectedViolation
 import plottwin.worldstate.RejectionRow
 
+data class EvaluatedCandidate(
+    val anchor: GroundPoint,
+    val footprint: List<GroundPoint>,
+    val hardViolations: List<Violation>,
+    val softViolations: List<Violation>,
+    val softScore: Double,
+    val pathDistance: Double,
+)
+
 private val winningPlacementFirst: Comparator<EvaluatedCandidate> =
     compareBy<EvaluatedCandidate> { it.softScore }
         .thenBy { it.pathDistance }
