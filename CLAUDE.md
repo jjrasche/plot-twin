@@ -29,13 +29,15 @@ cycle before photos→state ingestion exists.
 
 ## Vision
 
-One living model of the land, held for a decade. Jim speaks intent; the LLM compiles it to
-typed rules and ops; solvers verify; an optimizer places; the log remembers every change and
-why. Jim walks the result — on screen now, through his phone on the actual ground later — and
-what he sees is always derived from state that machines can check. The twin is where the
-10-year build gets designed, argued with, and kept honest: every structure placed before it's
+One living model per plot of land, held for a decade. Jim speaks intent; the LLM compiles it
+to typed rules and ops; solvers verify; an optimizer places; the log remembers every change
+and why. Jim walks the result — on screen now, through his phone on the actual ground later —
+and what he sees is always derived from state that machines can check. The twin is where a
+long build gets designed, argued with, and kept honest: every structure placed before it's
 bought, every constraint (drainage, sun, access, permit) enforced before a shovel moves.
-Success = the plot's next decade of decisions each ran through the loop first.
+First plot: Jim's 2 acres. Next: the common-ground corridor parcels — the design tool that
+turns "which land" (common-ground's job) into "what grows here." Success = a plot's next
+decade of decisions each ran through the loop first.
 
 ## Roadmap
 
@@ -52,6 +54,8 @@ Success = the plot's next decade of decisions each ran through the loop first.
 ## Rules
 
 - Decisions live in DECISIONS.md, one line each, dated.
+- Never cite decision/question IDs at Jim — he doesn't author them; say the thing itself.
+- No quick fixes: features may be sliced thin, but every slice lands on the locked architecture (log rows, pure solvers, LLM altitude) — never around it.
 - Docs are extremely concise. Future features are one line in docs/future.md.
 - Standards: `~/.claude/references/coding-standards.md`.
 

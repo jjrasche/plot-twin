@@ -19,3 +19,9 @@
 - 2026-08-05 — Projections are plural (current-state, render view, seasonal, plan overlays); all reads leave projections, only appends touch the log.
 - 2026-08-05 — Renderer draws violation overlays (location + magnitude); LLM reads projection read-only to resolve names. Neither breaks LLM-never-geometry.
 - 2026-08-05 — Tap-to-lock vs intent-only is UX policy, not architecture: every writer terminates as the same typed row.
+- 2026-08-05 — Units: feet/inches in every Jim-facing surface, meters internal.
+- 2026-08-05 — Toy-loop rooms: greenhouse + pergola.
+- 2026-08-05 — Terrain: USGS/Eaton County LiDAR first (parcel is Delta Twp, Eaton Co, MI); phone-survey fallback procedure only if data's missing.
+- 2026-08-05 — Data spine: common-ground ingests constraint layers (wetland/flood/parcel/zoning); plot-twin's land solvers read them as files. No duplicate collectors here; generic ETL only when pulling on a schedule.
+- 2026-08-05 — plot-twin generalizes to one-model-per-plot: Jim's 2 acres first, common-ground corridor parcels next.
+- 2026-08-05 — rationale ADOPT runs before any code lands.
