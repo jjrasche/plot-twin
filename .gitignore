@@ -1,1 +1,3 @@
 .claude/global-hook-debug.log
+.gradle/
+build/
