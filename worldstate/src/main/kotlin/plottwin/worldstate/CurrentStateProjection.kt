@@ -10,9 +10,16 @@ data class CurrentState(
     val rules: Map<String, RuleRow>,
     val locks: Map<String, LockKind>,
     val pendingOps: List<OpRow>,
+    val rejections: List<RejectionRow>,
 ) {
     companion object {
-        val EMPTY = CurrentState(entities = emptyMap(), rules = emptyMap(), locks = emptyMap(), pendingOps = emptyList())
+        val EMPTY = CurrentState(
+            entities = emptyMap(),
+            rules = emptyMap(),
+            locks = emptyMap(),
+            pendingOps = emptyList(),
+            rejections = emptyList(),
+        )
     }
 }
 
@@ -25,6 +32,7 @@ private fun applyRow(state: CurrentState, row: WorldRow): CurrentState = when (r
     is RuleRow -> state.copy(rules = state.rules + (row.ruleName to row))
     is LockRow -> state.copy(locks = state.locks + (row.targetName to row.kind))
     is OpRow -> state.copy(pendingOps = state.pendingOps + row)
+    is RejectionRow -> state.copy(rejections = state.rejections + row)
 }
 
 private fun placeEntity(state: CurrentState, name: String, footprint: List<GroundPoint>, height: Meters): CurrentState =

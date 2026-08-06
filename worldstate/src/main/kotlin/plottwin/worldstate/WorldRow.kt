@@ -58,8 +58,22 @@ data class PositionDiffRow(
     val height: Meters,
 ) : WorldRow
 
+@Serializable
+data class RejectedViolation(
+    val ruleName: String,
+    val location: GroundPoint,
+    val magnitude: Double,
+)
+
+@Serializable
+@SerialName("rejection")
+data class RejectionRow(
+    val op: OpRow,
+    val violations: List<RejectedViolation>,
+) : WorldRow
+
 fun carriesGeometry(row: WorldRow): Boolean = when (row) {
     is PositionDiffRow -> true
     is EntityRow -> row.footprint.isNotEmpty()
-    is RuleRow, is LockRow, is OpRow -> false
+    is RuleRow, is LockRow, is OpRow, is RejectionRow -> false
 }

@@ -18,6 +18,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
 
     private val rowCodec = Json
     private val ruleTriggers = mutableListOf<(RuleRow) -> Unit>()
+    private val opTriggers = mutableListOf<(OpRow) -> Unit>()
 
     companion object {
         fun open(dbPath: Path): WorldLog = openConnection("jdbc:sqlite:$dbPath")
@@ -35,6 +36,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         requireGeometryWriter(row, writer)
         val seq = insertRow(row, writer)
         notifyRuleTriggers(row)
+        notifyOpTriggers(row)
         return seq
     }
 
@@ -59,6 +61,10 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
 
     fun onRuleAppended(trigger: (RuleRow) -> Unit) {
         ruleTriggers.add(trigger)
+    }
+
+    fun onOpAppended(trigger: (OpRow) -> Unit) {
+        opTriggers.add(trigger)
     }
 
     override fun close() {
@@ -103,5 +109,10 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
     private fun notifyRuleTriggers(row: WorldRow) {
         if (row !is RuleRow) return
         ruleTriggers.forEach { trigger -> trigger(row) }
+    }
+
+    private fun notifyOpTriggers(row: WorldRow) {
+        if (row !is OpRow) return
+        opTriggers.forEach { trigger -> trigger(row) }
     }
 }
