@@ -13,6 +13,13 @@ enum class OpVerb { ADD_ROOM, MOVE, RESIZE, REROUTE, RELAX, LOCK }
 
 enum class OpSlot { SUBJECT, ROOM_KIND, DESTINATION, RELATION, RULE_NAME, EXTENT_TEXT }
 
+enum class OpStatus { RESOLVED, REJECTED }
+
+enum class RefRole { OP, RESOLUTION }
+
+@Serializable
+data class RowRef(val role: RefRole, val seq: Long)
+
 @Serializable
 data class GroundPoint(val east: Meters, val north: Meters)
 
@@ -56,6 +63,12 @@ data class PositionDiffRow(
     val entityName: String,
     val footprint: List<GroundPoint>,
     val height: Meters,
+) : WorldRow
+
+@Serializable
+@SerialName("op_status")
+data class OpStatusRow(
+    val status: OpStatus,
 ) : WorldRow
 
 @Serializable

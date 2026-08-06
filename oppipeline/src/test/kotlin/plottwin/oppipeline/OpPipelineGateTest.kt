@@ -17,11 +17,17 @@ import plottwin.worldstate.LoggedRow
 import plottwin.worldstate.Meters
 import plottwin.worldstate.OpRow
 import plottwin.worldstate.OpSlot
+import plottwin.worldstate.OpStatus
+import plottwin.worldstate.OpStatusRow
 import plottwin.worldstate.OpVerb
 import plottwin.worldstate.PositionDiffRow
+import plottwin.worldstate.RejectionRow
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
+import plottwin.worldstate.causeOpSeqOf
 import plottwin.worldstate.metersOf
+import plottwin.worldstate.resolutionOf
+import plottwin.worldstate.resolutionSeqOf
 
 class OpPipelineGateTest {
 
@@ -39,9 +45,8 @@ class OpPipelineGateTest {
             assertEquals(metersOf(feet = 9), placed.height)
             assertEquals(preOpViolations, runToyConstraintSolvers(log))
 
-            val placementRow = log.readAll().last()
+            val placementRow = log.readAll().last { it.row is PositionDiffRow }
             assertEquals(WriterRole.OPTIMIZER, placementRow.writer)
-            assertTrue(placementRow.row is PositionDiffRow)
         }
     }
 
@@ -91,6 +96,49 @@ class OpPipelineGateTest {
             assertTrue(rejection.violations.isNotEmpty())
             assertTrue(rejection.violations.all { it.ruleName == "greenhouse-drainage" })
             assertTrue(rejection.violations.all { it.magnitude > 0.0 })
+        }
+    }
+
+    @Test
+    fun placement_cites_its_op_and_consumes_the_pending_op() {
+        WorldLog.openInMemory().use { log ->
+            stageToyPlotWithRegions(log)
+            attachPipeline(log)
+
+            val opSeq = log.append(addSeedlingGreenhouseOp(), WriterRole.LLM)
+
+            val history = log.readAll()
+            val placement = history.last { it.row is PositionDiffRow }
+            assertEquals(opSeq, causeOpSeqOf(placement))
+
+            val status = history.last()
+            assertEquals(OpStatusRow(OpStatus.RESOLVED), status.row)
+            assertEquals(opSeq, causeOpSeqOf(status))
+            assertEquals(placement.seq, resolutionSeqOf(status))
+            assertEquals(placement, resolutionOf(history, opSeq))
+            assertTrue(log.currentState().pendingOps.isEmpty())
+        }
+    }
+
+    @Test
+    fun rejection_cites_its_op_and_consumes_the_pending_op_as_rejected() {
+        WorldLog.openInMemory().use { log ->
+            stageToyPlotWithRegions(log)
+            log.append(LockRow("greenhouse", LockKind.LOCK), WriterRole.OWNER)
+            attachPipeline(log)
+
+            val moveLocked = OpRow(
+                verb = OpVerb.MOVE,
+                slots = mapOf(OpSlot.SUBJECT to "greenhouse", OpSlot.DESTINATION to "north terrace"),
+            )
+            val opSeq = log.append(moveLocked, WriterRole.LLM)
+
+            val history = log.readAll()
+            val status = history.last()
+            assertEquals(OpStatusRow(OpStatus.REJECTED), status.row)
+            assertEquals(opSeq, causeOpSeqOf(status))
+            assertTrue(resolutionOf(history, opSeq)?.row is RejectionRow)
+            assertTrue(log.currentState().pendingOps.isEmpty())
         }
     }
 

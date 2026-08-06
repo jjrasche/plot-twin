@@ -3,6 +3,7 @@ package plottwin.worldstate
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 class GeometryWriteRejected(row: WorldRow, writer: WriterRole, requiredWriter: WriterRole) :
@@ -12,13 +13,15 @@ data class LoggedRow(
     val seq: Long,
     val writer: WriterRole,
     val row: WorldRow,
+    val refs: List<RowRef> = emptyList(),
 )
 
 class WorldLog private constructor(private val connection: Connection) : AutoCloseable {
 
     private val rowCodec = Json
+    private val refsCodec = ListSerializer(RowRef.serializer())
     private val ruleTriggers = mutableListOf<(RuleRow) -> Unit>()
-    private val opTriggers = mutableListOf<(OpRow) -> Unit>()
+    private val opTriggers = mutableListOf<(Long, OpRow) -> Unit>()
 
     companion object {
         fun open(dbPath: Path): WorldLog = openConnection("jdbc:sqlite:$dbPath")
@@ -32,17 +35,17 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         }
     }
 
-    fun append(row: WorldRow, writer: WriterRole): Long {
+    fun append(row: WorldRow, writer: WriterRole, refs: List<RowRef> = emptyList()): Long {
         requireGeometryWriter(row, writer)
-        val seq = insertRow(row, writer)
+        val seq = insertRow(row, writer, refs)
         notifyRuleTriggers(row)
-        notifyOpTriggers(row)
+        notifyOpTriggers(seq, row)
         return seq
     }
 
     fun readAll(): List<LoggedRow> {
         connection.createStatement().use { statement ->
-            val logRows = statement.executeQuery("SELECT seq, writer_role, payload FROM world_log ORDER BY seq")
+            val logRows = statement.executeQuery("SELECT seq, writer_role, payload, refs FROM world_log ORDER BY seq")
             return buildList {
                 while (logRows.next()) {
                     add(
@@ -50,6 +53,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
                             seq = logRows.getLong("seq"),
                             writer = WriterRole.valueOf(logRows.getString("writer_role")),
                             row = rowCodec.decodeFromString(WorldRow.serializer(), logRows.getString("payload")),
+                            refs = rowCodec.decodeFromString(refsCodec, logRows.getString("refs")),
                         )
                     )
                 }
@@ -63,7 +67,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         ruleTriggers.add(trigger)
     }
 
-    fun onOpAppended(trigger: (OpRow) -> Unit) {
+    fun onOpAppended(trigger: (Long, OpRow) -> Unit) {
         opTriggers.add(trigger)
     }
 
@@ -78,7 +82,8 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
                 CREATE TABLE IF NOT EXISTS world_log (
                     seq INTEGER PRIMARY KEY AUTOINCREMENT,
                     writer_role TEXT NOT NULL,
-                    payload TEXT NOT NULL
+                    payload TEXT NOT NULL,
+                    refs TEXT NOT NULL DEFAULT '[]'
                 )
                 """.trimIndent()
             )
@@ -90,10 +95,11 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         if (writer != requiredWriter) throw GeometryWriteRejected(row, writer, requiredWriter)
     }
 
-    private fun insertRow(row: WorldRow, writer: WriterRole): Long {
-        connection.prepareStatement("INSERT INTO world_log (writer_role, payload) VALUES (?, ?)").use { insert ->
+    private fun insertRow(row: WorldRow, writer: WriterRole, refs: List<RowRef>): Long {
+        connection.prepareStatement("INSERT INTO world_log (writer_role, payload, refs) VALUES (?, ?, ?)").use { insert ->
             insert.setString(1, writer.name)
             insert.setString(2, rowCodec.encodeToString(WorldRow.serializer(), row))
+            insert.setString(3, rowCodec.encodeToString(refsCodec, refs))
             insert.executeUpdate()
         }
         return lastInsertedSeq()
@@ -112,8 +118,8 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         ruleTriggers.forEach { trigger -> trigger(row) }
     }
 
-    private fun notifyOpTriggers(row: WorldRow) {
+    private fun notifyOpTriggers(seq: Long, row: WorldRow) {
         if (row !is OpRow) return
-        opTriggers.forEach { trigger -> trigger(row) }
+        opTriggers.forEach { trigger -> trigger(seq, row) }
     }
 }
