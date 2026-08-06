@@ -15,6 +15,19 @@ only a pointer here.
   - critical path is eyes: it is the instrument every later render lane is graded by
   - worktrees at ../.git-worktrees/pt-{eyes,earthworks,capture}
   - note: branch `research` already exists, so the capture lane's branch has no slash
+  - LANDED: earthworks design PASS, merged at b261702 (docs only, schema untouched). Snapshot
+    lane chained on it and told to land no schema change — the surface id waits on Jim.
+- NEEDS JIM (run 3, growing):
+  - earthworks proposal to ratify: one `regrade` verb (subject/form/prose extent — no
+    coordinates); cut/fill as an earthwork ledger projection rather than a violation type;
+    spoil conserved as a hard invariant with `haul-off` as the named escape; ONE terrain row
+    family carrying a surface id instead of two types; purpose selects a rule bundle, not a verb
+  - two rulings that proposal would amend: terrain writer role is hardcoded to capture, but
+    proposed surfaces make the optimizer a terrain writer; solvers gain a required surface
+    parameter beside date
+  - a fifth solver family looks unavoidable the first time a pond is real — impoundment and
+    spillway routing are hydraulic, not D8 accumulation
+  - do violations need a region scope? the earthwork balance rule has no natural point location
 - handoff: prior head's batch, now this run's scope:
   1. EYES (confirmed by Jim): charter staged at .claude/charters/overnight-9-eyes.md — camera-drive capability in factored-ui (worktree off il-scene-render-harness @ 8936e5d, one camera two drivers, headless capture) + plot-twin view harness w/ contact sheet the lead reviews by eye. Rewrite the charter if you see better.
   2. EARTHWORKS DESIGN DIG (confirmed — "dig deeper and fill my mental model"): charter it yourself. Scope from tonight's ruling talk: regrade op slots; cut/fill volume as solver outputs; spoil is conserved mass the optimizer must PLACE (pond dig → berm/fill placement scored by viewshed+watershed rules like any entity); proposed-ground vs measured-ground row types; whether purpose changes the op or just the rules. Ends in a proposal Jim ratifies; code only the uncontroversial row types.
