@@ -3,10 +3,13 @@ package plottwin.solvers
 import java.time.LocalDate
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.EntityRow
+import plottwin.worldstate.GriddedElevationOperator
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Hardness
 import plottwin.worldstate.Meters
+import plottwin.worldstate.RawElevation
 import plottwin.worldstate.RuleRow
+import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
 import plottwin.worldstate.metersOf
@@ -24,7 +27,7 @@ object ToyPlotFixture {
     val toyDate: LocalDate = LocalDate.of(2026, 8, 5)
     val pathClearanceBound: Meters = metersOf(feet = 4)
 
-    fun toyWorld(): SolverWorld = SolverWorld(toyState(), terrainWithSwale(), toyDate)
+    fun toyWorld(): SolverWorld = SolverWorld(toyState(), toyDate)
 
     fun toyConstraints(): List<Constraint> = listOf(
         ClearanceConstraint("path-clearance", "garden path", pathClearanceBound),
@@ -32,15 +35,15 @@ object ToyPlotFixture {
         WaterlogConstraint("greenhouse-drainage", "greenhouse", WATERLOG_THRESHOLD_SQUARE_METERS),
     )
 
-    fun terrainWithSwale(): TerrainGrid {
-        val surfaceHeights = FloatArray(CELLS_PER_SIDE * CELLS_PER_SIDE)
-        for (row in 0 until CELLS_PER_SIDE) {
-            for (column in 0 until CELLS_PER_SIDE) {
-                surfaceHeights[row * CELLS_PER_SIDE + column] = planeHeightAt(row) - swaleCarveAt(column)
-            }
-        }
-        return TerrainGrid(CELLS_PER_SIDE, CELLS_PER_SIDE, Meters(CELL_SIZE_METERS), surfaceHeights)
-    }
+    fun rawSwaleElevation(): RawElevation = RawElevation(
+        columns = CELLS_PER_SIDE,
+        rows = CELLS_PER_SIDE,
+        cellSize = Meters(CELL_SIZE_METERS),
+        surfaceHeights = swaleHeights(),
+    )
+
+    fun terrainWithSwale(): TerrainGrid =
+        TerrainGrid(CELLS_PER_SIDE, CELLS_PER_SIDE, Meters(CELL_SIZE_METERS), swaleHeights())
 
     fun toyState(): CurrentState = WorldLog.openInMemory().use { log ->
         appendToyPlot(log)
@@ -48,12 +51,23 @@ object ToyPlotFixture {
     }
 
     fun appendToyPlot(log: WorldLog) {
+        log.append(GriddedElevationOperator.compileBaseTerrain(rawSwaleElevation()), WriterRole.CAPTURE)
         log.append(greenhouseRow(), WriterRole.CAPTURE)
         log.append(pergolaRow(), WriterRole.CAPTURE)
         log.append(gardenPathRow(), WriterRole.CAPTURE)
         log.append(RuleRow("path-clearance", Hardness.HARD, 1.0, "paths keep 4' of walking clearance"), WriterRole.LLM)
         log.append(RuleRow("pergola-drainage", Hardness.SOFT, 1.0, "pergola floor stays out of runoff paths"), WriterRole.LLM)
         log.append(RuleRow("greenhouse-drainage", Hardness.HARD, 1.0, "greenhouse floor stays out of runoff paths"), WriterRole.LLM)
+    }
+
+    private fun swaleHeights(): FloatArray {
+        val surfaceHeights = FloatArray(CELLS_PER_SIDE * CELLS_PER_SIDE)
+        for (row in 0 until CELLS_PER_SIDE) {
+            for (column in 0 until CELLS_PER_SIDE) {
+                surfaceHeights[row * CELLS_PER_SIDE + column] = planeHeightAt(row) - swaleCarveAt(column)
+            }
+        }
+        return surfaceHeights
     }
 
     private fun planeHeightAt(row: Int): Float = row * SOUTHWARD_DROP_PER_CELL

@@ -1,6 +1,7 @@
 package plottwin.solvers
 
 import kotlin.math.sqrt
+import plottwin.worldstate.TerrainGrid
 
 const val NO_FLOW = -1
 
