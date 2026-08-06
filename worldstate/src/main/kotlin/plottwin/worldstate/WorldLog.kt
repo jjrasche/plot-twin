@@ -24,6 +24,8 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
     private val opTriggers = mutableListOf<(Long, OpRow) -> Unit>()
 
     companion object {
+        const val BEFORE_FIRST_SEQ = 0L
+
         fun open(dbPath: Path): WorldLog = openConnection("jdbc:sqlite:$dbPath")
 
         fun openInMemory(): WorldLog = openConnection("jdbc:sqlite::memory:")
@@ -43,9 +45,12 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         return seq
     }
 
-    fun readAll(): List<LoggedRow> {
-        connection.createStatement().use { statement ->
-            val logRows = statement.executeQuery("SELECT seq, writer_role, payload, refs FROM world_log ORDER BY seq")
+    fun readAll(): List<LoggedRow> = readRowsAfter(BEFORE_FIRST_SEQ)
+
+    fun readRowsAfter(seq: Long): List<LoggedRow> {
+        connection.prepareStatement("SELECT seq, writer_role, payload, refs FROM world_log WHERE seq > ? ORDER BY seq").use { select ->
+            select.setLong(1, seq)
+            val logRows = select.executeQuery()
             return buildList {
                 while (logRows.next()) {
                     add(
