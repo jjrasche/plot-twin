@@ -13,3 +13,9 @@
 - 2026-08-05 — Solvers take a date; sun/shade/deciduous are seasonal functions.
 - 2026-08-05 — Landmarks Jim references ("the big tree") become named entity rows; anything referenced twice earns a name.
 - 2026-08-05 — Architecture diagram: docs/architecture.drawio (inner/outer loop, op-vocabulary waist, relaxation edge).
+- 2026-08-05 — Ops are LOG ROWS, not calls (zero-based review): every LLM op appends through the waist; provenance ("why is the greenhouse here" = timestamped op row + intent), and appends reactively trigger the optimizer. No orchestrator node — the event loop is substrate.
+- 2026-08-05 — Gate has one owner: solvers measure (violations per candidate), optimizer gates on their results and scores the rest.
+- 2026-08-05 — SOLVERS = runner (fan-out, aggregate, rank) + pure leaf solvers. Ranking is the runner's.
+- 2026-08-05 — Projections are plural (current-state, render view, seasonal, plan overlays); all reads leave projections, only appends touch the log.
+- 2026-08-05 — Renderer draws violation overlays (location + magnitude); LLM reads projection read-only to resolve names. Neither breaks LLM-never-geometry.
+- 2026-08-05 — Tap-to-lock vs intent-only is UX policy, not architecture: every writer terminates as the same typed row.
