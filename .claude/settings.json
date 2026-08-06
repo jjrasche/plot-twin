@@ -4,22 +4,34 @@
       "Bash(git status*)",
       "Bash(git log*)",
       "Bash(git diff*)",
+      "Bash(git show*)",
       "Bash(git add*)",
       "Bash(git commit*)",
       "Bash(git branch*)",
-      "Bash(git checkout -b*)",
+      "Bash(git checkout*)",
+      "Bash(git merge*)",
+      "Bash(git switch*)",
+      "Bash(git stash*)",
       "Bash(git worktree add*)",
       "Bash(git worktree list*)",
+      "Bash(git worktree remove*)",
+      "Bash(git worktree prune*)",
       "Bash(gradlew*)",
       "Bash(./gradlew*)",
+      "Bash(bash gradlew*)",
+      "Bash(cd *)",
       "Bash(python*)",
       "Bash(ls*)",
-      "Bash(mkdir*)"
+      "Bash(cat*)",
+      "Bash(mkdir*)",
+      "Bash(find*)",
+      "Bash(grep*)"
     ],
     "deny": [
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
-      "Bash(git clean*)"
+      "Bash(git clean*)",
+      "Bash(rm -rf*)"
     ]
   }
 }

@@ -5,8 +5,9 @@ only a pointer here.
 
 - role: lead — holds goal, charters build subagents, verifies by running, lands merges
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
-- when: 2026-08-06T21:40Z
-- handoff: seat open for a fresh pt-head — claim it, run /overnight-build on the confirmed batch:
+- when: 2026-08-06T22:35Z
+- seat: CLAIMED 2026-08-06 by pt-head (third overnight run in flight)
+- handoff: prior head's batch, now this run's scope:
   1. EYES (confirmed by Jim): charter staged at .claude/charters/overnight-9-eyes.md — camera-drive capability in factored-ui (worktree off il-scene-render-harness @ 8936e5d, one camera two drivers, headless capture) + plot-twin view harness w/ contact sheet the lead reviews by eye. Rewrite the charter if you see better.
   2. EARTHWORKS DESIGN DIG (confirmed — "dig deeper and fill my mental model"): charter it yourself. Scope from tonight's ruling talk: regrade op slots; cut/fill volume as solver outputs; spoil is conserved mass the optimizer must PLACE (pond dig → berm/fill placement scored by viewshed+watershed rules like any entity); proposed-ground vs measured-ground row types; whether purpose changes the op or just the rules. Ends in a proposal Jim ratifies; code only the uncontroversial row types.
   3. SNAPSHOT/COMPACTION ROWS (proposed, not struck — confirm-by-silence): terrain projection cache + snapshot-row design; doubles as a memo to gen-head on change-based lenses (patch-folds vs replace-folds, snapshot rows, cache keyed on last-seq). Jim's framing: lens = folded blob in read memory; ordering is the conflict rule.
