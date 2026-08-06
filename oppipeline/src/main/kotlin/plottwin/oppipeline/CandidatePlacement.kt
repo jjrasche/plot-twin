@@ -1,5 +1,6 @@
 package plottwin.oppipeline
 
+import plottwin.geometry.distanceToSegment
 import plottwin.solvers.SolverWorld
 import plottwin.solvers.Violation
 import plottwin.solvers.runSolvers

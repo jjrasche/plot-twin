@@ -2,6 +2,7 @@ package plottwin.solvers
 
 import kotlin.math.ceil
 import kotlin.math.floor
+import plottwin.geometry.isInsidePolygon
 import plottwin.worldstate.GroundPoint
 
 object WaterlogAccumulation : LeafSolver {
