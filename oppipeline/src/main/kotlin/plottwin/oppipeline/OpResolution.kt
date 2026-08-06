@@ -2,6 +2,7 @@ package plottwin.oppipeline
 
 import java.time.LocalDate
 import plottwin.solvers.Constraint
+import plottwin.solvers.FlowFieldCache
 import plottwin.solvers.TerrainGrid
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
@@ -22,6 +23,7 @@ data class PlacementWorld(
     val date: LocalDate,
     val constraints: List<Constraint>,
     val candidateSpacing: Meters,
+    val flowFields: FlowFieldCache = FlowFieldCache(),
 )
 
 fun resolvePlacement(world: PlacementWorld, op: OpRow): PlacementVerdict = when (op.verb) {

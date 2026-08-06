@@ -10,7 +10,7 @@ object WaterlogAccumulation : LeafSolver {
         if (constraint !is WaterlogConstraint) return emptyList()
         val footprintRing = world.state.entities[constraint.entityName]?.footprint ?: return emptyList()
         if (footprintRing.size < 3) return emptyList()
-        val upslopeCounts = computeUpslopeCellCounts(computeFlowTargets(world.terrain))
+        val upslopeCounts = world.upslopeFields.upslopeCellCountsOf(world.terrain)
         val wettestCell = wettestCellInside(world.terrain, upslopeCounts, footprintRing)
         if (wettestCell == NO_FLOW) return emptyList()
         return listOfNotNull(excessViolation(world, constraint, wettestCell, upslopeCounts[wettestCell]))
