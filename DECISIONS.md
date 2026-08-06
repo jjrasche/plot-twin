@@ -56,3 +56,19 @@ Not built inside Genesis (no dependency); typed rows + log make the eventual por
 
 ## D-010 — process rules (2026-08-05, locked) #process
 Loop before capture. rationale governance adopted before any code. Tap-to-lock vs intent-only is UX policy, not architecture — every writer terminates as the same typed row. Repo is public. Never cite decision/question IDs at the owner — say the thing itself.
+
+## D-011 — terrain enters the log as rows: base-terrain + terrain-diff (2026-08-06, ruled) #terrain #state
+Nothing lives outside the log. Terrain becomes typed rows: a base-terrain row (initial ground) plus terrain-diff rows when ground actually changes (regrade, swale); replay stays honest, small changes stay small. Ingestion follows the Genesis adapter/operator shape — a daemon pulls raw (LiDAR tiles), an operator compiles raw into log rows. Cell-resolution strategy (fixed 10cm vs adaptive/coarse-to-fine) is the open detail — settle against D-007's grid before implementing.
+| option | replay honest | log size | verdict |
+|---|---|---|---|
+| terrain rows in the log (base + diffs) | yes | diffs are small | CHOSEN |
+| versioned artifact the log references | pointer only | small log, but truth splits across two stores | rejected — owner's rule: why should anything live outside the log |
+
+## D-012 — one rule row carries prose AND compiled constraint (2026-08-06, ruled) #rules
+The prose is the why (owner-facing rationale); the typed constraint is the implementation. Both live in the same rule row; compilation happens once at append, never per solver run. Re-compiling would let the implementation drift from the recorded why.
+
+## D-013 — two geometry writer roles: capture measures, optimizer places (2026-08-06, default taken) #provenance
+Measured geometry (LiDAR/survey/photo ingestion) and placed geometry (optimizer output) carry different writer signatures. Rows answer "who says the ground is here" vs "who decided the greenhouse goes here". Default taken by the lead after both charter-1 and charter-3 workers independently hit the single-writer wall; surfaced to the owner.
+
+## D-014 — the lead merges plot-twin at its own discretion (2026-08-06, ruled) #process
+Verified-gate branches land on main by the lead's call; no per-merge ratification. factored-ui merges remain the owner's.
