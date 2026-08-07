@@ -10,8 +10,9 @@ fragile part — defer it. SAM 3D is weeks-old research-grade; keep it off the c
 
 Downloadable today, $0, ~1 hour total:
 
-- **LiDAR point cloud**: QL2, ~2.2 pts/m², flown Dec 2017 – Apr 2018 (leaf-off), 19.6cm
-  vertical accuracy — Eaton County is in the 2016–2017 NRCS 30-county Michigan project
+- **LiDAR point cloud**: QL2, ~2.2 pts/m², flown Dec 2017 – Apr 2018 (leaf-off), measured at
+  6.2cm RMSEz on bare earth and 9.2cm under vegetation (accuracy budget below) — Eaton County
+  is in the 2016–2017 NRCS 30-county Michigan project
   under MiSAIL's statewide QL2 completion
   ([NOAA InPort 55315](https://www.fisheries.noaa.gov/inport/item/55315);
   [MiSAIL](https://www.michigan.gov/dtmb/services/maps/misail)). Clip an AOI via the
@@ -19,14 +20,15 @@ Downloadable today, $0, ~1 hour total:
   [USGS LidarExplorer](https://apps.nationalmap.gov/lidar-explorer/).
 - **1m bare-earth DEM**: USGS standard product wherever QL2 exists
   ([collection](https://data.usgs.gov/datacatalog/data/USGS:77ae0551-c61e-4979-aedd-d797abdcde0e)).
-- **NAIP imagery**: Michigan 2022, 4-band RGB+NIR, 60cm, leaf-on
-  ([InPort 70528](https://www.fisheries.noaa.gov/inport/item/70528)); a 2024 flight is
-  likely but unconfirmed. Eaton County GIS may hold 6–12in county orthos (unverified —
-  one lookup).
+- **NAIP imagery**: Michigan flies even years at 60cm, 4-band RGB+NIR, leaf-on
+  ([InPort 70528](https://www.fisheries.noaa.gov/inport/item/70528)); 2024 is flown and a
+  2026 flight is in acquisition. Eaton County GIS serves its own imagery down to ~7.5cm/px
+  (below).
 - No Eaton refresh is in the FY25 3DEP selections
   ([DCA](https://www.usgs.gov/3d-national-topography-model/fy25-3dep-data-collaboration-announcement-dca-selected-projects)) —
-  the 2017–18 QL2 is the best available and it comfortably feeds the 10cm-grid terrain
-  decision (heights interpolate; the grid resolution is about entities, not LiDAR density).
+  the 2017–18 QL2 is the best available. It supports the 10cm grid as an entity-scale store,
+  not as a claim of 10cm measurement: at 2.2 pts/m² the ground is sampled every ~0.67m in the
+  open and metres under canopy, so most cells are interpolation and carry a support distance.
 - Vintage caveat: 2017–18 point cloud — trees have grown or gone; leaf-off underestimates
   deciduous crowns.
 
@@ -77,7 +79,7 @@ nothing about capture pressures the schema.
 
 ---
 
-# Addendum — accuracy budget, pipeline, mesh importer (2026-08-06)
+# Accuracy budget, pipeline, mesh importer
 
 **Verdict: the vertical ground is better than advertised and it is not the problem. The
 Eaton collection measured 6.2cm RMSEz on bare earth — 1.6× better than the 10cm QL2 spec —
@@ -87,10 +89,6 @@ measurement, the imagery that would place a footprint is good to ~2m at best, th
 survey is eight growing seasons old, and the vertical datum it is expressed in is being
 retired at the end of this year. Vertical precision is a solved input; position, currency,
 and datum are the capture role's actual job.**
-
-Correction to the answer above: the "19.6cm vertical accuracy" recorded for this collection
-is the *specification ceiling* (NVA at 95% confidence = RMSEz × 1.96), not a measurement. The
-measured numbers are below.
 
 ## The receipt
 
@@ -112,6 +110,11 @@ Barry · **Eaton** · Ingham · Livingston) — there is no Eaton-only breakout.
 
 Spec was NVA ≤19.6cm @95% and VVA ≤29.4cm @95th pct; delivered 12.2cm and 19.5cm.
 Checkpoints were static-GPS, 20-minute occupations, withheld from calibration.
+
+**19.6cm is the number in general circulation for this collection, and it is a ceiling, not a
+measurement** — QL2's 10cm RMSEz allowance expressed at 95% confidence (RMSEz × 1.96). Quoting it
+as the accuracy understates the data by a factor of 1.6 and, worse, hides where the real error
+lives: not in vertical precision, but in the terms nobody tested.
 
 Sources — the actual project deliverables, not a spec page:
 [accuracy spreadsheet](https://rockyweb.usgs.gov/vdelivery/Datasets/Staged/Elevation/metadata/MI_31County_2016_A16/MI_31Co_Eaton_2016/reports/Accuracy_Report_Michigan_LiDAR_2017_8_Counties.xlsx)
@@ -500,17 +503,16 @@ OpenDroneMap/OpenMVS are CPU- and RAM-bound, not VRAM-bound. **No step in this d
 rented GPU**, and the two workhorses for a 2-acre plot — splatfacto and DeepForest — fit with
 headroom.
 
-## What this addendum contradicts
+## What the budget asks of the schema
 
-- **The base answer's "19.6cm vertical accuracy" was a spec, not a measurement.** Measured is
-  6.2cm RMSEz bare earth / 9.2cm vegetated. Corrected above.
-- **"Heights interpolate; the grid resolution is about entities, not LiDAR density" understated
-  the problem.** True for the *choice* of a 10cm grid, but the grid is 10× finer than the 1m
-  minimum cell size USGS specifies for QL2 — so the cells need a support-distance field or they
-  overstate what is known. That is a schema addition, not an architecture change.
-- **Nothing contradicts a locked decision.** The base-terrain row gains three fields — reference
-  frame + epoch, per-cell support distance, and a slope-derived vertical σ — all of which are data
-  in a row, which is where the architecture already says everything lives.
+**Nothing contradicts a locked decision.** The 10cm grid stands: it is the right store for
+entity-scale features and terrain-diff patches, and the choice was never a claim about LiDAR
+density. But the grid is 10× finer than the 1m minimum cell size USGS specifies for QL2, so
+without a support-distance field the cells overstate what is known.
+
+The base-terrain row gains three fields — reference frame + epoch, per-cell support distance, and
+a slope-derived vertical σ. All three are data in a row, which is where the architecture already
+says everything lives. A schema addition, not an architecture change.
 
 ## Open questions
 
