@@ -53,11 +53,21 @@ drop the filter, or make the floor skip when `--tests` is present — so it is l
     pergola at walk height. Render-lane call — marker scale should probably follow camera distance.
   - `overhead` is really near-overhead; the pitch clamp keeps the camera shy of vertical.
 
-### In flight
-- **light/sky BUILD** (charter 10) — running in `../.git-worktrees/pt-lightsky`, branch
-  `build/light-sky`, off 73b770f. Rung one of the ladder. It inherits the eyes module as its
-  instrument and owes the promotion of the shadow-direction check from advisory to a hard gate,
-  plus the sun azimuth constant the eyes lane had to invent.
+- **light/sky BUILD** (charter 10) — MERGED. Lead gate: BUILD SUCCESSFUL, **122 tests,
+  0 failures**. Rung one of the ladder is up: shadows swing correctly through the day, sky is
+  mauve at the ends and blue at midday. The shadow-direction check is promoted from advisory to
+  a real gate and the invented sun constant is gone. Contact sheets regenerate at
+  `eyes/build/{eyes,light_sky}_contact_sheet.png`.
+  - Lead ratified three decisions the lane recorded: sweep-serves-both and gradient-sky were
+    charter-authorised; the site row is forced (no latitude, no sun) — all three are on Jim's
+    review list, none were Jim-ruled.
+  - **Defects the LEAD found by eye that the lane did not name** — sky dome shows concentric fan
+    banding from its own triangulation, and a dark band sits at the horizon under the dome. Both
+    in TASKS Now. The lane's self-review said "the dome renders behind the ground" and stopped
+    there; a worker's eye-review is not a substitute for the lead's.
+  - Honest gaps the lane DID name: fog not delivered (needs a per-frame hook 0.19.0 lacks);
+    orbit-4 reads 31 degrees off because a swale trench out-darkens the greenhouse on that
+    bearing; sweep-cost and paint-cost were measured separately and never composed into a frame.
 
 ### Lead's own process note for next run
 Every charter gets: commit a checkpoint at every meaningful step, even broken. The eyes lane

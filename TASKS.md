@@ -2,8 +2,10 @@
 
 ## Now
 
-- Run overnight charters (.claude/charters/): 1 world-state schema · 2 solver kit · 3 op
-  pipeline · 4 scene3d batched-painter rebuild (factored-ui)
+- The sky dome shows concentric fan banding where its triangulation reads through the
+  gradient, and a dark band sits at the horizon between the dome's lower edge and the ground
+- Real terrain ingest for the parcel: the accuracy budget is answered, the pipeline is not
+  built (Q-002)
 
 ## Next
 
@@ -14,8 +16,13 @@
 - Orbit-4 reads the plot's principal shadow 31 degrees off, because the swale trench
   out-darkens the greenhouse along that bearing; the estimator models one occluder
 - Top-down 2D projection view with violation overlays
-- Real terrain ingest: QL2 LiDAR / USGS DEM for the parcel (Q-002 pipeline)
 - Real rooms replace toy fixture
+- Violation markers are drawn at a fixed world size and swamp the pergola at walk height;
+  marker scale probably wants to follow camera distance
+- The sunshed solver has never run on the toy plot's own rules — its end-to-end coverage is a
+  purpose-built yard, because adding a sun rule meant inventing a threshold nobody measured
+- Entity faces light by normal and assume nothing shadows them; true for the toy, false the
+  moment two structures stand close
 
 ## Later
 

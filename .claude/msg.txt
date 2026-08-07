@@ -1,5 +1,4 @@
-seat: factored-ui 0.19.0 released, eyes merged, light/sky in flight
+seat+tasks: light and sky landed; stale Now list replaced with what is actually next
 
-The render blocker is cleared. Camera drive is published and live on the CDN, plot-twin is
-repinned to a real coordinate with mavenLocal removed everywhere, eyes is on main with the
-full gate green at 95 tests, and the lane the release existed to unblock is running.
+The Now list still named charters that finished two runs ago. Replaced with the sky dome
+defects the lead found by eye and the real terrain ingest, which is the next rung.
