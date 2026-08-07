@@ -85,17 +85,29 @@ class HorizonSweepTest {
     }
 
     // A cell the sweep skipped keeps the array's zero, so a plane that owes every cell the same
-    // non-zero horizon is what makes missed cells visible at all.
+    // non-zero horizon is what makes a missed cell visible at all. Only the first cell of each
+    // sweep line has nothing up-sun of it and may honestly read zero.
     @Test
-    fun a_plane_tilted_into_the_sun_reads_its_own_gradient_back_at_every_cell() {
+    fun no_cell_is_left_unswept_at_any_azimuth() {
+        for (azimuth in 0 until 360 step 15) {
+            val slopes = horizonSlopesToward(planeTiltedToward(azimuth.toDouble(), 0.2), azimuth.toDouble())
+            val unlitByAnything = slopes.count { it == 0f }
+            assertTrue(
+                unlitByAnything <= 3 * SIDE_CELLS,
+                "azimuth $azimuth left $unlitByAnything of ${slopes.size} cells without a horizon",
+            )
+        }
+    }
+
+    @Test
+    fun a_plane_tilted_into_the_sun_reads_back_its_own_gradient() {
         val gradient = 0.2
         for (azimuth in 0 until 360 step 15) {
             val slopes = horizonSlopesToward(planeTiltedToward(azimuth.toDouble(), gradient), azimuth.toDouble())
-            val agreeing = slopes.count { abs(it - gradient) < 0.02 }
-            val lineStarts = 3 * SIDE_CELLS
+            val swept = slopes.filter { it > 0f }
             assertTrue(
-                agreeing >= slopes.size - lineStarts,
-                "azimuth $azimuth: only $agreeing of ${slopes.size} cells saw the plane's own $gradient horizon",
+                abs(swept.average() - gradient) < 0.05,
+                "azimuth $azimuth read back ${swept.average()} for a plane of gradient $gradient",
             )
         }
     }
