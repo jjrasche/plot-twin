@@ -1,1 +1,4 @@
-seat: capture research landed; three terrain-row fields and the datum deadline held for Jim
+seat: run 3 morning report — 4 lanes delivered, 3 merged, eyes blocked on a factored-ui release
+
+Merged worktrees and branches pruned. The eyes worktrees stay up in both repos because that
+work cannot land until factored-ui publishes the camera capability.

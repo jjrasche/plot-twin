@@ -5,23 +5,57 @@ only a pointer here.
 
 - role: lead — holds goal, charters build subagents, verifies by running, lands merges
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
-- when: 2026-08-06T22:35Z
-- seat: CLAIMED 2026-08-06 by pt-head (third overnight run in flight)
-- RUN 3 IN FLIGHT (started 2026-08-06 ~22:40Z), base main @ e3ec7cb:
-  - parallel now: eyes+CV (`build/eyes`, charter 9) · earthworks design (`design/earthworks`,
-    charter 11) · capture pipeline research (`research-capture-pipeline`, charter 12)
-  - chained: light/sky BUILD (charter 10) on eyes — the contact sheet is how it gets judged;
-    snapshot rows (charter 13) on earthworks — both touch the schema
-  - critical path is eyes: it is the instrument every later render lane is graded by
-  - worktrees at ../.git-worktrees/pt-{eyes,earthworks,capture}
-  - note: branch `research` already exists, so the capture lane's branch has no slash
-  - LANDED: earthworks design PASS, merged at b261702 (docs only, schema untouched). Snapshot
-    lane chained on it and told to land no schema change — the surface id waits on Jim.
-  - LANDED: snapshot/lens design PASS, merged — terrain projection cache shipped with five
-    tests (lead re-ran fresh gate: 81 tests, 0 failures), no schema change. Genesis memo on the
-    board at ~/.claude/brothers/messages/change-based-lenses-for-gen-head.md
-  - LANDED: capture accuracy budget PASS after one rework (first commit appended a correction
-    instead of fixing the figure — sent back, fixed, verified). Real measured numbers now.
+- when: 2026-08-07T04:30Z
+- seat: CLAIMED 2026-08-06 by pt-head
+
+## RUN 3 MORNING REPORT (2026-08-06 night → 2026-08-07)
+
+Four lanes chartered, four delivered. Three merged to main, one verified-but-BLOCKED on a
+factored-ui release. Every verdict below is the lead's own fresh re-run, not a worker's claim.
+
+**THE ONE THING THAT NEEDS JIM FIRST: cut a factored-ui release.** The render half of the
+ladder is now stacked behind it. plot-twin's eyes branch points at a mavenLocal snapshot,
+which cannot merge — it breaks a clean checkout and it breaks the pin-everything rule. Two
+factored-ui branches are waiting (batched painter from run 2, camera drive from run 3, the
+second sitting on the first), and light/sky will need a third. Until factored-ui publishes,
+every render lane produces an unmergeable branch. Nothing else on this list blocks as much.
+
+### Landed on main
+- **earthworks design** (b261702) — five questions, five recommendations with counterarguments,
+  every number sourced. Docs only, schema untouched as railed.
+- **snapshot rows + terrain projection cache** — the cache SHIPPED with five tests. Lead gate:
+  BUILD SUCCESSFUL, 81 tests, 0 failures (76 before). No schema change. Genesis memo delivered
+  to the board.
+- **capture accuracy budget** (9822a9c) — real measured numbers from the actual Eaton work-unit
+  checkpoint spreadsheet. PASS after ONE REWORK: the first commit appended a correction instead
+  of fixing the figure, leaving the wrong number in the summary. Sent back, fixed, re-verified.
+
+### Verified but NOT merged
+- **eyes + CV** — `build/eyes` (plot-twin) and `build/camera-drive` (factored-ui). Lead gate on
+  plot-twin: BUILD SUCCESSFUL, **90 tests, 0 failures** — note the worker reported 133, which is
+  wrong; class count matched, test count did not. Contact sheet reviewed by the lead's own eye:
+  seven poses, terrain/greenhouse/pergola/path/markers all identifiable. Blocked from merge only
+  by the snapshot pin. `../.git-worktrees/pt-eyes` and `../.git-worktrees/fu-eyes-camera` stay up.
+  - Contact sheet: `../.git-worktrees/pt-eyes/eyes/build/eyes_contact_sheet.png`
+  - The worker marked its own shadow-direction check ADVISORY and excluded it from the verdict —
+    scene3d has no sun pass and terrain is tinted by elevation, so the "darkest direction" tracks
+    downhill, not the sun. The estimator math is gated in both directions with synthetic shadows;
+    only the live reading is untrustworthy. It promotes when the light/sky lane lands a sun pass.
+    That is exactly the honesty the charter asked for.
+  - Legibility, seen by eye: violation markers are drawn at a fixed world size and swamp the
+    pergola at walk height. Render-lane call — marker scale should probably follow camera distance.
+  - `overhead` is really near-overhead; the pitch clamp keeps the camera shy of vertical.
+
+### Not started
+- **light/sky BUILD** (charter 10 written, `.claude/charters/overnight-10-light-sky.md`) — chained
+  on eyes and therefore on the factored-ui release. This is rung one of the ladder.
+
+### Lead's own process note for next run
+Every charter gets: commit a checkpoint at every meaningful step, even broken. The eyes lane
+stalled after an hour with everything uncommitted — the only real failure mode hit all night,
+and it nearly cost the lane.
+
+- run stats: 4 lanes, 4 delivered, 3 merged, 1 rework, 1 stall recovered, 0 rejected outright
 - NEEDS JIM (run 3, growing):
   - capture asks three fields onto the base terrain row: reference frame + epoch, per-cell
     support distance (98% of 10cm cells hold no measurement), slope-derived vertical sigma
