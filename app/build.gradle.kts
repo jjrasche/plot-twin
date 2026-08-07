@@ -5,7 +5,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     maven("https://jjrasche.github.io/factoredui/")
     mavenCentral()
     google()
