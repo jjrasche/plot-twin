@@ -11,7 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":eyes"))
+    api(project(":render"))
+    implementation(testFixtures(project(":solvers")))
     implementation(compose.desktop.currentOs)
     testImplementation(libs.kotlin.test)
 }
@@ -22,10 +23,4 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-compose.desktop {
-    application {
-        mainClass = "plottwin.app.WalkableToyPlotAppKt"
-    }
 }
