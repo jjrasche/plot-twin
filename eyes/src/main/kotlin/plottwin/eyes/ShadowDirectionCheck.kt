@@ -99,10 +99,13 @@ fun angleErrorDegrees(left: Double, right: Double): Double {
     return Math.toDegrees(if (difference > PI) 2 * PI - difference else difference)
 }
 
+// Advisory until the renderer grows a sun pass: scene3d tints terrain by elevation, so the
+// darkest direction around a point tracks the downhill slope, not the light. See TASKS.md.
 fun shadowFinding(
     subject: String,
     estimate: ShadowEstimate,
     expectedScreenRadians: Double?,
+    advisory: Boolean,
 ): EyeFinding {
     if (expectedScreenRadians == null) {
         return EyeFinding(
@@ -112,6 +115,7 @@ fun shadowFinding(
             bound = SHADOW_CONTRAST_FLOOR,
             passed = false,
             detail = "the sampled ground point does not project into this view",
+            advisory = advisory,
         )
     }
     if (!estimate.hasSignal) {
@@ -120,8 +124,9 @@ fun shadowFinding(
             subject = subject,
             measured = estimate.contrast,
             bound = SHADOW_CONTRAST_FLOOR,
-            passed = true,
-            detail = "no directional darkening above the floor — nothing to disagree with the sun about",
+            passed = false,
+            detail = "no directional darkening above the floor — no shadow to compare with the sun",
+            advisory = advisory,
         )
     }
     val error = angleErrorDegrees(estimate.screenRadians, expectedScreenRadians)
@@ -136,5 +141,6 @@ fun shadowFinding(
             Math.toDegrees(estimate.screenRadians),
             Math.toDegrees(expectedScreenRadians),
         ),
+        advisory = advisory,
     )
 }

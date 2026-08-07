@@ -59,7 +59,9 @@ private fun drawTileLabel(
 
 private fun labelSummaryOf(inspection: ViewpointInspection): String {
     val failures = failedFindings(inspection.findings)
-    if (failures.isEmpty()) return "${inspection.findings.size} checks ok"
+    val advisories = advisoryFindings(inspection.findings)
+    val gated = inspection.findings.size - advisories.size
+    if (failures.isEmpty()) return "$gated checks ok, ${advisories.size} advisory"
     return failures.joinToString(", ") { "${it.check} %.2f".format(it.measured) }
 }
 

@@ -25,7 +25,7 @@ class ShadowDirectionCheckTest {
             expected,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(lit, anchor.x.toDouble(), anchor.y.toDouble()), expected)
+        val finding = shadowFinding(viewpoint.name, sample(lit, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
         assertTrue(finding.passed, "sun-aligned shadow was rejected: ${finding.line()}")
         assertTrue(finding.measured <= SHADOW_AZIMUTH_TOLERANCE_DEGREES, "azimuth error ${finding.measured} deg")
     }
@@ -46,19 +46,18 @@ class ShadowDirectionCheckTest {
             expected + PI / 2,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected)
+        val finding = shadowFinding(viewpoint.name, sample(wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
         assertTrue(!finding.passed, "a shadow 90 deg off the sun should fail: ${finding.line()}")
     }
 
     @Test
-    fun a_frame_with_no_directional_darkening_reports_no_signal() {
+    fun the_reading_taken_off_a_sunless_render_is_marked_advisory_not_a_verdict() {
         val scene = toyPlotScene()
         val viewer = PlotViewer(scene.spec)
-        val viewpoint = greenhouseViewpoint(scene)
-        val projector = viewer.projectorFor(viewpoint.pose)
-        val anchor = projector.project(groundSampleOf(scene.state, viewpoint))
-        val estimate = sample(viewer.capture(viewpoint.pose), anchor.x.toDouble(), anchor.y.toDouble())
-        assertTrue(!estimate.hasSignal, "scene3d has no sun pass yet, so contrast ${estimate.contrast} should stay under the floor")
+        val inspection = inspectViewpoint(scene, viewer, greenhouseViewpoint(scene))
+        val shadow = inspection.findings.first { it.check == "shadow-direction" }
+        assertTrue(shadow.advisory, "scene3d has no sun pass, so this reading must not gate: ${shadow.line()}")
+        assertTrue(failedFindings(inspection.findings).none { it.check == "shadow-direction" }, "advisory findings must not count as failures")
     }
 
     private fun sample(image: java.awt.image.BufferedImage, centerX: Double, centerY: Double): ShadowEstimate =

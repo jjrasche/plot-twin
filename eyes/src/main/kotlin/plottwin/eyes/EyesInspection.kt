@@ -73,10 +73,12 @@ private fun shadowFindingAt(
             bound = SHADOW_CONTRAST_FLOOR,
             passed = false,
             detail = "the sampled ground point does not project into this view",
+            advisory = true,
         )
     }
     return shadowFinding(
         subject = viewpoint.name,
+        advisory = true,
         estimate = estimateShadowDirection(
             image,
             anchor.x.toDouble(),
