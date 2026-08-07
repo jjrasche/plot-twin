@@ -12,7 +12,11 @@ class WalkableSceneProjectionTest {
 
     private val toySpec: WalkableSceneSpec by lazy {
         val world = ToyPlotFixture.toyWorld()
-        projectWalkableScene(world.state, runSolvers(world, ToyPlotFixture.toyConstraints()))
+        projectWalkableScene(
+            world.state,
+            runSolvers(world, ToyPlotFixture.toyConstraints()),
+            daylightOverPlot(world.state, ToyPlotFixture.toyMidday),
+        )
     }
 
     @Test
@@ -90,7 +94,11 @@ class WalkableSceneProjectionTest {
     @Test
     fun projection_before_any_base_terrain_row_fails_loudly() {
         assertFailsWith<IllegalArgumentException> {
-            projectWalkableScene(CurrentState.EMPTY, emptyList())
+            projectWalkableScene(
+                CurrentState.EMPTY,
+                emptyList(),
+                daylightAt(ToyPlotFixture.toySite, ToyPlotFixture.toyMidday),
+            )
         }
     }
 }

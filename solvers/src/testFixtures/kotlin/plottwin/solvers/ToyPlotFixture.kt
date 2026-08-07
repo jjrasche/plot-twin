@@ -1,6 +1,7 @@
 package plottwin.solvers
 
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.EntityRow
 import plottwin.worldstate.GriddedElevationOperator
@@ -29,6 +30,10 @@ object ToyPlotFixture {
 
     // the home 2 acres: Delta Township, Eaton County, Michigan
     val toySite = SiteRow(latitudeDegrees = 42.6006, longitudeDegrees = -84.6547, timeZoneId = "America/Detroit")
+
+    val toyMorning: ZonedDateTime = toyDate.atTime(9, 0).atZone(zoneOf(toySite))
+    val toyMidday: ZonedDateTime = toyDate.atTime(13, 0).atZone(zoneOf(toySite))
+    val toyEvening: ZonedDateTime = toyDate.atTime(18, 30).atZone(zoneOf(toySite))
 
     val pathClearanceBound: Meters = metersOf(feet = 4)
 

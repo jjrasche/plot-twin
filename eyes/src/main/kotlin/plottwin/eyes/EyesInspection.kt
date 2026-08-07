@@ -6,7 +6,6 @@ import plottwin.render.groundHeightAt
 import plottwin.render.sceneFrameOf
 import plottwin.worldstate.CurrentState
 
-const val SUN_AZIMUTH_DEGREES_AT_TOY_NOON = 180.0
 const val SHADOW_INNER_RADIUS_PX = 14.0
 const val SHADOW_OUTER_RADIUS_PX = 60.0
 
@@ -36,11 +35,19 @@ fun inspectViewpoint(scene: PlotScene, viewer: PlotViewer, viewpoint: Viewpoint)
     return ViewpointInspection(viewpoint, image, findings)
 }
 
+// One claim, read from every angle: the plot's principal shadow points away from the sun.
+// The tallest thing on the plot owns that shadow — a low viewpoint's own subject may be a
+// stake in a ditch whose trench is darker than anything it casts.
+fun principalShadowCasterOf(state: CurrentState): String? =
+    state.entities.entries
+        .filter { (_, placed) -> placed.footprint.size >= 3 && placed.height.value > 0.0 }
+        .maxByOrNull { (_, placed) -> placed.height.value }
+        ?.key
+
 fun groundSampleOf(state: CurrentState, viewpoint: Viewpoint): Vec3 {
     val terrain = requireNotNull(state.terrain) { "shadow sampling needs a base-terrain row" }.grid
     val frame = sceneFrameOf(terrain)
-    val subject = viewpoint.subject
-    val placed = subject?.let { state.entities[it] }
+    val placed = principalShadowCasterOf(state)?.let { state.entities[it] }
     if (placed == null) {
         return Vec3(
             frame.sceneX(terrain.columns * terrain.cellSize.value / 2.0),
@@ -63,9 +70,17 @@ private fun shadowFindingAt(
     image: BufferedImage,
 ): EyeFinding {
     val projector = viewer.projectorFor(viewpoint.pose)
+    val caster = principalShadowCasterOf(scene.state)
+    val casterHeight = caster?.let { scene.state.entities.getValue(it).height.value } ?: 0.0
     val groundPoint = groundSampleOf(scene.state, viewpoint)
     val anchor = projector.project(groundPoint)
-    if (!anchor.visible) {
+    val shadow = projectShadow(
+        projector,
+        groundPoint,
+        scene.daylight.sun.azimuthDegrees,
+        castShadowMetersOf(casterHeight, scene.daylight.sun.altitudeDegrees),
+    )
+    if (!anchor.visible || shadow == null) {
         return EyeFinding(
             check = "shadow-direction",
             subject = viewpoint.name,
@@ -76,16 +91,29 @@ private fun shadowFindingAt(
             advisory = true,
         )
     }
+    val (innerRadius, outerRadius) = shadowAnnulusOf(shadow.lengthPx)
     return shadowFinding(
         subject = viewpoint.name,
-        advisory = true,
+        advisory = false,
         estimate = estimateShadowDirection(
             image,
             anchor.x.toDouble(),
             anchor.y.toDouble(),
-            SHADOW_INNER_RADIUS_PX,
-            SHADOW_OUTER_RADIUS_PX,
+            innerRadius,
+            outerRadius,
+            casterMaskOf(scene, viewer, caster, viewpoint, image),
         ),
-        expectedScreenRadians = expectedShadowScreenRadians(projector, groundPoint, SUN_AZIMUTH_DEGREES_AT_TOY_NOON),
+        expectedScreenRadians = shadow.screenRadians,
     )
+}
+
+private fun casterMaskOf(
+    scene: PlotScene,
+    viewer: PlotViewer,
+    caster: String?,
+    viewpoint: Viewpoint,
+    image: BufferedImage,
+): BooleanArray? {
+    if (caster == null || !scene.spec.meshesByEntity.containsKey(caster)) return null
+    return renderedEntityMaskOf(image, viewer.captureWithout(caster, viewpoint.pose))
 }
