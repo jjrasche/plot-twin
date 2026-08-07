@@ -35,6 +35,14 @@ data class EntityRow(
 ) : WorldRow
 
 @Serializable
+@SerialName("site")
+data class SiteRow(
+    val latitudeDegrees: Double,
+    val longitudeDegrees: Double,
+    val timeZoneId: String,
+) : WorldRow
+
+@Serializable
 @SerialName("rule")
 data class RuleRow(
     val ruleName: String,
@@ -109,5 +117,6 @@ fun geometryWriterFor(row: WorldRow): WriterRole? = when {
     row is PositionDiffRow -> WriterRole.OPTIMIZER
     row is EntityRow && row.footprint.isNotEmpty() -> WriterRole.CAPTURE
     row is BaseTerrainRow || row is TerrainDiffRow -> WriterRole.CAPTURE
+    row is SiteRow -> WriterRole.CAPTURE
     else -> null
 }

@@ -7,6 +7,7 @@ data class SolverWorld(
     val state: CurrentState,
     val date: LocalDate,
     val upslopeFields: UpslopeFieldSource = UNCACHED_UPSLOPE_FIELD,
+    val sunshedFields: SunshedFieldSource = UNCACHED_SUNSHED_FIELD,
 )
 
 fun interface LeafSolver {

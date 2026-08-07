@@ -17,6 +17,7 @@ data class CurrentState(
     val pendingOpsBySeq: Map<Long, OpRow>,
     val rejections: List<RejectionRow>,
     val terrain: ProjectedTerrain? = null,
+    val site: SiteRow? = null,
 ) {
     val pendingOps: List<OpRow> get() = pendingOpsBySeq.values.toList()
 
@@ -37,6 +38,7 @@ fun projectCurrentState(log: List<LoggedRow>): CurrentState =
 private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = when (val row = logged.row) {
     is EntityRow -> placeEntity(state, row.entityName, row.footprint, row.height)
     is PositionDiffRow -> placeEntity(state, row.entityName, row.footprint, row.height)
+    is SiteRow -> state.copy(site = row)
     is RuleRow -> state.copy(rules = state.rules + (row.ruleName to row))
     is LockRow -> state.copy(locks = state.locks + (row.targetName to row.kind))
     is OpRow -> state.copy(pendingOpsBySeq = state.pendingOpsBySeq + (logged.seq to row))

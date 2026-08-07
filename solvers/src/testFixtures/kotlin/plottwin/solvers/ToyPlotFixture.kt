@@ -9,6 +9,7 @@ import plottwin.worldstate.Hardness
 import plottwin.worldstate.Meters
 import plottwin.worldstate.RawElevation
 import plottwin.worldstate.RuleRow
+import plottwin.worldstate.SiteRow
 import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
@@ -25,6 +26,10 @@ object ToyPlotFixture {
     const val WATERLOG_THRESHOLD_SQUARE_METERS = 5.0
 
     val toyDate: LocalDate = LocalDate.of(2026, 8, 5)
+
+    // the home 2 acres: Delta Township, Eaton County, Michigan
+    val toySite = SiteRow(latitudeDegrees = 42.6006, longitudeDegrees = -84.6547, timeZoneId = "America/Detroit")
+
     val pathClearanceBound: Meters = metersOf(feet = 4)
 
     fun toyWorld(): SolverWorld = SolverWorld(toyState(), toyDate)
@@ -58,6 +63,7 @@ object ToyPlotFixture {
         log.append(RuleRow("path-clearance", Hardness.HARD, 1.0, "paths keep 4' of walking clearance"), WriterRole.LLM)
         log.append(RuleRow("pergola-drainage", Hardness.SOFT, 1.0, "pergola floor stays out of runoff paths"), WriterRole.LLM)
         log.append(RuleRow("greenhouse-drainage", Hardness.HARD, 1.0, "greenhouse floor stays out of runoff paths"), WriterRole.LLM)
+        log.append(toySite, WriterRole.CAPTURE)
     }
 
     private fun swaleHeights(): FloatArray {
