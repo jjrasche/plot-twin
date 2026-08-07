@@ -1,4 +1,5 @@
-seat: run 3 morning report — 4 lanes delivered, 3 merged, eyes blocked on a factored-ui release
+seat: factored-ui 0.19.0 released, eyes merged, light/sky in flight
 
-Merged worktrees and branches pruned. The eyes worktrees stay up in both repos because that
-work cannot land until factored-ui publishes the camera capability.
+The render blocker is cleared. Camera drive is published and live on the CDN, plot-twin is
+repinned to a real coordinate with mavenLocal removed everywhere, eyes is on main with the
+full gate green at 95 tests, and the lane the release existed to unblock is running.

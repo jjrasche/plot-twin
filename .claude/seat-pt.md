@@ -13,12 +13,19 @@ only a pointer here.
 Four lanes chartered, four delivered. Three merged to main, one verified-but-BLOCKED on a
 factored-ui release. Every verdict below is the lead's own fresh re-run, not a worker's claim.
 
-**THE ONE THING THAT NEEDS JIM FIRST: cut a factored-ui release.** The render half of the
-ladder is now stacked behind it. plot-twin's eyes branch points at a mavenLocal snapshot,
-which cannot merge — it breaks a clean checkout and it breaks the pin-everything rule. Two
-factored-ui branches are waiting (batched painter from run 2, camera drive from run 3, the
-second sitting on the first), and light/sky will need a third. Until factored-ui publishes,
-every render lane produces an unmergeable branch. Nothing else on this list blocks as much.
+**RELEASE DONE — the render blocker is cleared (Jim authorized 2026-08-07).** kotlin-compose
+**0.19.0** is published and live: camera drive merged into `il-scene-render-harness` (6c538a3),
+tagged `kotlin-compose-v0.19.0`, publish workflow green, Pages deployed, pom returns 200 over
+HTTPS. The tag DID auto-fire CI this time — last release's quirk did not repeat. Verified
+before tagging by the lead's own runs: wasmJs compile green, desktopTest 132 tests 0 failures.
+plot-twin repinned to 0.19.0 and **mavenLocal removed from all three modules** so a stale local
+build can never shadow the published artifact. Eyes then merged; light/sky is running.
+
+**KNOWN RED, not mine:** the general `ci` workflow on `il-scene-render-harness` fails and did so
+before this release. Cause: the workflow deliberately runs a FILTERED subset (38 non-UI desktop
+tests) while a suite-shrink guard demands at least 100, so the guard fires on a narrowing the
+workflow itself performs. The publish workflow is separate and green. Fix is a judgment call —
+drop the filter, or make the floor skip when `--tests` is present — so it is left for Jim.
 
 ### Landed on main
 - **earthworks design** (b261702) — five questions, five recommendations with counterarguments,
@@ -30,12 +37,12 @@ every render lane produces an unmergeable branch. Nothing else on this list bloc
   checkpoint spreadsheet. PASS after ONE REWORK: the first commit appended a correction instead
   of fixing the figure, leaving the wrong number in the summary. Sent back, fixed, re-verified.
 
-### Verified but NOT merged
-- **eyes + CV** — `build/eyes` (plot-twin) and `build/camera-drive` (factored-ui). Lead gate on
-  plot-twin: BUILD SUCCESSFUL, **90 tests, 0 failures** — note the worker reported 133, which is
-  wrong; class count matched, test count did not. Contact sheet reviewed by the lead's own eye:
-  seven poses, terrain/greenhouse/pergola/path/markers all identifiable. Blocked from merge only
-  by the snapshot pin. `../.git-worktrees/pt-eyes` and `../.git-worktrees/fu-eyes-camera` stay up.
+- **eyes + CV** (73b770f) — MERGED after the release cleared its pin. Lead gate on merged main:
+  BUILD SUCCESSFUL, **95 tests, 0 failures** (90 eyes + 5 cache — nothing broke across the merge;
+  eyes was branched before the cache landed, so this was a real cross-module check). Note the
+  worker reported 133 tests where the XML said 90; class count matched, test count did not.
+  Contact sheet reviewed by the lead's own eye: seven poses, terrain/greenhouse/pergola/path/
+  markers all identifiable. All worktrees pruned, all branches deleted.
   - Contact sheet: `../.git-worktrees/pt-eyes/eyes/build/eyes_contact_sheet.png`
   - The worker marked its own shadow-direction check ADVISORY and excluded it from the verdict —
     scene3d has no sun pass and terrain is tinted by elevation, so the "darkest direction" tracks
@@ -46,9 +53,11 @@ every render lane produces an unmergeable branch. Nothing else on this list bloc
     pergola at walk height. Render-lane call — marker scale should probably follow camera distance.
   - `overhead` is really near-overhead; the pitch clamp keeps the camera shy of vertical.
 
-### Not started
-- **light/sky BUILD** (charter 10 written, `.claude/charters/overnight-10-light-sky.md`) — chained
-  on eyes and therefore on the factored-ui release. This is rung one of the ladder.
+### In flight
+- **light/sky BUILD** (charter 10) — running in `../.git-worktrees/pt-lightsky`, branch
+  `build/light-sky`, off 73b770f. Rung one of the ladder. It inherits the eyes module as its
+  instrument and owes the promotion of the shadow-direction check from advisory to a hard gate,
+  plus the sun azimuth constant the eyes lane had to invent.
 
 ### Lead's own process note for next run
 Every charter gets: commit a checkpoint at every meaningful step, even broken. The eyes lane
