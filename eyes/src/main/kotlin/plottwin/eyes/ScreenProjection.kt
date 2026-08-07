@@ -11,8 +11,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-
-
 const val NOTHING_DRAWN = -1
 
 class ScreenProjector(camera: Camera, val width: Int, val height: Int) {

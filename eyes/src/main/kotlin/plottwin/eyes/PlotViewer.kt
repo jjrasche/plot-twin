@@ -1,8 +1,6 @@
 package plottwin.eyes
 
-import ai.factoredui.compose.math.Camera
 import ai.factoredui.compose.scene3d.Scene3dCameraPose
-import ai.factoredui.compose.scene3d.Scene3dEntity
 import ai.factoredui.compose.scene3d.captureScene3dPoseView
 import ai.factoredui.compose.scene3d.cameraOfPose
 import ai.factoredui.compose.scene3d.prepare
@@ -49,9 +47,5 @@ class PlotViewer(
 
     fun projectorFor(pose: Scene3dCameraPose): ScreenProjector = ScreenProjector(cameraOfPose(pose), width, height)
 
-    fun cameraFor(pose: Scene3dCameraPose): Camera = cameraOfPose(pose)
-
     private fun decode(png: ByteArray): BufferedImage = ImageIO.read(ByteArrayInputStream(png))
 }
-
-fun drawnEntityIds(spec: WalkableSceneSpec): List<String> = spec.world.entities.map(Scene3dEntity::id)
