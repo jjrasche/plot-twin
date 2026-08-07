@@ -7,7 +7,8 @@ import kotlin.math.sqrt
 import plottwin.worldstate.TerrainGrid
 
 const val SKY_ENTITY_ID = "sky"
-const val SKY_DOME_CELLS = 48
+const val SKY_DOME_CELLS = 96
+const val SKY_RIM_HEIGHT_SHARE = 0.14f
 const val SKY_DOME_RADIUS_MULTIPLE = 6.0f
 const val SUN_GLOW_TIGHTNESS = 24.0f
 
@@ -49,10 +50,11 @@ fun skyDomeMeshOf(radius: Float, daylight: Daylight, cells: Int = SKY_DOME_CELLS
     return Scene3dMesh(vertices = vertices, triColors = triColors, gridCellsX = cells, gridCellsZ = cells)
 }
 
+// Floored, not cut off: a heightfield dropping to zero mid-cell tears into spikes.
 private fun domeHeightAt(east: Float, north: Float, radius: Float): Float {
     val fromZenith = east * east + north * north
-    if (fromZenith >= radius * radius) return 0f
-    return sqrt(radius * radius - fromZenith)
+    val onSphere = sqrt((radius * radius - fromZenith).coerceAtLeast(0f))
+    return maxOf(onSphere, radius * SKY_RIM_HEIGHT_SHARE)
 }
 
 private fun skyColorToward(east: Float, up: Float, north: Float, radius: Float, daylight: Daylight): Rgb {

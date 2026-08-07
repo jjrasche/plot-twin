@@ -10,9 +10,9 @@ import plottwin.worldstate.CurrentState
 import plottwin.worldstate.SiteRow
 
 const val PEAK_SUN_STRENGTH = 0.75f
-const val SKY_STRENGTH = 0.30f
+const val SKY_STRENGTH = 0.38f
 const val AIR_MASS_EXPONENT = 0.25f
-const val HIGH_SUN_DEGREES = 25.0
+const val HIGH_SUN_DEGREES = 55.0
 
 data class Rgb(val red: Float, val green: Float, val blue: Float) {
     operator fun times(scale: Float): Rgb = Rgb(red * scale, green * scale, blue * scale)
