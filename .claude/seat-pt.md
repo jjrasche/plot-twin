@@ -20,7 +20,17 @@ only a pointer here.
   - LANDED: snapshot/lens design PASS, merged — terrain projection cache shipped with five
     tests (lead re-ran fresh gate: 81 tests, 0 failures), no schema change. Genesis memo on the
     board at ~/.claude/brothers/messages/change-based-lenses-for-gen-head.md
+  - LANDED: capture accuracy budget PASS after one rework (first commit appended a correction
+    instead of fixing the figure — sent back, fixed, verified). Real measured numbers now.
 - NEEDS JIM (run 3, growing):
+  - capture asks three fields onto the base terrain row: reference frame + epoch, per-cell
+    support distance (98% of 10cm cells hold no measurement), slope-derived vertical sigma
+  - set permanent surveyed marks on the parcel? four RTK shots would register every future
+    phone capture for free and would outlive the 2026 datum change
+  - may we pull from Eaton County's own imagery service? ~7.5cm/px, March leaf-off, three
+    years fresher than the federal imagery — the licensing question is real, not rhetorical
+  - the national vertical reference retires end-2026, shifting coordinates by up to several
+    meters — larger than the entire measurement error budget
   - snapshot forks, deliberately not defaulted: (a) do snapshots live IN the log or in a store
     beside it? if in the log, the log stops being uniformly append-only and row types need a
     truth-vs-derived mark; (b) may an oversized truth row's payload move to cold storage with a
