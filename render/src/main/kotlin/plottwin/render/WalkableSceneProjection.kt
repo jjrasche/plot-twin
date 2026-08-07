@@ -21,13 +21,14 @@ data class WalkableSceneSpec(
     @SerialName("meshes_by_entity") val meshesByEntity: Map<String, Scene3dMesh>,
 )
 
-fun projectWalkableScene(state: CurrentState, violations: List<Violation>): WalkableSceneSpec {
+fun projectWalkableScene(state: CurrentState, violations: List<Violation>, daylight: Daylight): WalkableSceneSpec {
     val terrain = requireNotNull(state.terrain) { "cannot project a walkable scene before a base-terrain row is logged" }.grid
     val frame = sceneFrameOf(terrain)
     val meshes = LinkedHashMap<String, Scene3dMesh>()
-    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame)
+    val shading = terrainShadingFor(state, daylight, RENDER_DOWNSAMPLE_FACTOR)
+    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading)
     for ((entityName, placed) in state.entities) {
-        meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame)
+        meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight)
     }
     violations.forEachIndexed { rank, violation ->
         meshes[violationMarkerId(violation, rank)] = violationMarkerMeshOf(violation, terrain, frame)

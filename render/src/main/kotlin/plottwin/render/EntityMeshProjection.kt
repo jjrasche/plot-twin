@@ -17,18 +17,28 @@ private val entityColors = mapOf(
 )
 private const val DEFAULT_ENTITY_COLOR = "9aa0a8"
 
-fun entityMeshOf(entityName: String, placed: PlacedEntity, terrain: TerrainGrid, frame: SceneFrame): Scene3dMesh {
-    val color = entityColors[entityName] ?: DEFAULT_ENTITY_COLOR
-    return if (placed.footprint.size < 3) walklineRibbonMeshOf(placed.footprint, terrain, frame, color)
-    else extrudedPrismMeshOf(placed.footprint, placed.height, terrain, frame, color)
+fun entityMeshOf(
+    entityName: String,
+    placed: PlacedEntity,
+    terrain: TerrainGrid,
+    frame: SceneFrame,
+    daylight: Daylight,
+): Scene3dMesh {
+    val albedo = rgbOfHex(entityColors[entityName] ?: DEFAULT_ENTITY_COLOR)
+    return if (placed.footprint.size < 3) walklineRibbonMeshOf(placed.footprint, terrain, frame, albedo, daylight)
+    else extrudedPrismMeshOf(placed.footprint, placed.height, terrain, frame, albedo, daylight)
 }
+
+private fun litFace(albedo: Rgb, normal: SceneDirection, daylight: Daylight): String =
+    hexOf(litColor(albedo, normal, sunlitFraction = 1f, skyOpenness = 1f, daylight = daylight))
 
 private fun extrudedPrismMeshOf(
     ring: List<GroundPoint>,
     height: Meters,
     terrain: TerrainGrid,
     frame: SceneFrame,
-    color: String,
+    albedo: Rgb,
+    daylight: Daylight,
 ): Scene3dMesh {
     val cornerCount = ring.size
     val floorHeight = groundHeightAt(terrain, footprintCentroid(ring))
@@ -44,31 +54,50 @@ private fun extrudedPrismMeshOf(
         vertices.add(roofHeight)
         vertices.add(frame.sceneZ(corner.north.value))
     }
+    val centroid = footprintCentroid(ring)
     val triangles = ArrayList<Int>()
+    val triColors = ArrayList<String>()
     for (corner in 0 until cornerCount) {
         val next = (corner + 1) % cornerCount
         triangles.addAll(listOf(corner, next, cornerCount + next))
         triangles.addAll(listOf(corner, cornerCount + next, cornerCount + corner))
+        val wallFace = litFace(albedo, outwardWallNormal(ring[corner], ring[next], centroid), daylight)
+        triColors.add(wallFace)
+        triColors.add(wallFace)
     }
+    val roofFace = litFace(albedo, SceneDirection(0f, 1f, 0f), daylight)
+    val floorFace = litFace(albedo, SceneDirection(0f, -1f, 0f), daylight)
     for (fan in 1 until cornerCount - 1) {
         triangles.addAll(listOf(cornerCount, cornerCount + fan, cornerCount + fan + 1))
         triangles.addAll(listOf(0, fan + 1, fan))
+        triColors.add(roofFace)
+        triColors.add(floorFace)
     }
-    return Scene3dMesh(
-        vertices = vertices,
-        triangles = triangles,
-        triColors = List(triangles.size / 3) { color },
-    )
+    return Scene3dMesh(vertices = vertices, triangles = triangles, triColors = triColors)
+}
+
+private fun outwardWallNormal(start: GroundPoint, end: GroundPoint, centroid: GroundPoint): SceneDirection {
+    val eastSpan = end.east.value - start.east.value
+    val northSpan = end.north.value - start.north.value
+    val length = hypot(eastSpan, northSpan).coerceAtLeast(1e-9)
+    val sideEast = (northSpan / length).toFloat()
+    val sideNorth = (-eastSpan / length).toFloat()
+    val towardEdgeEast = (start.east.value + end.east.value) / 2 - centroid.east.value
+    val towardEdgeNorth = (start.north.value + end.north.value) / 2 - centroid.north.value
+    val outward = if (sideEast * towardEdgeEast + sideNorth * towardEdgeNorth < 0) -1f else 1f
+    return SceneDirection(sideEast * outward, 0f, sideNorth * outward)
 }
 
 private fun walklineRibbonMeshOf(
     polyline: List<GroundPoint>,
     terrain: TerrainGrid,
     frame: SceneFrame,
-    color: String,
+    albedo: Rgb,
+    daylight: Daylight,
 ): Scene3dMesh {
     val vertices = ArrayList<Float>()
     val triangles = ArrayList<Int>()
+    val color = litFace(albedo, SceneDirection(0f, 1f, 0f), daylight)
     for (segment in 0 until polyline.size - 1) {
         val start = polyline[segment]
         val end = polyline[segment + 1]

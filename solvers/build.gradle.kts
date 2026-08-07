@@ -10,6 +10,7 @@ repositories {
 dependencies {
     api(project(":worldstate"))
     implementation(project(":geometry"))
+    implementation(libs.solar.positioning)
     testImplementation(libs.kotlin.test)
 }
 

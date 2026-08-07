@@ -4,12 +4,14 @@ kotlinxSerializationJson = "1.11.0"
 sqliteJdbc = "3.45.3.0"
 compose = "1.10.3"
 factoredUi = "0.19.0"
+solarPositioning = "2.0.13"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 factoredui-kotlin-compose = { module = "ai.factoredui:kotlin-compose", version.ref = "factoredUi" }
+solar-positioning = { module = "net.e175.klaus:solarpositioning", version.ref = "solarPositioning" }
 
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

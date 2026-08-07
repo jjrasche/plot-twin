@@ -72,3 +72,16 @@ Measured geometry (LiDAR/survey/photo ingestion) and placed geometry (optimizer 
 
 ## D-014 — the lead merges plot-twin at its own discretion (2026-08-06, ruled) #process
 Verified-gate branches land on main by the lead's call; no per-merge ratification. factored-ui merges remain the owner's.
+
+## D-015 — one CPU line sweep is both the sunshed solver and the renderer's light (2026-08-07, ruled) #solvers #renderer
+Q-004's horizon sweep is built once, in `:solvers`, and read twice: the solver integrates it over a day into direct-sun hours; the renderer evaluates it at one moment into a lit fraction and, over eight azimuths, into sky openness. Measured on the 900x900 toy plot (810,000 cells): one sweep 20 ms, a whole solstice day at 15-minute samples 1976 ms — cheap enough that the renderer sweeps at solver resolution and averages down, which is where its soft shadow edges come from. Entities are rasterised into the same occluder surface as the ground, so a greenhouse shades a bed for the same reason a hill does.
+| option | one truth | verdict |
+|---|---|---|
+| sweep in :solvers, render reads it | yes | CHOSEN |
+| lighting effect in :render + separate solver | no — two shadow answers, only one logged | rejected |
+
+## D-016 — sky v1 is an analytic altitude gradient on a heightfield dome, not Hosek-Wilkie (2026-08-07, ruled) #renderer
+Hosek-Wilkie needs its fitted radiance coefficient tables vendored verbatim; hand-transcribing a multi-KB numeric blob is unverifiable, and the dome mesh plus per-triangle colour path is identical either way, so the model is a drop-in later. v1 is horizon-to-zenith interpolation keyed on sun altitude plus a sun-proximity glow. The dome itself is a heightfield entity listed first, which is the only sky scene3d 0.19.0 can draw — it draws heightfield entities in list order before every other mesh. It is not in the gated spec: the eyes skyline check reads the topmost non-background pixel, and a sky dome makes every column's topmost pixel sky.
+
+## D-017 — the plot is georeferenced by a site row (2026-08-07, ruled) #state #solvers
+Latitude, longitude and time zone enter the log as a typed `site` row with the CAPTURE writer, because the sunshed solver cannot exist without them and nothing lives outside the log (D-001, D-011).

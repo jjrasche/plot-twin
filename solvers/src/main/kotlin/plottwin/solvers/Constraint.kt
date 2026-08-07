@@ -19,5 +19,11 @@ data class WaterlogConstraint(
     val maxUpslopeSquareMeters: Double,
 ) : Constraint
 
+data class SunHoursConstraint(
+    override val ruleName: String,
+    val bedName: String,
+    val minimumDirectHours: Double,
+) : Constraint
+
 internal fun ruleWeightOf(state: CurrentState, ruleName: String): Double =
     state.rules[ruleName]?.weight ?: 1.0

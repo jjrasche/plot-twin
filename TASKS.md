@@ -7,9 +7,12 @@
 
 ## Next
 
-- Promote the eyes shadow-direction check from advisory to gating once the renderer casts
-  sun shadows — today terrain is tinted by elevation, so the darkest direction reads the
-  downhill slope, not the light
+- Teach the eyes skyline check what sky is, so the sky dome can join the gated spec — today
+  it reads the topmost non-background pixel, which a dome makes sky in every column
+- Aerial-perspective fog on the ground: needs a per-frame renderer hook in scene3d, since
+  baked per-triangle colour is camera-independent and one spec serves seven poses
+- Orbit-4 reads the plot's principal shadow 31 degrees off, because the swale trench
+  out-darkens the greenhouse along that bearing; the estimator models one occluder
 - Top-down 2D projection view with violation overlays
 - Real terrain ingest: QL2 LiDAR / USGS DEM for the parcel (Q-002 pipeline)
 - Real rooms replace toy fixture

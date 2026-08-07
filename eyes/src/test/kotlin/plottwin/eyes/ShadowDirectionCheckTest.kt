@@ -3,6 +3,7 @@ package plottwin.eyes
 import kotlin.math.PI
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import plottwin.solvers.ToyPlotFixture
 
 class ShadowDirectionCheckTest {
 
@@ -17,7 +18,9 @@ class ShadowDirectionCheckTest {
         val projector = viewer.projectorFor(viewpoint.pose)
         val groundPoint = groundSampleOf(scene.state, viewpoint)
         val anchor = projector.project(groundPoint)
-        val expected = requireNotNull(expectedShadowScreenRadians(projector, groundPoint, SUN_AZIMUTH_DEGREES_AT_TOY_NOON))
+        val expected = requireNotNull(
+            expectedShadowScreenRadians(projector, groundPoint, scene.daylight.sun.azimuthDegrees),
+        )
         val lit = paintShadowLobe(
             viewer.capture(viewpoint.pose),
             anchor.x.toDouble(),
@@ -38,7 +41,9 @@ class ShadowDirectionCheckTest {
         val projector = viewer.projectorFor(viewpoint.pose)
         val groundPoint = groundSampleOf(scene.state, viewpoint)
         val anchor = projector.project(groundPoint)
-        val expected = requireNotNull(expectedShadowScreenRadians(projector, groundPoint, SUN_AZIMUTH_DEGREES_AT_TOY_NOON))
+        val expected = requireNotNull(
+            expectedShadowScreenRadians(projector, groundPoint, scene.daylight.sun.azimuthDegrees),
+        )
         val wrongWay = paintShadowLobe(
             viewer.capture(viewpoint.pose),
             anchor.x.toDouble(),
@@ -51,13 +56,20 @@ class ShadowDirectionCheckTest {
     }
 
     @Test
-    fun the_reading_taken_off_a_sunless_render_is_marked_advisory_not_a_verdict() {
-        val scene = toyPlotScene()
-        val viewer = PlotViewer(scene.spec)
-        val inspection = inspectViewpoint(scene, viewer, greenhouseViewpoint(scene))
+    fun the_rendered_evening_shadow_gates_and_agrees_with_the_solvers_sun() {
+        val scene = toyPlotScene(ToyPlotFixture.toyEvening)
+        val inspection = inspectViewpoint(scene, PlotViewer(scene.spec), greenhouseViewpoint(scene))
         val shadow = inspection.findings.first { it.check == "shadow-direction" }
-        assertTrue(shadow.advisory, "scene3d has no sun pass, so this reading must not gate: ${shadow.line()}")
-        assertTrue(failedFindings(inspection.findings).none { it.check == "shadow-direction" }, "advisory findings must not count as failures")
+        assertTrue(!shadow.advisory, "the renderer casts sun shadows now, so this reading must gate: ${shadow.line()}")
+        assertTrue(shadow.passed, "rendered shadow disagrees with the sun: ${shadow.line()}")
+    }
+
+    @Test
+    fun the_sun_the_check_compares_against_comes_from_the_solver_not_a_constant() {
+        val morningAzimuth = toyPlotScene(ToyPlotFixture.toyMorning).daylight.sun.azimuthDegrees
+        val eveningAzimuth = toyPlotScene(ToyPlotFixture.toyEvening).daylight.sun.azimuthDegrees
+        assertTrue(morningAzimuth < 180.0, "a 9am August sun should stand east of south, got $morningAzimuth")
+        assertTrue(eveningAzimuth > 180.0, "a 6:30pm August sun should stand west of south, got $eveningAzimuth")
     }
 
     private fun sample(image: java.awt.image.BufferedImage, centerX: Double, centerY: Double): ShadowEstimate =

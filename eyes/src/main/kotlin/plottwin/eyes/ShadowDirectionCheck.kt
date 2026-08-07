@@ -8,11 +8,13 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.math.tan
 
 const val SHADOW_BIN_COUNT = 36
 const val SHADOW_CONTRAST_FLOOR = 0.08
 const val SHADOW_AZIMUTH_TOLERANCE_DEGREES = 20.0
 const val SHADOW_PROBE_METERS = 6.0f
+const val DEEP_SHADOW_SHARE = 0.6
 
 data class ShadowEstimate(val screenRadians: Double, val contrast: Double) {
     val hasSignal: Boolean get() = contrast >= SHADOW_CONTRAST_FLOOR
@@ -26,12 +28,16 @@ fun luminanceAt(image: BufferedImage, column: Int, row: Int): Double {
     return 0.2126 * red + 0.7152 * green + 0.0722 * blue
 }
 
+// The reading is about the shadow ON THE GROUND, so the caster's own pixels are excluded:
+// from a walking camera a tall body fills the annulus and its silhouette, not the light,
+// would decide the darkest bearing.
 fun estimateShadowDirection(
     image: BufferedImage,
     centerX: Double,
     centerY: Double,
     innerRadius: Double,
     outerRadius: Double,
+    casterMask: BooleanArray? = null,
 ): ShadowEstimate {
     val binTotals = DoubleArray(SHADOW_BIN_COUNT)
     val binCounts = IntArray(SHADOW_BIN_COUNT)
@@ -46,6 +52,7 @@ fun estimateShadowDirection(
             val reach = hypot(offsetX, offsetY)
             if (reach < innerRadius || reach > outerRadius) continue
             if (image.getRGB(column, row) == BACKGROUND_ARGB) continue
+            if (casterMask != null && casterMask[row * image.width + column]) continue
             val bin = binOf(atan2(offsetY, offsetX))
             binTotals[bin] += luminanceAt(image, column, row)
             binCounts[bin]++
@@ -56,11 +63,14 @@ fun estimateShadowDirection(
     if (occupied.size < SHADOW_BIN_COUNT / 2) return ShadowEstimate(Double.NaN, 0.0)
     val overallMean = occupied.average()
     if (overallMean <= 0.0) return ShadowEstimate(Double.NaN, 0.0)
+    // Only the darkest lobe votes: every bin voting turns the reading into the frame's whole
+    // shading gradient, and a grazing view has plenty of that pulling away from the shadow.
+    val deepShadowBound = overallMean - DEEP_SHADOW_SHARE * (overallMean - occupied.min())
     var darknessX = 0.0
     var darknessY = 0.0
     for (bin in 0 until SHADOW_BIN_COUNT) {
-        if (binMeans[bin].isNaN()) continue
-        val darkness = (overallMean - binMeans[bin]).coerceAtLeast(0.0)
+        if (binMeans[bin].isNaN() || binMeans[bin] > deepShadowBound) continue
+        val darkness = overallMean - binMeans[bin]
         val angle = binAngleOf(bin)
         darknessX += darkness * cos(angle)
         darknessY += darkness * sin(angle)
@@ -83,15 +93,39 @@ fun shadowDirectionOf(sunAzimuthDegrees: Double): Vec3 {
     return Vec3(sin(shadowAzimuth).toFloat(), 0f, cos(shadowAzimuth).toFloat())
 }
 
+data class ScreenShadow(val screenRadians: Double, val lengthPx: Double)
+
+fun projectShadow(
+    projector: ScreenProjector,
+    groundPoint: Vec3,
+    sunAzimuthDegrees: Double,
+    shadowMeters: Float = SHADOW_PROBE_METERS,
+): ScreenShadow? {
+    val origin = projector.project(groundPoint)
+    val tip = projector.project(groundPoint + shadowDirectionOf(sunAzimuthDegrees) * shadowMeters)
+    if (!origin.visible || !tip.visible) return null
+    val acrossScreen = (tip.x - origin.x).toDouble()
+    val downScreen = (tip.y - origin.y).toDouble()
+    return ScreenShadow(atan2(downScreen, acrossScreen), hypot(acrossScreen, downScreen))
+}
+
 fun expectedShadowScreenRadians(
     projector: ScreenProjector,
     groundPoint: Vec3,
     sunAzimuthDegrees: Double,
-): Double? {
-    val origin = projector.project(groundPoint)
-    val tip = projector.project(groundPoint + shadowDirectionOf(sunAzimuthDegrees) * SHADOW_PROBE_METERS)
-    if (!origin.visible || !tip.visible) return null
-    return atan2((tip.y - origin.y).toDouble(), (tip.x - origin.x).toDouble())
+): Double? = projectShadow(projector, groundPoint, sunAzimuthDegrees)?.screenRadians
+
+// The shadow the reading is about is the caster's own, so the annulus is sized to it: a fixed
+// pixel ring reads mostly open ground from an orbit and mostly building from a walking eye.
+fun shadowAnnulusOf(lengthPx: Double): Pair<Double, Double> {
+    val inner = (0.2 * lengthPx).coerceIn(6.0, 60.0)
+    val outer = (1.15 * lengthPx).coerceIn(inner + 8.0, 220.0)
+    return inner to outer
+}
+
+fun castShadowMetersOf(casterHeightMeters: Double, sunAltitudeDegrees: Double): Float {
+    if (sunAltitudeDegrees <= 1.0) return 60f
+    return (casterHeightMeters / tan(Math.toRadians(sunAltitudeDegrees))).coerceIn(0.5, 60.0).toFloat()
 }
 
 fun angleErrorDegrees(left: Double, right: Double): Double {
@@ -99,8 +133,6 @@ fun angleErrorDegrees(left: Double, right: Double): Double {
     return Math.toDegrees(if (difference > PI) 2 * PI - difference else difference)
 }
 
-// Advisory until the renderer grows a sun pass: scene3d tints terrain by elevation, so the
-// darkest direction around a point tracks the downhill slope, not the light. See TASKS.md.
 fun shadowFinding(
     subject: String,
     estimate: ShadowEstimate,
