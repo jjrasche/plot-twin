@@ -38,6 +38,7 @@ fun estimateShadowDirection(
     innerRadius: Double,
     outerRadius: Double,
     casterMask: BooleanArray? = null,
+    skyPixel: ((Int) -> Boolean)? = null,
 ): ShadowEstimate {
     val binTotals = DoubleArray(SHADOW_BIN_COUNT)
     val binCounts = IntArray(SHADOW_BIN_COUNT)
@@ -51,7 +52,9 @@ fun estimateShadowDirection(
             val offsetY = row - centerY
             val reach = hypot(offsetX, offsetY)
             if (reach < innerRadius || reach > outerRadius) continue
-            if (image.getRGB(column, row) == BACKGROUND_ARGB) continue
+            val argb = image.getRGB(column, row)
+            if (argb == BACKGROUND_ARGB) continue
+            if (skyPixel != null && skyPixel(argb)) continue
             if (casterMask != null && casterMask[row * image.width + column]) continue
             val bin = binOf(atan2(offsetY, offsetX))
             binTotals[bin] += luminanceAt(image, column, row)

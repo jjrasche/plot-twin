@@ -10,9 +10,10 @@ class SkylineCheckTest {
         val scene = toyPlotScene()
         val viewer = PlotViewer(scene.spec)
         val viewpoint = plotViewpoints(scene.state).first { it.name.startsWith("orbit-") }
+        val classifier = requireNotNull(skyClassifierOf(scene.spec, scene.daylight))
         val comparison = compareSkylines(
-            observedSkylineOf(viewer.capture(viewpoint.pose)),
-            predictedSkylineOf(scene.spec.meshesByEntity.values, viewer.projectorFor(viewpoint.pose)),
+            observedSkylineOf(viewer.capture(viewpoint.pose), classifier),
+            predictedSkylineOf(terrainAndEntityMeshesOf(scene.spec).values, viewer.projectorFor(viewpoint.pose)),
         )
         assertTrue(comparison.coverage >= SKYLINE_COVERAGE_BOUND, "coverage ${comparison.coverage}")
         assertTrue(comparison.agreement >= SKYLINE_AGREEMENT_BOUND, "agreement ${comparison.agreement}, median error ${comparison.medianRowError}")
@@ -25,9 +26,10 @@ class SkylineCheckTest {
         val viewpoints = plotViewpoints(scene.state)
         val rendered = viewpoints.first { it.name == "orbit-1-of-$ORBIT_STEPS" }
         val elsewhere = viewpoints.first { it.name == "orbit-3-of-$ORBIT_STEPS" }
+        val classifier = requireNotNull(skyClassifierOf(scene.spec, scene.daylight))
         val comparison = compareSkylines(
-            observedSkylineOf(viewer.capture(rendered.pose)),
-            predictedSkylineOf(scene.spec.meshesByEntity.values, viewer.projectorFor(elsewhere.pose)),
+            observedSkylineOf(viewer.capture(rendered.pose), classifier),
+            predictedSkylineOf(terrainAndEntityMeshesOf(scene.spec).values, viewer.projectorFor(elsewhere.pose)),
         )
         assertTrue(
             comparison.agreement < SKYLINE_AGREEMENT_BOUND,

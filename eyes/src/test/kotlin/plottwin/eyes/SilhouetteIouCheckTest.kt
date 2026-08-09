@@ -17,7 +17,7 @@ class SilhouetteIouCheckTest {
             viewer = viewer,
             viewpoint = viewpoint,
             entityName = "greenhouse",
-            meshesByEntity = scene.spec.meshesByEntity,
+            meshesByEntity = terrainAndEntityMeshesOf(scene.spec),
             renderedView = viewer.capture(viewpoint.pose),
         )
         assertTrue(finding.passed, finding.line())
@@ -33,7 +33,7 @@ class SilhouetteIouCheckTest {
             viewer.captureWithout("greenhouse", viewpoint.pose),
         )
         val fromElsewhere = predictedEntityMaskOf(
-            scene.spec.meshesByEntity,
+            terrainAndEntityMeshesOf(scene.spec),
             "greenhouse",
             viewer.projectorFor(plotViewpoints(scene.state).first { it.name == "overhead" }.pose),
         )

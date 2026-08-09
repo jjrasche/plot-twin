@@ -21,16 +21,20 @@ fun inspectPlot(scene: PlotScene, viewer: PlotViewer): List<ViewpointInspection>
 fun inspectViewpoint(scene: PlotScene, viewer: PlotViewer, viewpoint: Viewpoint): ViewpointInspection {
     val image = viewer.capture(viewpoint.pose)
     val projector = viewer.projectorFor(viewpoint.pose)
+    val classifier = skyClassifierOf(scene.spec, scene.daylight)
+    val solidMeshes = terrainAndEntityMeshesOf(scene.spec)
+    val predictedSkyline = predictedSkylineOf(solidMeshes.values, projector)
+    val observedSkyline = if (classifier == null) observedSkylineOf(image) else observedSkylineOf(image, classifier)
     val findings = ArrayList<EyeFinding>()
-    findings += skylineFindings(
-        viewpoint.name,
-        compareSkylines(observedSkylineOf(image), predictedSkylineOf(scene.spec.meshesByEntity.values, projector)),
-    )
+    findings += skylineFindings(viewpoint.name, compareSkylines(observedSkyline, predictedSkyline))
+    if (classifier != null) {
+        findings += skyRegionFindings(viewpoint.name, skyRegionReadingOf(image, classifier, predictedSkyline))
+    }
     findings += histogramFindings(viewpoint.name, luminanceHistogramOf(image))
-    findings += shadowFindingAt(scene, viewer, viewpoint, image)
+    findings += shadowFindingAt(scene, viewer, viewpoint, image, classifier)
     val subject = viewpoint.subject
-    if (subject != null && scene.spec.meshesByEntity.containsKey(subject)) {
-        findings += silhouetteFinding(viewer, viewpoint, subject, scene.spec.meshesByEntity, image)
+    if (subject != null && solidMeshes.containsKey(subject)) {
+        findings += silhouetteFinding(viewer, viewpoint, subject, solidMeshes, image)
     }
     return ViewpointInspection(viewpoint, image, findings)
 }
@@ -68,6 +72,7 @@ private fun shadowFindingAt(
     viewer: PlotViewer,
     viewpoint: Viewpoint,
     image: BufferedImage,
+    classifier: SkyClassifier?,
 ): EyeFinding {
     val projector = viewer.projectorFor(viewpoint.pose)
     val caster = principalShadowCasterOf(scene.state)
@@ -102,10 +107,14 @@ private fun shadowFindingAt(
             innerRadius,
             outerRadius,
             casterMaskOf(scene, viewer, caster, viewpoint, image),
+            skyPixelOf(classifier),
         ),
         expectedScreenRadians = shadow.screenRadians,
     )
 }
+
+fun skyPixelOf(classifier: SkyClassifier?): ((Int) -> Boolean)? =
+    classifier?.let { it::isSky }
 
 private fun casterMaskOf(
     scene: PlotScene,
