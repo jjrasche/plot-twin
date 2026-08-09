@@ -1,4 +1,6 @@
-seat+tasks: light and sky landed; stale Now list replaced with what is actually next
+charters 14-16: real terrain (3DEP+NAIP), eyes learn sky, earthworks commands
 
-The Now list still named charters that finished two runs ago. Replaced with the sky dome
-defects the lead found by eye and the real terrain ingest, which is the next rung.
+The 2026-08-08 overnight run's three lanes, from Jim's three priorities: address-to-walkable
+real parcel via USGS 3DEP + NAIP (Google Maps prohibited), sky-aware skyline so the dome joins
+the gated spec plus DEM-generic verification, and the Q-005 earthworks design implemented —
+regrade verb, surface ids, conserved spoil, earthwork ledger, 4D BIM staging research (Q-007).
