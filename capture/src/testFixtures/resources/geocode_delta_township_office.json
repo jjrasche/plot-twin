@@ -1,0 +1,7 @@
+{
+ "input_address": "7710 W Saginaw Hwy, Lansing, MI 48917",
+ "matched_address": "7710 W SAGINAW HWY, LANSING, MI, 48917",
+ "latitude_degrees": 42.741113960292,
+ "longitude_degrees": -84.663062487704,
+ "source": "US Census Geocoder, benchmark Public_AR_Current"
+}
