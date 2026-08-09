@@ -34,10 +34,12 @@ class RealParcelContactSheetTest {
     fun the_dem_predicted_skyline_agrees_with_the_rendered_skyline() {
         val scene = realParcelScene(RealParcelFixture.parcel())
         val viewer = PlotViewer(scene.spec)
+        val classifier = skyClassifierOf(scene.spec, scene.daylight)
         val comparisons = plotViewpoints(scene.state).map { viewpoint ->
             val image = viewer.capture(viewpoint.pose)
             val projector = viewer.projectorFor(viewpoint.pose)
-            viewpoint.name to compareSkylines(observedSkylineOf(image), predictedSkylineOf(scene.spec.meshesByEntity.values, projector))
+            val observed = if (classifier == null) observedSkylineOf(image) else observedSkylineOf(image, classifier)
+            viewpoint.name to compareSkylines(observed, predictedSkylineOf(terrainAndEntityMeshesOf(scene.spec).values, projector))
         }
         comparisons.forEach { (name, comparison) ->
             println("[real-parcel] $name skyline agreement %.3f coverage %.3f".format(comparison.agreement, comparison.coverage))

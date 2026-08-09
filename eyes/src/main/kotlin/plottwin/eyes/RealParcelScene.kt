@@ -10,6 +10,7 @@ import plottwin.capture.appendRealParcel
 import plottwin.capture.readCompiledParcel
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
+import plottwin.render.withSkyDome
 import plottwin.worldstate.WorldLog
 
 val REAL_PARCEL_VIEW_DATE: LocalDate = LocalDate.of(2026, 8, 8)
@@ -23,7 +24,9 @@ fun realParcelScene(parcel: CompiledParcel, moment: ZonedDateTime = realParcelMi
         log.currentState()
     }
     val daylight = daylightOverPlot(state, moment)
-    return PlotScene(state, projectWalkableScene(state, emptyList(), daylight, albedoTriplesOf(parcel)), daylight)
+    val terrain = requireNotNull(state.terrain) { "the real parcel scene needs a base-terrain row" }.grid
+    val spec = withSkyDome(projectWalkableScene(state, emptyList(), daylight, albedoTriplesOf(parcel)), terrain, daylight)
+    return PlotScene(state, spec, daylight)
 }
 
 fun realParcelSceneFromFile(parcelPath: Path, moment: ZonedDateTime? = null): PlotScene {
