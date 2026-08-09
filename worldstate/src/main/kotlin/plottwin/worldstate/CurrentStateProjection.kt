@@ -20,6 +20,7 @@ data class CurrentState(
     val proposedTerrain: Map<String, ProjectedTerrain> = emptyMap(),
     val realizedSurfaces: Map<String, Long> = emptyMap(),
     val earthworks: List<LoggedEarthwork> = emptyList(),
+    val stages: Map<String, StageRow> = emptyMap(),
     val site: SiteRow? = null,
 ) {
     val pendingOps: List<OpRow> get() = pendingOpsBySeq.values.toList()
@@ -56,6 +57,7 @@ private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = whe
     is TerrainDiffRow -> foldTerrainDiff(state, logged, row)
     is SurfaceRealizedRow -> state.copy(realizedSurfaces = state.realizedSurfaces + (row.surfaceName to row.confirmedBySeq))
     is EarthworkRow -> state.copy(earthworks = state.earthworks + LoggedEarthwork(logged.seq, causeOpSeqOf(logged), row))
+    is StageRow -> state.copy(stages = state.stages + (row.stageName to row))
 }
 
 private fun foldTerrainDiff(state: CurrentState, logged: LoggedRow, diff: TerrainDiffRow): CurrentState =

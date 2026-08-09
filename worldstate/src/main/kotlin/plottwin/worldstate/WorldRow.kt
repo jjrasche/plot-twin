@@ -107,6 +107,17 @@ data class SurfaceRealizedRow(
     val confirmedBySeq: Long,
 ) : WorldRow
 
+// Q-007: IfcTask-shaped staging — member ops, FINISH_START predecessors, optional planned dates (ISO-8601)
+@Serializable
+@SerialName("stage")
+data class StageRow(
+    val stageName: String,
+    val memberOpSeqs: List<Long>,
+    val predecessorStageNames: List<String> = emptyList(),
+    val scheduledStart: String? = null,
+    val scheduledFinish: String? = null,
+) : WorldRow
+
 @Serializable
 @SerialName("op_status")
 data class OpStatusRow(
