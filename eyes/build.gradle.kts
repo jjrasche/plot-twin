@@ -12,7 +12,9 @@ repositories {
 
 dependencies {
     api(project(":render"))
+    api(project(":capture"))
     implementation(testFixtures(project(":solvers")))
+    testImplementation(testFixtures(project(":capture")))
     implementation(compose.desktop.currentOs)
     testImplementation(libs.kotlin.test)
 }

@@ -9,7 +9,12 @@ import plottwin.worldstate.TerrainGrid
 private val DRY_GRASS = Rgb(0.42f, 0.55f, 0.29f)
 private val LUSH_GRASS = Rgb(0.34f, 0.52f, 0.26f)
 
-fun terrainMeshOf(terrain: TerrainGrid, frame: SceneFrame, shading: TerrainShading): Scene3dMesh {
+fun terrainMeshOf(
+    terrain: TerrainGrid,
+    frame: SceneFrame,
+    shading: TerrainShading,
+    albedoOverride: List<Rgb>? = null,
+): Scene3dMesh {
     val vertexCountX = terrain.columns + 1
     val vertexCountZ = terrain.rows + 1
     val cellMeters = terrain.cellSize.value
@@ -21,7 +26,8 @@ fun terrainMeshOf(terrain: TerrainGrid, frame: SceneFrame, shading: TerrainShadi
             vertices.add(frame.sceneZ(vertexZ * cellMeters))
         }
     }
-    val albedo = grassAlbedoOf(terrain)
+    val albedo = albedoOverride ?: grassAlbedoOf(terrain)
+    require(albedo.size == terrain.cellCount) { "expected ${terrain.cellCount} albedo cells, got ${albedo.size}" }
     val triColors = ArrayList<String>(terrain.columns * terrain.rows * 2)
     for (row in 0 until terrain.rows) {
         for (column in 0 until terrain.columns) {

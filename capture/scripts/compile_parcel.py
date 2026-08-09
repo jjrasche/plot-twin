@@ -131,7 +131,7 @@ def main() -> None:
     fixture = {"site": site} | compile_grid(
         dem, naip, dem_band, naip_bands, center_east, center_north, FIXTURE_CELLS_PER_SIDE, FIXTURE_CELL_SIZE_METERS, dem_manifest
     )
-    fixture_path = pathlib.Path(__file__).resolve().parent.parent / "src" / "test" / "resources" / "real_parcel_1m_90x90.json"
+    fixture_path = pathlib.Path(__file__).resolve().parent.parent / "src" / "testFixtures" / "resources" / "real_parcel_1m_90x90.json"
     write_json(fixture_path, fixture)
 
     provenance = parcel["provenance"]
