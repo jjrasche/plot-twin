@@ -1,6 +1,10 @@
-charters 14-16: real terrain (3DEP+NAIP), eyes learn sky, earthworks commands
+merge: eyes learn sky — the dome joins the gated spec
 
-The 2026-08-08 overnight run's three lanes, from Jim's three priorities: address-to-walkable
-real parcel via USGS 3DEP + NAIP (Google Maps prohibited), sky-aware skyline so the dome joins
-the gated spec plus DEM-generic verification, and the Q-005 earthworks design implemented —
-regrade verb, surface ids, conserved spoil, earthwork ledger, 4D BIM staging research (Q-007).
+Charter 15: a sky classifier reads the palette from the spec's own sky mesh (Chebyshev-10
+bucketed nearest-neighbour), so the skyline check knows sky from terrain and the dome enters
+the gated spec. The dome is rebuilt polar — rings uniform in the blend parameter, 256 spokes,
+below-horizon skirt, background set to the horizon tint — which kills both defects the lead
+found by eye: sky-above-skyline 0.89/0.11 -> 0.9995/0.9996, worst banding step 37.0 -> 1.9.
+The old square-lattice dome survives inside the banding test as its permanent prey, and the
+skyline predictor now takes any heightfield from the log. Lead gate: fresh cleanTest in the
+lane worktree, 130 tests 0 failures; contact sheets reviewed by the lead's eye.
