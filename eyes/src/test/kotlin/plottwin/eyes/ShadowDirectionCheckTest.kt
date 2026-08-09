@@ -28,7 +28,7 @@ class ShadowDirectionCheckTest {
             expected,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(lit, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
+        val finding = shadowFinding(viewpoint.name, sample(scene, lit, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
         assertTrue(finding.passed, "sun-aligned shadow was rejected: ${finding.line()}")
         assertTrue(finding.measured <= SHADOW_AZIMUTH_TOLERANCE_DEGREES, "azimuth error ${finding.measured} deg")
     }
@@ -51,7 +51,7 @@ class ShadowDirectionCheckTest {
             expected + PI / 2,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
+        val finding = shadowFinding(viewpoint.name, sample(scene, wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
         assertTrue(!finding.passed, "a shadow 90 deg off the sun should fail: ${finding.line()}")
     }
 
@@ -72,6 +72,13 @@ class ShadowDirectionCheckTest {
         assertTrue(eveningAzimuth > 180.0, "a 6:30pm August sun should stand west of south, got $eveningAzimuth")
     }
 
-    private fun sample(image: java.awt.image.BufferedImage, centerX: Double, centerY: Double): ShadowEstimate =
-        estimateShadowDirection(image, centerX, centerY, SHADOW_INNER_RADIUS_PX, SHADOW_OUTER_RADIUS_PX)
+    private fun sample(scene: PlotScene, image: java.awt.image.BufferedImage, centerX: Double, centerY: Double): ShadowEstimate =
+        estimateShadowDirection(
+            image,
+            centerX,
+            centerY,
+            SHADOW_INNER_RADIUS_PX,
+            SHADOW_OUTER_RADIUS_PX,
+            skyPixel = skyPixelOf(skyClassifierOf(scene.spec, scene.daylight)),
+        )
 }

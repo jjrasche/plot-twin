@@ -2,13 +2,17 @@ package plottwin.render
 
 import ai.factoredui.compose.scene3d.Scene3dEntity
 import ai.factoredui.compose.scene3d.Scene3dMesh
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
 import kotlin.math.sqrt
 import plottwin.worldstate.TerrainGrid
 
 const val SKY_ENTITY_ID = "sky"
-const val SKY_DOME_CELLS = 96
-const val SKY_RIM_HEIGHT_SHARE = 0.14f
+const val SKY_DOME_RING_CELLS = 96
+const val SKY_DOME_SPOKE_CELLS = 256
+const val SKY_SKIRT_RING_CELLS = 3
+const val SKY_SKIRT_DROP_SHARE = 0.08f
 const val SKY_DOME_RADIUS_MULTIPLE = 6.0f
 const val SUN_GLOW_TIGHTNESS = 24.0f
 
@@ -17,7 +21,10 @@ const val SUN_GLOW_TIGHTNESS = 24.0f
 fun withSkyDome(spec: WalkableSceneSpec, terrain: TerrainGrid, daylight: Daylight): WalkableSceneSpec {
     val dome = skyDomeMeshOf(skyDomeRadiusOf(terrain), daylight)
     return spec.copy(
-        world = spec.world.copy(entities = listOf(Scene3dEntity(id = SKY_ENTITY_ID)) + spec.world.entities),
+        world = spec.world.copy(
+            entities = listOf(Scene3dEntity(id = SKY_ENTITY_ID)) + spec.world.entities,
+            background = hexOf(daylight.horizonTint),
+        ),
         meshesByEntity = linkedMapOf(SKY_ENTITY_ID to dome) + spec.meshesByEntity,
     )
 }
@@ -25,36 +32,68 @@ fun withSkyDome(spec: WalkableSceneSpec, terrain: TerrainGrid, daylight: Dayligh
 fun skyDomeRadiusOf(terrain: TerrainGrid): Float =
     (maxOf(terrain.columns, terrain.rows) * terrain.cellSize.value).toFloat() * SKY_DOME_RADIUS_MULTIPLE
 
-fun skyDomeMeshOf(radius: Float, daylight: Daylight, cells: Int = SKY_DOME_CELLS): Scene3dMesh {
-    val cellSpan = 2f * radius / cells
-    val vertices = ArrayList<Float>((cells + 1) * (cells + 1) * 3)
-    for (vertexZ in 0..cells) {
-        for (vertexX in 0..cells) {
-            val east = -radius + vertexX * cellSpan
-            val north = -radius + vertexZ * cellSpan
-            vertices.add(east)
-            vertices.add(domeHeightAt(east, north, radius))
-            vertices.add(north)
+// Polar lattice: rows are rings uniform in the horizon-to-zenith blend parameter, columns are
+// azimuth spokes, so iso-colour contours align with the triangulation instead of cutting it.
+// Below the horizon a short skirt at full radius drops under every terrain silhouette.
+fun skyDomeMeshOf(radius: Float, daylight: Daylight): Scene3dMesh {
+    val ringVertexRows = SKY_SKIRT_RING_CELLS + SKY_DOME_RING_CELLS + 1
+    val perRow = SKY_DOME_SPOKE_CELLS + 1
+    val vertices = ArrayList<Float>(ringVertexRows * perRow * 3)
+    for (ringVertex in 0 until ringVertexRows) {
+        val up = ringHeightAt(ringVertex, radius)
+        val ringRadius = ringRadiusAt(ringVertex, radius)
+        for (spokeVertex in 0 until perRow) {
+            val azimuth = 2.0 * Math.PI * spokeVertex / SKY_DOME_SPOKE_CELLS
+            vertices.add((ringRadius * sin(azimuth)).toFloat())
+            vertices.add(up)
+            vertices.add((ringRadius * cos(azimuth)).toFloat())
         }
     }
-    val triColors = ArrayList<String>(cells * cells * 2)
-    for (row in 0 until cells) {
-        for (column in 0 until cells) {
-            val east = -radius + (column + 0.5f) * cellSpan
-            val north = -radius + (row + 0.5f) * cellSpan
-            val face = hexOf(skyColorToward(east, domeHeightAt(east, north, radius), north, radius, daylight))
-            triColors.add(face)
-            triColors.add(face)
+    val triColors = ArrayList<String>((ringVertexRows - 1) * SKY_DOME_SPOKE_CELLS * 2)
+    for (ring in 0 until ringVertexRows - 1) {
+        for (spoke in 0 until SKY_DOME_SPOKE_CELLS) {
+            val corner = ring * perRow + spoke
+            triColors.add(centroidColorOf(vertices, corner, corner + 1, corner + perRow, radius, daylight))
+            triColors.add(centroidColorOf(vertices, corner + 1, corner + perRow + 1, corner + perRow, radius, daylight))
         }
     }
-    return Scene3dMesh(vertices = vertices, triColors = triColors, gridCellsX = cells, gridCellsZ = cells)
+    return Scene3dMesh(
+        vertices = vertices,
+        triColors = triColors,
+        gridCellsX = SKY_DOME_SPOKE_CELLS,
+        gridCellsZ = ringVertexRows - 1,
+    )
 }
 
-// Floored, not cut off: a heightfield dropping to zero mid-cell tears into spikes.
-private fun domeHeightAt(east: Float, north: Float, radius: Float): Float {
-    val fromZenith = east * east + north * north
-    val onSphere = sqrt((radius * radius - fromZenith).coerceAtLeast(0f))
-    return maxOf(onSphere, radius * SKY_RIM_HEIGHT_SHARE)
+private fun ringBlendAt(ringVertex: Int): Float =
+    (ringVertex - SKY_SKIRT_RING_CELLS).toFloat() / SKY_DOME_RING_CELLS
+
+private fun ringHeightAt(ringVertex: Int, radius: Float): Float {
+    if (ringVertex <= SKY_SKIRT_RING_CELLS) {
+        return -SKY_SKIRT_DROP_SHARE * radius * (1f - ringVertex.toFloat() / SKY_SKIRT_RING_CELLS)
+    }
+    val blend = ringBlendAt(ringVertex)
+    return radius * blend * blend
+}
+
+private fun ringRadiusAt(ringVertex: Int, radius: Float): Float {
+    if (ringVertex <= SKY_SKIRT_RING_CELLS) return radius
+    val blend = ringBlendAt(ringVertex)
+    return radius * sqrt((1f - blend.pow(4)).coerceAtLeast(0f))
+}
+
+private fun centroidColorOf(
+    vertices: List<Float>,
+    first: Int,
+    second: Int,
+    third: Int,
+    radius: Float,
+    daylight: Daylight,
+): String {
+    val east = (vertices[first * 3] + vertices[second * 3] + vertices[third * 3]) / 3f
+    val up = (vertices[first * 3 + 1] + vertices[second * 3 + 1] + vertices[third * 3 + 1]) / 3f
+    val north = (vertices[first * 3 + 2] + vertices[second * 3 + 2] + vertices[third * 3 + 2]) / 3f
+    return hexOf(skyColorToward(east, up, north, radius, daylight))
 }
 
 private fun skyColorToward(east: Float, up: Float, north: Float, radius: Float, daylight: Daylight): Rgb {

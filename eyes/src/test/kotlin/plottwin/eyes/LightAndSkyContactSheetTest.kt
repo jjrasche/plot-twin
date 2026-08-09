@@ -6,7 +6,6 @@ import java.time.ZonedDateTime
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import plottwin.render.skyDomeRadiusOf
-import plottwin.render.withSkyDome
 import plottwin.solvers.ToyPlotFixture
 
 private const val SKY_BAND_ROWS = 40
@@ -19,11 +18,15 @@ private val sheetMoments = listOf(
 
 private class SkyTile(val label: String, val moment: ZonedDateTime, val image: BufferedImage, val skyLuminance: Double)
 
-private fun skyLitScene(moment: ZonedDateTime): PlotScene {
-    val plain = toyPlotScene(moment)
-    val terrain = plain.state.terrain!!.grid
-    return plain.copy(spec = withSkyDome(plain.spec, terrain, plain.daylight))
-}
+private fun skyLitScene(moment: ZonedDateTime): PlotScene = toyPlotScene(moment)
+
+private fun domelessSpec(scene: PlotScene) = scene.spec.copy(
+    world = scene.spec.world.copy(
+        entities = scene.spec.world.entities.filterNot { it.id == plottwin.render.SKY_ENTITY_ID },
+        background = plottwin.render.SCENE_BACKGROUND,
+    ),
+    meshesByEntity = terrainAndEntityMeshesOf(scene.spec),
+)
 
 private fun meanSkyBandLuminance(image: BufferedImage): Double {
     var total = 0.0
@@ -60,6 +63,7 @@ private fun shadowBearingAtTheGreenhouseOf(moment: ZonedDateTime): Double {
         innerRadius,
         outerRadius,
         renderedEntityMaskOf(image, viewer.captureWithout(caster, walkHeight.pose)),
+        skyPixelOf(skyClassifierOf(scene.spec, scene.daylight)),
     ).screenRadians
 }
 
@@ -128,7 +132,7 @@ class LightAndSkyContactSheetTest {
         val viewer = PlotViewer(scene.spec)
         val walkPose = plotViewpoints(scene.state).first { it.subject == "greenhouse" }.pose
         val withSky = viewer.capture(walkPose)
-        val withoutSky = PlotViewer(toyPlotScene(ToyPlotFixture.toyMidday).spec).capture(walkPose)
+        val withoutSky = PlotViewer(domelessSpec(scene)).capture(walkPose)
 
         val skyPixels = (0 until withSky.width step 4).count { column -> withSky.getRGB(column, 4) != BACKGROUND_ARGB }
         assertTrue(skyPixels > withSky.width / 8, "the dome left the top of the frame as bare background")
