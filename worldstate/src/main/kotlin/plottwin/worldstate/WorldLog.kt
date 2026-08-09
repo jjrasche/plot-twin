@@ -39,6 +39,8 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
 
     fun append(row: WorldRow, writer: WriterRole, refs: List<RowRef> = emptyList()): Long {
         requireGeometryWriter(row, writer)
+        if (row is OpRow) requireCoordinateFreeSlots(row)
+        if (row is EarthworkRow && !isConserved(row)) throw EarthworkNotConserved(row)
         val seq = insertRow(row, writer, refs)
         notifyRuleTriggers(row)
         notifyOpTriggers(seq, row)

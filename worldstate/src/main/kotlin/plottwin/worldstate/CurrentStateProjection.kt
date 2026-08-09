@@ -17,9 +17,17 @@ data class CurrentState(
     val pendingOpsBySeq: Map<Long, OpRow>,
     val rejections: List<RejectionRow>,
     val terrain: ProjectedTerrain? = null,
+    val proposedTerrain: Map<String, ProjectedTerrain> = emptyMap(),
+    val realizedSurfaces: Map<String, Long> = emptyMap(),
+    val earthworks: List<LoggedEarthwork> = emptyList(),
     val site: SiteRow? = null,
 ) {
     val pendingOps: List<OpRow> get() = pendingOpsBySeq.values.toList()
+
+    fun terrainOn(surface: Surface): ProjectedTerrain? = when (surface) {
+        Surface.Measured -> terrain
+        is Surface.Proposed -> proposedTerrain[surface.name]
+    }
 
     companion object {
         val EMPTY = CurrentState(
@@ -44,8 +52,19 @@ private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = whe
     is OpRow -> state.copy(pendingOpsBySeq = state.pendingOpsBySeq + (logged.seq to row))
     is OpStatusRow -> consumeOp(state, logged)
     is RejectionRow -> state.copy(rejections = state.rejections + row)
-    is BaseTerrainRow, is TerrainDiffRow -> state.copy(terrain = foldTerrain(state.terrain, logged))
+    is BaseTerrainRow -> state.copy(terrain = foldTerrain(state.terrain, logged))
+    is TerrainDiffRow -> foldTerrainDiff(state, logged, row)
+    is SurfaceRealizedRow -> state.copy(realizedSurfaces = state.realizedSurfaces + (row.surfaceName to row.confirmedBySeq))
+    is EarthworkRow -> state.copy(earthworks = state.earthworks + LoggedEarthwork(logged.seq, causeOpSeqOf(logged), row))
 }
+
+private fun foldTerrainDiff(state: CurrentState, logged: LoggedRow, diff: TerrainDiffRow): CurrentState =
+    when (val surface = diff.surface) {
+        Surface.Measured -> state.copy(terrain = foldTerrain(state.terrain, logged))
+        is Surface.Proposed -> state.copy(
+            proposedTerrain = foldProposalTerrain(state.proposedTerrain, state.terrain, logged, diff, surface.name),
+        )
+    }
 
 private fun consumeOp(state: CurrentState, statusLogged: LoggedRow): CurrentState {
     val consumedOpSeq = causeOpSeqOf(statusLogged) ?: return state

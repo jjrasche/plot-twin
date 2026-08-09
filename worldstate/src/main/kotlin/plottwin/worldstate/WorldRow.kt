@@ -9,9 +9,9 @@ enum class Hardness { HARD, SOFT }
 
 enum class LockKind { LOCK, MASK }
 
-enum class OpVerb { ADD_ROOM, MOVE, RESIZE, REROUTE, RELAX, LOCK }
+enum class OpVerb { ADD_ROOM, MOVE, RESIZE, REROUTE, RELAX, LOCK, REGRADE }
 
-enum class OpSlot { SUBJECT, ROOM_KIND, DESTINATION, RELATION, RULE_NAME, EXTENT_TEXT }
+enum class OpSlot { SUBJECT, ROOM_KIND, DESTINATION, RELATION, RULE_NAME, EXTENT_TEXT, GROUND_FORM, SPOIL_DESTINATION }
 
 enum class OpStatus { RESOLVED, REJECTED }
 
@@ -90,6 +90,21 @@ data class TerrainDiffRow(
     val columns: Int,
     val rows: Int,
     val heightsBase64: String,
+    val surface: Surface = Surface.Measured,
+    val branchedFromSeq: Long? = null,
+) : WorldRow {
+    init {
+        require((surface is Surface.Proposed) == (branchedFromSeq != null)) {
+            "a proposed diff carries the measured baseline seq it branched from; a measured diff carries none"
+        }
+    }
+}
+
+@Serializable
+@SerialName("surface_realized")
+data class SurfaceRealizedRow(
+    val surfaceName: String,
+    val confirmedBySeq: Long,
 ) : WorldRow
 
 @Serializable
@@ -112,11 +127,14 @@ data class RejectionRow(
     val violations: List<RejectedViolation>,
 ) : WorldRow
 
-// D-013: capture measures (footprints, ground), the optimizer places (position diffs)
+// D-013 as amended: the writer role derives from the surface — measured ground is CAPTURE's,
+// proposed ground is the OPTIMIZER's, and realization is capture confirming a proposal.
 fun geometryWriterFor(row: WorldRow): WriterRole? = when {
     row is PositionDiffRow -> WriterRole.OPTIMIZER
     row is EntityRow && row.footprint.isNotEmpty() -> WriterRole.CAPTURE
-    row is BaseTerrainRow || row is TerrainDiffRow -> WriterRole.CAPTURE
+    row is TerrainDiffRow -> if (row.surface is Surface.Proposed) WriterRole.OPTIMIZER else WriterRole.CAPTURE
+    row is BaseTerrainRow -> WriterRole.CAPTURE
+    row is SurfaceRealizedRow -> WriterRole.CAPTURE
     row is SiteRow -> WriterRole.CAPTURE
     else -> null
 }
