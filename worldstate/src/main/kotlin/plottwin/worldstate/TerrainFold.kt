@@ -2,8 +2,29 @@ package plottwin.worldstate
 
 fun foldTerrain(terrain: ProjectedTerrain?, logged: LoggedRow): ProjectedTerrain? = when (val row = logged.row) {
     is BaseTerrainRow -> ProjectedTerrain(logged.seq, terrainGridOf(row))
-    is TerrainDiffRow -> terrain?.let { ProjectedTerrain(logged.seq, patchedGrid(it.grid, row)) }
+    is TerrainDiffRow ->
+        if (row.surface == Surface.Measured) terrain?.let { ProjectedTerrain(logged.seq, patchedGrid(it.grid, row)) }
+        else terrain
     else -> terrain
+}
+
+fun foldProposalTerrain(
+    proposed: Map<String, ProjectedTerrain>,
+    measured: ProjectedTerrain?,
+    logged: LoggedRow,
+    diff: TerrainDiffRow,
+    surfaceName: String,
+): Map<String, ProjectedTerrain> {
+    val branchBase = proposed[surfaceName] ?: branchOffMeasured(measured, diff)
+    return proposed + (surfaceName to ProjectedTerrain(logged.seq, patchedGrid(branchBase.grid, diff)))
+}
+
+private fun branchOffMeasured(measured: ProjectedTerrain?, diff: TerrainDiffRow): ProjectedTerrain {
+    requireNotNull(measured) { "a proposal branches off measured ground; no base-terrain row logged yet" }
+    require(diff.branchedFromSeq == measured.versionSeq) {
+        "proposal claims measured baseline seq ${diff.branchedFromSeq} but measured ground is at seq ${measured.versionSeq}"
+    }
+    return measured
 }
 
 private fun patchedGrid(baseGrid: TerrainGrid, diff: TerrainDiffRow): TerrainGrid {

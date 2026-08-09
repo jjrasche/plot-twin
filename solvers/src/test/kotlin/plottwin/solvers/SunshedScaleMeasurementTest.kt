@@ -3,6 +3,7 @@ package plottwin.solvers
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import plottwin.worldstate.Surface
 
 private val measuredDay: LocalDate = LocalDate.of(2026, 6, 21)
 
@@ -27,7 +28,7 @@ class SunshedScaleMeasurementTest {
     fun a_whole_solstice_day_of_sun_hours_over_two_acres_stays_inside_a_solver_run() {
         val state = ToyPlotFixture.toyState()
         val startedAt = System.nanoTime()
-        val hours = requireNotNull(UNCACHED_SUNSHED_FIELD.directSunHoursOf(state, measuredDay))
+        val hours = requireNotNull(UNCACHED_SUNSHED_FIELD.directSunHoursOf(state, measuredDay, Surface.Measured))
         val elapsedMillis = (System.nanoTime() - startedAt) / 1e6
 
         val daylightSamples = daylightRaysOn(ToyPlotFixture.toySite, measuredDay).size

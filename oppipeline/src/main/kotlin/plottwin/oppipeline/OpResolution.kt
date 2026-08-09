@@ -12,6 +12,7 @@ import plottwin.worldstate.OpSlot
 import plottwin.worldstate.OpVerb
 import plottwin.worldstate.RejectedViolation
 import plottwin.worldstate.RejectionRow
+import plottwin.worldstate.Surface
 import plottwin.worldstate.metersOf
 
 val DEFAULT_ROOM_HEIGHT: Meters = metersOf(feet = 9)
@@ -19,14 +20,16 @@ val DEFAULT_ROOM_HEIGHT: Meters = metersOf(feet = 9)
 data class PlacementWorld(
     val projection: CurrentState,
     val date: LocalDate,
+    val surface: Surface,
     val constraints: List<Constraint>,
     val candidateSpacing: Meters,
     val flowFields: FlowFieldCache = FlowFieldCache(),
 )
 
-fun resolvePlacement(world: PlacementWorld, op: OpRow): PlacementVerdict = when (op.verb) {
+fun resolvePlacement(world: PlacementWorld, opSeq: Long, op: OpRow): PlacementVerdict = when (op.verb) {
     OpVerb.ADD_ROOM -> resolveAddRoom(world, op)
     OpVerb.MOVE -> resolveMove(world, op)
+    OpVerb.REGRADE -> resolveRegrade(world, opSeq, op)
     OpVerb.RESIZE, OpVerb.REROUTE, OpVerb.RELAX, OpVerb.LOCK -> slotRejection(op, "verb-unsupported")
 }
 
@@ -65,7 +68,7 @@ private fun lockedRejection(projection: CurrentState, op: OpRow, subjectName: St
     return Rejection(RejectionRow(op, listOf(RejectedViolation("entity-locked", lockLocation, 0.0))))
 }
 
-private fun slotRejection(op: OpRow, ruleName: String): Rejection =
+internal fun slotRejection(op: OpRow, ruleName: String): Rejection =
     Rejection(RejectionRow(op, listOf(RejectedViolation(ruleName, GROUND_ORIGIN, 0.0))))
 
 private val GROUND_ORIGIN = GroundPoint(Meters(0.0), Meters(0.0))

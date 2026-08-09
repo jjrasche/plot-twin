@@ -9,7 +9,7 @@ import plottwin.worldstate.TerrainGrid
 object WaterlogAccumulation : LeafSolver {
     override fun findViolations(world: SolverWorld, constraint: Constraint): List<Violation> {
         if (constraint !is WaterlogConstraint) return emptyList()
-        val terrain = world.state.terrain ?: return emptyList()
+        val terrain = world.state.terrainOn(world.surface) ?: return emptyList()
         val footprintRing = world.state.entities[constraint.entityName]?.footprint ?: return emptyList()
         if (footprintRing.size < 3) return emptyList()
         val upslopeCounts = world.upslopeFields.upslopeCellCountsOf(terrain)

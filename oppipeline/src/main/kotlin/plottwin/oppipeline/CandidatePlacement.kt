@@ -76,7 +76,7 @@ private fun evaluateCandidate(
 }
 
 private fun runConstraintSolvers(world: PlacementWorld, projection: CurrentState): List<Violation> =
-    runSolvers(SolverWorld(projection, world.date, world.flowFields), world.constraints)
+    runSolvers(SolverWorld(projection, world.date, world.surface, world.flowFields), world.constraints)
 
 private fun isHardRule(projection: CurrentState, ruleName: String): Boolean =
     (projection.rules[ruleName]?.hardness ?: Hardness.HARD) == Hardness.HARD

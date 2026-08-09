@@ -13,6 +13,7 @@ import plottwin.worldstate.Meters
 import plottwin.worldstate.RawElevation
 import plottwin.worldstate.RuleRow
 import plottwin.worldstate.SiteRow
+import plottwin.worldstate.Surface
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
 
@@ -48,7 +49,7 @@ private fun southWall(heightMeters: Double) = EntityRow(
 )
 
 private fun bedSunHours(state: CurrentState): Double {
-    val hours = requireNotNull(UNCACHED_SUNSHED_FIELD.directSunHoursOf(state, summerDay))
+    val hours = requireNotNull(UNCACHED_SUNSHED_FIELD.directSunHoursOf(state, summerDay, Surface.Measured))
     val grid = state.terrain!!.grid
     return (0 until grid.cellCount)
         .filter { cell -> plottwin.geometry.isInsidePolygon(grid.centerOf(cell), bedFootprint) }
@@ -84,7 +85,7 @@ class SunshedSweepTest {
     @Test
     fun the_solver_reports_the_shortfall_in_hours_against_the_rule() {
         val state = flatYardState(southWall(heightMeters = 6.0))
-        val world = SolverWorld(state, summerDay)
+        val world = SolverWorld(state, summerDay, Surface.Measured)
         val constraint = SunHoursConstraint("bed-sun", "seed bed", minimumDirectHours = 14.0)
         val violations = runSolvers(world, listOf(constraint))
         val sunshed = violations.single { it.ruleName == "bed-sun" }
@@ -94,7 +95,7 @@ class SunshedSweepTest {
 
     @Test
     fun a_bed_that_makes_its_hours_raises_no_violation() {
-        val world = SolverWorld(flatYardState(), summerDay)
+        val world = SolverWorld(flatYardState(), summerDay, Surface.Measured)
         val constraint = SunHoursConstraint("bed-sun", "seed bed", minimumDirectHours = 6.0)
         assertTrue(runSolvers(world, listOf(constraint)).none { it.ruleName == "bed-sun" })
     }
@@ -103,12 +104,12 @@ class SunshedSweepTest {
     fun the_cache_answers_a_repeat_date_without_sweeping_again() {
         val state = flatYardState()
         var sweeps = 0
-        val cache = SunshedCache { cachedState, date ->
+        val cache = SunshedCache { cachedState, date, cachedSurface ->
             sweeps++
-            UNCACHED_SUNSHED_FIELD.directSunHoursOf(cachedState, date)
+            UNCACHED_SUNSHED_FIELD.directSunHoursOf(cachedState, date, cachedSurface)
         }
-        cache.directSunHoursOf(state, summerDay)
-        cache.directSunHoursOf(state, summerDay)
+        cache.directSunHoursOf(state, summerDay, Surface.Measured)
+        cache.directSunHoursOf(state, summerDay, Surface.Measured)
         assertEquals(1, sweeps)
     }
 }

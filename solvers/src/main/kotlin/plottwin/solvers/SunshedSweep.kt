@@ -9,10 +9,10 @@ import plottwin.worldstate.TerrainGrid
 object SunshedSweep : LeafSolver {
     override fun findViolations(world: SolverWorld, constraint: Constraint): List<Violation> {
         if (constraint !is SunHoursConstraint) return emptyList()
-        val terrain = world.state.terrain ?: return emptyList()
+        val terrain = world.state.terrainOn(world.surface) ?: return emptyList()
         val footprintRing = world.state.entities[constraint.bedName]?.footprint ?: return emptyList()
         if (footprintRing.size < 3) return emptyList()
-        val directSunHours = world.sunshedFields.directSunHoursOf(world.state, world.date) ?: return emptyList()
+        val directSunHours = world.sunshedFields.directSunHoursOf(world.state, world.date, world.surface) ?: return emptyList()
         val darkestCell = darkestCellInside(terrain.grid, directSunHours, footprintRing)
         if (darkestCell == NO_SUNSHED_CELL) return emptyList()
         return listOfNotNull(shortfallViolation(world, terrain.grid, constraint, darkestCell, directSunHours[darkestCell]))

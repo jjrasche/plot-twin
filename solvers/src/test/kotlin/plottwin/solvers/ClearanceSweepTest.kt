@@ -8,6 +8,7 @@ import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity
+import plottwin.worldstate.Surface
 import plottwin.worldstate.TerrainGrid
 
 class ClearanceSweepTest {
@@ -53,7 +54,7 @@ class ClearanceSweepTest {
 
     private fun worldWith(path: PlacedEntity, obstacle: PlacedEntity): SolverWorld {
         val state = CurrentState.EMPTY.copy(entities = mapOf(PATH_NAME to path, "planter" to obstacle))
-        return SolverWorld(state, LocalDate.of(2026, 8, 5))
+        return SolverWorld(state, LocalDate.of(2026, 8, 5), Surface.Measured)
     }
 
     private fun straightPath(): PlacedEntity = PlacedEntity(

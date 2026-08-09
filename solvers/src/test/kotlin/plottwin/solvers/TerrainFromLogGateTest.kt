@@ -7,6 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import plottwin.worldstate.GriddedElevationOperator
 import plottwin.worldstate.ProjectedTerrain
+import plottwin.worldstate.Surface
 import plottwin.worldstate.WorldLog
 
 class TerrainFromLogGateTest {
@@ -23,7 +24,7 @@ class TerrainFromLogGateTest {
         )
 
         val fromLog = runSolvers(ToyPlotFixture.toyWorld(), ToyPlotFixture.toyConstraints())
-        val fromSideChannel = runSolvers(SolverWorld(sideChannelState, ToyPlotFixture.toyDate), ToyPlotFixture.toyConstraints())
+        val fromSideChannel = runSolvers(SolverWorld(sideChannelState, ToyPlotFixture.toyDate, Surface.Measured), ToyPlotFixture.toyConstraints())
 
         assertEquals(fromSideChannel, fromLog)
     }
