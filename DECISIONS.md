@@ -31,6 +31,7 @@ Every LLM op appends through the schema waist (add_room · move · resize · rer
 
 ## D-005 — solvers = runner + pure leaves, ranked emit, date-parameterized (2026-08-05, locked) #solvers
 Runner fans out, aggregates, ranks by severity (ranking is the runner's); leaves are pure `f(state, rule) -> [violations]` in four families (geometry · propagation-sheds · accumulation/D8 · land+zoning). Solvers take a date — sun/shade/deciduous are seasonal.
+**Amended 2026-08-08 (per Q-005): solvers take `(date, surface)`.** The terrain projection is parameterized by surface identity — `measured` or `proposed(<name>)` — exactly as solvers are parameterized by date, and neither parameter has a default: "does the greenhouse flood?" reads a proposal, "did the contractor build it right?" reads measured, and no caller gets an implicit answer. Enforced at the type level — `SolverWorld` requires a surface, so a solver call that names no ground does not compile.
 
 ## D-006 — one Rule class with a hardness field; objective = weighted soft rules (2026-08-05, locked) #rules
 hard → gates, soft → scores; the same rule can flip by source (permit = hard, taste = soft). Weights are configurable, versioned rows. Weight is a rule's input; severity is a violation's output. Nothing is random: objective decides, deterministic tie-break settles. Landmarks the owner references become named entity rows (anything referenced twice earns a name).
@@ -69,6 +70,7 @@ The prose is the why (owner-facing rationale); the typed constraint is the imple
 
 ## D-013 — two geometry writer roles: capture measures, optimizer places (2026-08-06, default taken) #provenance
 Measured geometry (LiDAR/survey/photo ingestion) and placed geometry (optimizer output) carry different writer signatures. Rows answer "who says the ground is here" vs "who decided the greenhouse goes here". Default taken by the lead after both charter-1 and charter-3 workers independently hit the single-writer wall; surfaced to the owner.
+**Amended 2026-08-08 (per Q-005): for terrain rows the writer role derives from the surface, it is not a free signature.** Terrain rows carry a surface id — `measured`, or `proposed(<name>)` with the measured baseline seq the proposal branched from — and the role follows: measured ground ⇒ CAPTURE, proposed ground ⇒ OPTIMIZER; the log rejects any other pairing. A `surface_realized` row (CAPTURE-only) retires a proposal once capture confirms it was built; the proposal is never rewritten, and measured-now minus proposal is the as-built deviation. A tightening of the two-roles ruling, not a loosening.
 
 ## D-014 — the lead merges plot-twin at its own discretion (2026-08-06, ruled) #process
 Verified-gate branches land on main by the lead's call; no per-merge ratification. factored-ui merges remain the owner's.
