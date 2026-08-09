@@ -66,12 +66,14 @@ class SkyClassifierTest {
     }
 
     @Test
-    fun grass_entity_and_marker_colours_stay_outside_the_sky_palette() {
-        val scene = toyPlotScene(ToyPlotFixture.toyMidday)
-        val classifier = requireNotNull(skyClassifierOf(scene.spec, scene.daylight))
-        val solidColors = terrainAndEntityMeshesOf(scene.spec).values.flatMap { it.triColors }.toHashSet()
-        val misread = solidColors.filter { classifier.isSky(argbOfHex(it)) }
-        assertTrue(misread.isEmpty(), "solid-geometry colours inside the sky palette: $misread")
+    fun grass_entity_and_marker_colours_stay_outside_the_sky_palette_all_day() {
+        for (moment in listOf(ToyPlotFixture.toyMorning, ToyPlotFixture.toyMidday, ToyPlotFixture.toyEvening)) {
+            val scene = toyPlotScene(moment)
+            val classifier = requireNotNull(skyClassifierOf(scene.spec, scene.daylight))
+            val solidColors = terrainAndEntityMeshesOf(scene.spec).values.flatMap { it.triColors }.toHashSet()
+            val misread = solidColors.filter { classifier.isSky(argbOfHex(it)) }
+            assertTrue(misread.isEmpty(), "solid-geometry colours inside the sky palette at $moment: $misread")
+        }
     }
 
     @Test
