@@ -1,3 +1,4 @@
 .claude/global-hook-debug.log
 .gradle/
 build/
+__pycache__/

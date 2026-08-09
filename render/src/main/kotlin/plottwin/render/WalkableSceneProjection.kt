@@ -21,12 +21,18 @@ data class WalkableSceneSpec(
     @SerialName("meshes_by_entity") val meshesByEntity: Map<String, Scene3dMesh>,
 )
 
-fun projectWalkableScene(state: CurrentState, violations: List<Violation>, daylight: Daylight): WalkableSceneSpec {
+fun projectWalkableScene(
+    state: CurrentState,
+    violations: List<Violation>,
+    daylight: Daylight,
+    terrainAlbedoTriples: FloatArray? = null,
+): WalkableSceneSpec {
     val terrain = requireNotNull(state.terrain) { "cannot project a walkable scene before a base-terrain row is logged" }.grid
     val frame = sceneFrameOf(terrain)
     val meshes = LinkedHashMap<String, Scene3dMesh>()
     val shading = terrainShadingFor(state, daylight, RENDER_DOWNSAMPLE_FACTOR)
-    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading)
+    val albedoOverride = terrainAlbedoTriples?.let { averagedAlbedoOf(it, terrain, RENDER_DOWNSAMPLE_FACTOR) }
+    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading, albedoOverride)
     for ((entityName, placed) in state.entities) {
         meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight)
     }
@@ -44,6 +50,18 @@ fun projectWalkableScene(state: CurrentState, violations: List<Violation>, dayli
 }
 
 fun violationMarkerId(violation: Violation, rank: Int): String = "violation-${violation.ruleName}-$rank"
+
+// full-res rgb triples averaged down per channel, so a render cell carries its cells' mean color
+fun averagedAlbedoOf(triples: FloatArray, terrain: TerrainGrid, downsampleFactor: Int): List<Rgb> {
+    require(triples.size == terrain.cellCount * 3) { "expected ${terrain.cellCount * 3} albedo floats, got ${triples.size}" }
+    val red = FloatArray(terrain.cellCount) { triples[it * 3] }
+    val green = FloatArray(terrain.cellCount) { triples[it * 3 + 1] }
+    val blue = FloatArray(terrain.cellCount) { triples[it * 3 + 2] }
+    val coarseRed = averageDown(red, terrain.columns, terrain.rows, downsampleFactor)
+    val coarseGreen = averageDown(green, terrain.columns, terrain.rows, downsampleFactor)
+    val coarseBlue = averageDown(blue, terrain.columns, terrain.rows, downsampleFactor)
+    return List(coarseRed.size) { Rgb(coarseRed[it], coarseGreen[it], coarseBlue[it]) }
+}
 
 fun overviewCameraOf(terrain: TerrainGrid): Scene3dCameraState {
     val plotWidth = (terrain.columns * terrain.cellSize.value).toFloat()
