@@ -5,8 +5,21 @@ only a pointer here.
 
 - role: lead — holds goal, charters build subagents, verifies by running, lands merges
 - topology: orchestrator-worker (subagents build); brothers board only for cross-tab peers (common-ground)
-- when: 2026-08-07T04:30Z
+- when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
+
+## RUN 5 IN FLIGHT (2026-08-08 night)
+
+Jim's three priorities, verbatim charters at .claude/charters/overnight-{14,15,16}-*.md.
+Baseline gate run fresh by the lead on main @ 482bff1: BUILD SUCCESSFUL, 122 tests 0 failures.
+
+- lane 14 real terrain: address → 3DEP DEM + NAIP → log rows → walkable real parcel.
+  Worktree ../.git-worktrees/pt-terrain, branch build/real-terrain. Google Maps prohibited.
+- lane 15 eyes sky: sky-aware skyline (dome joins the gated spec), DEM-generic skyline,
+  fix dome fan-banding + horizon dark band. Worktree pt-eyes-sky, branch build/eyes-sky.
+- lane 16 earthworks: Q-005 implemented — regrade verb, surface ids, (date,surface) solvers,
+  conservation invariant + ledger, three intent tests, Q-007 4D-BIM staging research.
+  Worktree pt-earthworks, branch build/earthworks. Amends D-005/D-013 as charter-authorized.
 
 ## RUN 3 MORNING REPORT (2026-08-06 night → 2026-08-07)
 
