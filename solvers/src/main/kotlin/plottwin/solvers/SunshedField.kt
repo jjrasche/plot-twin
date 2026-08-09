@@ -3,9 +3,10 @@ package plottwin.solvers
 import java.time.LocalDate
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.PlacedEntity
+import plottwin.worldstate.Surface
 
 fun interface SunshedFieldSource {
-    fun directSunHoursOf(state: CurrentState, date: LocalDate): FloatArray?
+    fun directSunHoursOf(state: CurrentState, date: LocalDate, surface: Surface): FloatArray?
 }
 
 fun directSunHoursOf(surface: OccluderSurface, rays: List<SunRay>, sampleMinutes: Long): FloatArray {
@@ -18,10 +19,10 @@ fun directSunHoursOf(surface: OccluderSurface, rays: List<SunRay>, sampleMinutes
     return hours
 }
 
-val UNCACHED_SUNSHED_FIELD: SunshedFieldSource = SunshedFieldSource { state, date ->
+val UNCACHED_SUNSHED_FIELD: SunshedFieldSource = SunshedFieldSource { state, date, surface ->
     val site = state.site ?: return@SunshedFieldSource null
-    val surface = occluderSurfaceOf(state) ?: return@SunshedFieldSource null
-    directSunHoursOf(surface, daylightRaysOn(site, date), SUN_SAMPLE_MINUTES)
+    val occluders = occluderSurfaceOf(state, surface) ?: return@SunshedFieldSource null
+    directSunHoursOf(occluders, daylightRaysOn(site, date), SUN_SAMPLE_MINUTES)
 }
 
 // everything the sweep reads is in the key: ground version, what stands on it, and the date
@@ -36,9 +37,9 @@ class SunshedCache(
 ) : SunshedFieldSource {
     private val hoursByKey = mutableMapOf<SunshedKey, FloatArray>()
 
-    override fun directSunHoursOf(state: CurrentState, date: LocalDate): FloatArray? {
-        val terrain = state.terrain ?: return null
+    override fun directSunHoursOf(state: CurrentState, date: LocalDate, surface: Surface): FloatArray? {
+        val terrain = state.terrainOn(surface) ?: return null
         val key = SunshedKey(terrain.versionSeq, state.entities, date)
-        return hoursByKey.getOrPut(key) { source.directSunHoursOf(state, date) ?: return null }
+        return hoursByKey.getOrPut(key) { source.directSunHoursOf(state, date, surface) ?: return null }
     }
 }

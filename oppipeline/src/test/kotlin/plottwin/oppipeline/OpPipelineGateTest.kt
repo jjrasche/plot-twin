@@ -22,6 +22,7 @@ import plottwin.worldstate.OpStatusRow
 import plottwin.worldstate.OpVerb
 import plottwin.worldstate.PositionDiffRow
 import plottwin.worldstate.RejectionRow
+import plottwin.worldstate.Surface
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
 import plottwin.worldstate.causeOpSeqOf
@@ -183,6 +184,7 @@ class OpPipelineGateTest {
         OpPipeline(
             log = log,
             date = ToyPlotFixture.toyDate,
+            surface = Surface.Measured,
             constraints = pipelineConstraints(),
             candidateSpacing = candidateSpacing,
         ).attach()
@@ -195,7 +197,7 @@ class OpPipelineGateTest {
     )
 
     private fun runToyConstraintSolvers(log: WorldLog) = runSolvers(
-        SolverWorld(log.currentState(), ToyPlotFixture.toyDate),
+        SolverWorld(log.currentState(), ToyPlotFixture.toyDate, Surface.Measured),
         pipelineConstraints(),
     )
 

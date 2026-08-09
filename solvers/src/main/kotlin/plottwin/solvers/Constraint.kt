@@ -25,5 +25,10 @@ data class SunHoursConstraint(
     val minimumDirectHours: Double,
 ) : Constraint
 
+data class EarthworkBalanceConstraint(
+    override val ruleName: String,
+    val maxHaulOffCubicMeters: Double,
+) : Constraint
+
 internal fun ruleWeightOf(state: CurrentState, ruleName: String): Double =
     state.rules[ruleName]?.weight ?: 1.0

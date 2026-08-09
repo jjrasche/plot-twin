@@ -6,10 +6,11 @@ import kotlin.test.assertEquals
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
+import plottwin.worldstate.Surface
 
 class SolverRunnerTest {
 
-    private val emptyWorld = SolverWorld(CurrentState.EMPTY, LocalDate.of(2026, 8, 5))
+    private val emptyWorld = SolverWorld(CurrentState.EMPTY, LocalDate.of(2026, 8, 5), Surface.Measured)
 
     @Test
     fun runner_fans_every_constraint_over_every_leaf_and_ranks_the_union() {

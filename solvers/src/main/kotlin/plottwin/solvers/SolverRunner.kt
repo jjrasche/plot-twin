@@ -1,6 +1,6 @@
 package plottwin.solvers
 
-val registeredLeafSolvers: List<LeafSolver> = listOf(ClearanceSweep, WaterlogAccumulation, SunshedSweep)
+val registeredLeafSolvers: List<LeafSolver> = listOf(ClearanceSweep, WaterlogAccumulation, SunshedSweep, EarthworkBalance)
 
 fun runSolvers(
     world: SolverWorld,

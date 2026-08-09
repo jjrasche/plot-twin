@@ -7,6 +7,7 @@ import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity
+import plottwin.worldstate.Surface
 import plottwin.worldstate.TerrainGrid
 
 // What the sun actually has to get past: ground height plus whatever stands on it.
@@ -28,8 +29,10 @@ class OccluderSurface(
 fun bareGroundSurfaceOf(grid: TerrainGrid): OccluderSurface =
     OccluderSurface(grid.columns, grid.rows, grid.cellSize, grid.surfaceHeights.copyOf())
 
-fun occluderSurfaceOf(state: CurrentState): OccluderSurface? {
-    val grid = state.terrain?.grid ?: return null
+fun occluderSurfaceOf(state: CurrentState): OccluderSurface? = occluderSurfaceOf(state, Surface.Measured)
+
+fun occluderSurfaceOf(state: CurrentState, surface: Surface): OccluderSurface? {
+    val grid = state.terrainOn(surface)?.grid ?: return null
     val surface = bareGroundSurfaceOf(grid)
     state.entities.values.forEach { placed -> raiseFootprint(surface, placed) }
     return surface

@@ -11,6 +11,7 @@ import plottwin.worldstate.Meters
 import plottwin.worldstate.RawElevation
 import plottwin.worldstate.RuleRow
 import plottwin.worldstate.SiteRow
+import plottwin.worldstate.Surface
 import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
@@ -37,7 +38,7 @@ object ToyPlotFixture {
 
     val pathClearanceBound: Meters = metersOf(feet = 4)
 
-    fun toyWorld(): SolverWorld = SolverWorld(toyState(), toyDate)
+    fun toyWorld(): SolverWorld = SolverWorld(toyState(), toyDate, Surface.Measured)
 
     fun toyConstraints(): List<Constraint> = listOf(
         ClearanceConstraint("path-clearance", "garden path", pathClearanceBound),
