@@ -55,22 +55,37 @@ fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, predicte
     )
 }
 
+// Measured over the eroded sky interior: boundary pixels are sky-terrain blends whose
+// jump reads the silhouette edge, not the gradient.
 private fun maxAdjacentSkyLuminanceJumpOf(image: BufferedImage, sky: BooleanArray): Double {
+    val interior = erodedOnce(sky, image.width, image.height)
     var worstJump = 0.0
     for (row in 0 until image.height) {
         for (column in 0 until image.width) {
-            if (!sky[row * image.width + column]) continue
+            if (!interior[row * image.width + column]) continue
             val luminance = luminanceAt(image, column, row)
-            if (column + 1 < image.width && sky[row * image.width + column + 1]) {
+            if (column + 1 < image.width && interior[row * image.width + column + 1]) {
                 worstJump = maxOf(worstJump, abs(luminance - luminanceAt(image, column + 1, row)))
             }
-            if (row + 1 < image.height && sky[(row + 1) * image.width + column]) {
+            if (row + 1 < image.height && interior[(row + 1) * image.width + column]) {
                 worstJump = maxOf(worstJump, abs(luminance - luminanceAt(image, column, row + 1)))
             }
         }
     }
     return worstJump
 }
+
+private fun erodedOnce(mask: BooleanArray, width: Int, height: Int): BooleanArray =
+    BooleanArray(mask.size) { pixel ->
+        val row = pixel / width
+        val column = pixel % width
+        mask[pixel] && neighborsOf(row, column, width, height).all { mask[it] }
+    }
+
+private fun neighborsOf(row: Int, column: Int, width: Int, height: Int): List<Int> =
+    (maxOf(0, row - 1)..minOf(height - 1, row + 1)).flatMap { neighborRow ->
+        (maxOf(0, column - 1)..minOf(width - 1, column + 1)).map { neighborColumn -> neighborRow * width + neighborColumn }
+    }
 
 fun skyRegionFindings(viewpointName: String, reading: SkyRegionReading): List<EyeFinding> = listOf(
     EyeFinding(

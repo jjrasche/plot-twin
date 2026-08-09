@@ -19,7 +19,10 @@ private fun walkHeightGroundTruthAt(moment: java.time.ZonedDateTime): GroundTrut
     val pose = plotViewpoints(scene.state).first { it.subject == "greenhouse" }.pose
     val withDome = PlotViewer(scene.spec).capture(pose)
     val withoutDome = PlotViewer(scene.spec.copy(
-        world = scene.spec.world.copy(entities = scene.spec.world.entities.filterNot { it.id == plottwin.render.SKY_ENTITY_ID }),
+        world = scene.spec.world.copy(
+            entities = scene.spec.world.entities.filterNot { it.id == plottwin.render.SKY_ENTITY_ID },
+            background = plottwin.render.SCENE_BACKGROUND,
+        ),
         meshesByEntity = terrainAndEntityMeshesOf(scene.spec),
     )).capture(pose)
     val domeDrawn = ArrayList<Int>()
