@@ -14,6 +14,7 @@ import plottwin.worldstate.GriddedElevationOperator
 import plottwin.worldstate.Meters
 import plottwin.worldstate.RawElevation
 import plottwin.worldstate.SiteRow
+import plottwin.worldstate.Surface
 import plottwin.worldstate.WorldLog
 import plottwin.worldstate.WriterRole
 
@@ -44,7 +45,7 @@ private fun rollingHillWorld(): SolverWorld = WorldLog.openInMemory().use { log 
         WriterRole.CAPTURE,
     )
     log.append(SiteRow(latitudeDegrees = 42.6006, longitudeDegrees = -84.6547, timeZoneId = "America/Detroit"), WriterRole.CAPTURE)
-    SolverWorld(log.currentState(), LocalDate.of(2026, 8, 5))
+    SolverWorld(log.currentState(), LocalDate.of(2026, 8, 5), Surface.Measured)
 }
 
 class HeightfieldSkylineGateTest {
