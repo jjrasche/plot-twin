@@ -8,6 +8,41 @@ only a pointer here.
 - when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
 
+## RUN 6 REPORT (2026-08-09 night → 2026-08-10)
+
+Jim's rulings executed: run-5 amendments + StageRow ratified as landed. Two lanes chartered,
+two delivered PASS, two MERGED. Final main: **175 tests, 0 failures, 1 skip** (was 168/0/1;
+the skip is still the geocode gate). Lead verdicts from fresh cleanTest re-runs + XML counts.
+
+### Lane 17 — stage-diff (charter 17): PASS, merged
+`projectStageDiff` in :render (volumes ONLY from the earthwork ledger) + top-down painter:
+red/blue colour-blind-safe cut/fill ramps, volume-weighted movement arrows, haul-off edge
+arrow, plain-language legend with the ~10 yd³/truck anchor. Three eyes gates over the three
+intent fixtures: region IoU 1.000 (bound .900), legend-vs-ledger ≤.042 (bound .05), quiet
+ground 0 differing pixels; byte-identical rerun. `--stage-diff [dig|foundation|berm]` in the
+app. Contact sheet lead-reviewed cold: what/where/how-much all readable at a glance.
+
+### Lane 18 — DSM research (charter 18): PASS, merged
+Q-008: StageRow's predecessor DAG IS a task DSM for the acyclic case; DSM's one addition is
+coupled stages that must iterate; at n<20 the position taken is adopt-nothing. 21 cited URLs,
+two primary sources quoted, UNADOPTED marked throughout. Convention hazard flagged (IR/FAD vs
+IC/FBD transposes which triangle means feedback) — any future adoption must state its
+convention.
+
+### BLOCKED — the recapture (the night's one blocked item)
+Jim's amendment said the true address is in tonight's transcript; the export in Downloads
+collapsed his own turns, so the address is NOT in the file (verified: only multi-digit string
+is "20,000"). A bounded search of local repos and connected mail found his Grand Rapids
+billing address and his employer's Delta Twp office — no 2-acre parcel address; I stopped
+rather than geocode a guess and render the wrong land as the twin. Standing recovery (also in
+TASKS Now): geocode.py + recapture.py, two commands, address never committed.
+Heartbeat watches Downloads for a fresh export.
+
+### Board
+- Permissions proposal posted (below) — awaiting cg-head/gen-head convergence; nothing landed
+  in settings.json.
+- Common Ground seam proposal: NOT yet on the board as of this writing; heartbeat watches.
+
 ## PERMISSIONS PROPOSAL (run 6, per Jim's directive; shape being coordinated on the board)
 
 Evidence base: run-5 worker reports (both build lanes needed `git -C <abs>` and `gradlew -p

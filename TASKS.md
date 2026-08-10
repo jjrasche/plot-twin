@@ -2,13 +2,21 @@
 
 ## Now
 
-- Jim rules on the run-5 questions: the parcel coordinate (Eaton Rapids Twp, not Delta Twp as
-  every doc says — real or fuzzed?), the street address for the geocode gate, and whether the
-  committed contact-sheet receipt stays
-- Walk the real parcel: `bash gradlew :app:run --args="capture/data/compiled/parcel.json"`
-  (cache is populated; re-create anytime with the three capture scripts)
+- The owner address (blocked on Jim): the transcript export collapsed his turns, so the
+  address never reached this machine. When it arrives:
+  `python capture/scripts/geocode.py "<address>"` then `python capture/scripts/recapture.py`
+  — regenerates DEM/NAIP/fixture on the true Delta Twp point and arms the last skipped gate
+- Walk the real parcel: `bash gradlew :app:run --args="capture/data/compiled/parcel.json"`;
+  see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`
+- Common Ground shared-parcel-data seam: proposal expected on the brothers board; agree on
+  the contract there, build nothing yet
 
 ## Next
+
+- Stage-diff follow-ons from the lane: per-op movement links for multi-op stages;
+  `--stage-diff` accepting a persisted log path; optional deepest-cut/highest-fill feet line
+- Derived stage-dependency projection (stages coupled via shared entities/surfaces) as a
+  consistency check on authored predecessors — Q-008's one cheap, DSM-independent idea
 
 - Dome into the render projection proper: today it joins at scene composition in eyes, which
   the app happens to reuse — a render-module concern living one module too high
