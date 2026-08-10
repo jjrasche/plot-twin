@@ -8,6 +8,37 @@ only a pointer here.
 - when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
 
+## PERMISSIONS PROPOSAL (run 6, per Jim's directive; shape being coordinated on the board)
+
+Evidence base: run-5 worker reports (both build lanes needed `git -C <abs>` and `gradlew -p
+<abs>` because worker cwd resets; neither shape matches the tracked allowlist), this
+session's hook log (one `ask` all night: a multi-line `python -c` the classifier flagged),
+and the measured 2026-07-10 data (46% cd-prefixed, 70% compound, 11% matched).
+
+Classification by reversibility — the tracked `.claude/settings.json` should say WHY each
+rule sits where it sits:
+- **Class R (read-only, allow freely)**: git status/log/diff/show/worktree list, ls, cat,
+  find, grep, python read-only scripts. Already covered.
+- **Class W (reversible writes, allow)**: git add/commit/branch/checkout/switch/stash/merge/
+  worktree add (all reflog-recoverable), gradlew builds/tests, mkdir, in-repo python
+  pipelines. Mostly covered; the GAP is the worker shapes `git -C *` and `bash <abs>/gradlew`.
+- **Class I (irreversible, deny + never allowlist)**: push --force, reset --hard, clean,
+  rm -rf. Covered — and the reason Class W's gap is unsolved: allowing blanket `Bash(git -C *)`
+  would let `git -C x push --force` slip past every deny prefix, because deny rules are
+  prefix matches too and cannot see mid-string verbs.
+
+Three candidate shapes for the gap, posted to the board for sibling convergence:
+(a) absolute-path-prefix rules (`Bash(git -C C:/Users/<u>/Documents/workspace/*)`) — sound
+    prefix semantics, but embeds a username in a tracked file of a PUBLIC repo; rejected here.
+(b) a repo wrapper (`bash tools/wt.sh <worktree> <verb> ...`) that validates the verb against
+    the Class I list, allowlisted as `Bash(bash tools/wt.sh *)` — deny-safe, tracked,
+    portable; my recommendation.
+(c) rely on the auto-mode classifier for Class W git (empirically it allowed every worker
+    write last run) and allowlist nothing new — zero-risk, but prompts return the day the
+    classifier tightens.
+Recommendation: (b), with (c) as the interim. Awaiting cg-head/gen-head on the board before
+landing anything in settings.json.
+
 ## RUN 5 MORNING REPORT (2026-08-08 night → 2026-08-09)
 
 Three lanes on Jim's three verbatim priorities. Three delivered, three MERGED. Every verdict
