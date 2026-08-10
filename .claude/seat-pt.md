@@ -43,6 +43,17 @@ Heartbeat watches Downloads for a fresh export.
   in settings.json.
 - Common Ground seam proposal: NOT yet on the board as of this writing; heartbeat watches.
 
+## PERMISSIONS — LANDED 2026-08-10 (board-converged shape)
+
+cg-head and gen-head posted their tracked allowlists; the classification principle converged
+(reversibility classes; `git -C *` absent from allow because deny rules prefix-match). Landed
+in plot-twin's tracked `.claude/settings.json`: deny extended to ALL pushes, `checkout --`,
+forced worktree ops; and `tools/wt.sh` (allowlisted, refuses the irreversible tail in code)
+closes the worker-cwd-reset gap the siblings' "cd then bare git" answer cannot — plot-twin
+workers' cwd resets between calls, the lead's does not. Board reply:
+messages/allowlist-LANDED-in-plot-twin-wrapper-covers-the-worker-cwd-gap-*.md.
+Original proposal below for the record.
+
 ## PERMISSIONS PROPOSAL (run 6, per Jim's directive; shape being coordinated on the board)
 
 Evidence base: run-5 worker reports (both build lanes needed `git -C <abs>` and `gradlew -p

@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "_classification": "Tracked allowlist, classified by reversibility (board-converged shape, 2026-08-10). allow = read-only + one-commit-reversible writes inside the repo. deny = the irreversible tail; deny prefix-matches, which is why blanket 'git -C *' is deliberately ABSENT from allow — it would carry irreversible verbs past every deny prefix. Subagents (whose cwd resets between calls) use 'bash tools/wt.sh <worktree> <verbs>', which refuses the irreversible tail in code.",
     "allow": [
       "Bash(git status*)",
       "Bash(git log*)",
@@ -8,14 +9,17 @@
       "Bash(git add*)",
       "Bash(git commit*)",
       "Bash(git branch*)",
-      "Bash(git checkout*)",
+      "Bash(git checkout *)",
       "Bash(git merge*)",
       "Bash(git switch*)",
       "Bash(git stash*)",
+      "Bash(git fetch*)",
+      "Bash(git restore --staged*)",
       "Bash(git worktree add*)",
       "Bash(git worktree list*)",
       "Bash(git worktree remove*)",
       "Bash(git worktree prune*)",
+      "Bash(bash tools/wt.sh *)",
       "Bash(gradlew*)",
       "Bash(./gradlew*)",
       "Bash(bash gradlew*)",
@@ -25,12 +29,18 @@
       "Bash(cat*)",
       "Bash(mkdir*)",
       "Bash(find*)",
-      "Bash(grep*)"
+      "Bash(grep*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(wc*)"
     ],
     "deny": [
-      "Bash(git push --force*)",
+      "Bash(git push*)",
       "Bash(git reset --hard*)",
       "Bash(git clean*)",
+      "Bash(git checkout --*)",
+      "Bash(git worktree remove --force*)",
+      "Bash(git worktree add -f*)",
       "Bash(rm -rf*)"
     ]
   }
