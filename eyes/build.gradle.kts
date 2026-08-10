@@ -13,6 +13,7 @@ repositories {
 dependencies {
     api(project(":render"))
     api(project(":capture"))
+    api(project(":oppipeline"))
     implementation(testFixtures(project(":solvers")))
     testImplementation(testFixtures(project(":capture")))
     implementation(compose.desktop.currentOs)
