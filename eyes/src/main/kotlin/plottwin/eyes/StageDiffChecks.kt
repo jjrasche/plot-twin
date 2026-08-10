@@ -76,16 +76,6 @@ private fun observedKindMask(render: StageDiffRender, kind: DiffRegionKind): Boo
     return mask
 }
 
-private fun intersectionOverUnion(expected: BooleanArray, observed: BooleanArray): Double {
-    var intersection = 0
-    var union = 0
-    for (pixel in expected.indices) {
-        if (expected[pixel] && observed[pixel]) intersection++
-        if (expected[pixel] || observed[pixel]) union++
-    }
-    return if (union == 0) 0.0 else intersection.toDouble() / union
-}
-
 // gate 2: the legend carries exactly the ledger's numbers — re-projected from the raw log, not from the spec
 private fun legendEqualsLedgerFinding(scene: StageDiffScene, spec: StageDiffSpec): EyeFinding {
     val independentLedger = ledgerOfProposal(scene.history, scene.proposal.name)

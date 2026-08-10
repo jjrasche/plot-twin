@@ -106,9 +106,10 @@ private fun paintOverlay(spec: StageDiffSpec): BufferedImage {
         drawArrow(canvas, from, to, strokeWidthFor(movement.looseCubicYards))
         drawHaloedText(
             canvas,
+            spec.columns,
             "${ownerYards(movement.looseCubicYards)} yd3 moves here",
             (from.first + to.first) / 2,
-            minOf(from.second, to.second) - 14,
+            maxOf(16, minOf(from.second, to.second) - 14),
         )
     }
     spec.haulOff?.let { haul ->
@@ -117,9 +118,10 @@ private fun paintOverlay(spec: StageDiffSpec): BufferedImage {
         drawArrow(canvas, from, to, strokeWidthFor(haul.looseCubicYards))
         drawHaloedText(
             canvas,
+            spec.columns,
             "${ownerYards(haul.looseCubicYards)} yd3 hauled away",
             (from.first + to.first) / 2,
-            (from.second + to.second) / 2 - 14,
+            maxOf(16, (from.second + to.second) / 2 - 14),
         )
     }
     canvas.dispose()
@@ -159,9 +161,10 @@ private fun drawArrow(canvas: Graphics2D, from: Pair<Int, Int>, to: Pair<Int, In
     canvas.fill(head)
 }
 
-private fun drawHaloedText(canvas: Graphics2D, text: String, centerX: Int, baselineY: Int, size: Int = 15) {
+private fun drawHaloedText(canvas: Graphics2D, plotWidth: Int, text: String, centerX: Int, baselineY: Int, size: Int = 15) {
     canvas.font = Font(Font.SANS_SERIF, Font.BOLD, size)
-    val left = centerX - canvas.fontMetrics.stringWidth(text) / 2
+    val textWidth = canvas.fontMetrics.stringWidth(text)
+    val left = (centerX - textWidth / 2).coerceIn(4, maxOf(4, plotWidth - textWidth - 4))
     canvas.color = Color.WHITE
     for (dx in -1..1) for (dy in -1..1) {
         if (dx != 0 || dy != 0) canvas.drawString(text, left + dx, baselineY + dy)
