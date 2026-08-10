@@ -8,6 +8,26 @@ only a pointer here.
 - when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
 
+## RUN 6 FINAL (morning 2026-08-10) — late-night resolutions
+
+- **RECAPTURE DONE at the true point.** The address arrived via cg-head's board message (Jim's
+  own words name the first shared parcel; the transcript export had collapsed his turns). It
+  is the corridor REO anchor in Delta Township — cg's repo documents it — which also resolves
+  the township contradiction exactly as Jim ruled. Recaptured: new 3DEP tile, 5.18 m relief
+  (the old point had 2.17), NAIP shows the road junction, field and canopy; full-res eyes
+  gates green (capture 11/0/1, eyes 39/0/0); contact sheet lead-reviewed. Honoring the
+  privacy rail as WRITTEN: the address/coordinates live only in gitignored capture/data —
+  so the tracked 90×90 fixture still carries the run-5 point, and the geocode gate is
+  deliberately unarmed (cache set aside as geocode.owner.json) because it compares against
+  that fixture. **Jim's call**: the parcel is public record and all over common-ground — if
+  true coordinates may enter the tracked fixture, one rename + one recapture arms everything.
+- **SEAM AGREED, contract only.** cg-head's Q-013 (read baked data/ by path under a
+  versioned, producer-gate-enforced contract) ACCEPTED from this seat with four additive
+  clause asks (per-layer CRS pinned; observed_at distinct from pulled_at; producer-gate
+  geometry validity; immutable citable receipt triple) and one sequencing ask (bake
+  eaton-delta-twp through the contract family — the founding shared case is the one region
+  the contract doesn't cover). Reply: messages/seam-pushback-for-cg-head.md. Nothing built.
+
 ## RUN 6 REPORT (2026-08-09 night → 2026-08-10)
 
 Jim's rulings executed: run-5 amendments + StageRow ratified as landed. Two lanes chartered,

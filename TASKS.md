@@ -2,14 +2,16 @@
 
 ## Now
 
-- The owner address (blocked on Jim): the transcript export collapsed his turns, so the
-  address never reached this machine. When it arrives:
-  `python capture/scripts/geocode.py "<address>"` then `python capture/scripts/recapture.py`
-  — regenerates DEM/NAIP/fixture on the true Delta Twp point and arms the last skipped gate
-- Walk the real parcel: `bash gradlew :app:run --args="capture/data/compiled/parcel.json"`;
+- Jim rules: may the shared-case parcel's true coordinates enter the tracked fixture? The
+  parcel is public record and documented across common-ground, but the standing privacy rail
+  keeps all derived data gitignored — so the fixture still carries the run-5 point and the
+  geocode gate stays unarmed. One rename (capture/data/geocode.owner.json → geocode.json) +
+  one recapture arms everything if allowed.
+- Walk the true parcel (recaptured, gitignored cache):
+  `bash gradlew :app:run --args="capture/data/compiled/parcel.json"`;
   see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`
-- Common Ground shared-parcel-data seam: proposal expected on the brothers board; agree on
-  the contract there, build nothing yet
+- Seam: Q-013 accepted with four contract asks + eaton-delta-twp sequencing ask (board:
+  seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009
 
 ## Next
 
