@@ -42,10 +42,10 @@ class RealParcelFixtureGateTest {
     }
 
     @Test
-    fun fixture_site_matches_the_toy_site_row_ground_truth() {
+    fun fixture_site_matches_the_ratified_parcel_point() {
         val site = siteRowOf(RealParcelFixture.parcel())
-        assertEquals(42.6006, site.latitudeDegrees, 1e-9)
-        assertEquals(-84.6547, site.longitudeDegrees, 1e-9)
+        assertEquals(42.68317626142, site.latitudeDegrees, 1e-9)
+        assertEquals(-84.619591093007, site.longitudeDegrees, 1e-9)
         assertEquals("America/Detroit", site.timeZoneId)
     }
 }
