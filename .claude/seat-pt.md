@@ -8,6 +8,19 @@ only a pointer here.
 - when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
 
+## RUN 7 IN FLIGHT (2026-08-10 night) — the eyes get real
+
+Rulings ledgered tonight: D-018 (lead merges own gate-green work; Jim by exception), D-019
+(visual deliverables gated by the lead's eye across measured cycles), D-020 (the parcel is
+Isaac's, public record; true point in the tracked fixture — geocode gate armed, suite
+175/0/0, zero skips for the first time).
+
+- lane 19 true-3D: QL2 lidar point cloud → CHM → trees/structures/pond as CAPTURE entity
+  rows → real geometry through the painter. Worktree ../.git-worktrees/pt-veg, branch
+  build/true-3d. Charter at .claude/charters/overnight-19-true-3d.md carries the committed
+  S1–S7 cycle scorecard the lead runs after merge (D-019); pass band is S7=2 — the lead's
+  eye confirms it reads as that actual parcel.
+
 ## RUN 6 FINAL (morning 2026-08-10) — late-night resolutions
 
 - **RECAPTURE DONE at the true point.** The address arrived via cg-head's board message (Jim's
