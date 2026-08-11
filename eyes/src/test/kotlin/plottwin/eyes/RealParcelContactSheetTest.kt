@@ -15,7 +15,7 @@ class RealParcelContactSheetTest {
 
     @Test
     fun the_real_parcel_renders_from_every_named_viewpoint_and_passes_pixel_checks() {
-        val scene = realParcelScene(RealParcelFixture.parcel())
+        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features())
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
         val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_contact_sheet.png"))
@@ -23,7 +23,10 @@ class RealParcelContactSheetTest {
         println("[real-parcel] sun ${scene.daylight.sun}")
         println(findingsReportOf(inspections))
 
-        assertTrue(inspections.size >= 5, "expected overhead + orbit viewpoints, got ${inspections.size}")
+        assertTrue(inspections.size >= 7, "expected overhead + woods + road + orbit viewpoints, got ${inspections.size}")
+        val poseNames = inspections.map { it.viewpoint.name }
+        assertTrue("walk-height-in-woods" in poseNames, "missing the walk-height pose inside the woods")
+        assertTrue("on-road" in poseNames, "missing the pose on the road corridor")
         val failures = inspections
             .flatMap { failedFindings(it.findings) }
             .filterNot { it.check == "shadow-direction" || it.advisory }

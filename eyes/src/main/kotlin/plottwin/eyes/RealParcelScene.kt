@@ -4,10 +4,14 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.nio.file.Files
 import plottwin.capture.CompiledParcel
+import plottwin.capture.ParcelFeatures
 import plottwin.capture.albedoTriplesOf
+import plottwin.capture.appendParcelFeatures
 import plottwin.capture.appendRealParcel
 import plottwin.capture.readCompiledParcel
+import plottwin.capture.readParcelFeatures
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
 import plottwin.render.withSkyDome
@@ -18,9 +22,14 @@ val REAL_PARCEL_VIEW_DATE: LocalDate = LocalDate.of(2026, 8, 8)
 fun realParcelMidday(parcel: CompiledParcel): ZonedDateTime =
     REAL_PARCEL_VIEW_DATE.atTime(13, 0).atZone(ZoneId.of(parcel.site.timeZoneId))
 
-fun realParcelScene(parcel: CompiledParcel, moment: ZonedDateTime = realParcelMidday(parcel)): PlotScene {
+fun realParcelScene(
+    parcel: CompiledParcel,
+    features: ParcelFeatures? = null,
+    moment: ZonedDateTime = realParcelMidday(parcel),
+): PlotScene {
     val state = WorldLog.openInMemory().use { log ->
         appendRealParcel(log, parcel)
+        features?.let { appendParcelFeatures(log, it) }
         log.currentState()
     }
     val daylight = daylightOverPlot(state, moment)
@@ -31,5 +40,7 @@ fun realParcelScene(parcel: CompiledParcel, moment: ZonedDateTime = realParcelMi
 
 fun realParcelSceneFromFile(parcelPath: Path, moment: ZonedDateTime? = null): PlotScene {
     val parcel = readCompiledParcel(parcelPath)
-    return realParcelScene(parcel, moment ?: realParcelMidday(parcel))
+    val featuresPath = parcelPath.resolveSibling("features.json")
+    val features = if (Files.exists(featuresPath)) readParcelFeatures(featuresPath) else null
+    return realParcelScene(parcel, features, moment ?: realParcelMidday(parcel))
 }
