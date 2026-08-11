@@ -11,6 +11,10 @@ import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity
 import plottwin.worldstate.TerrainGrid
+import plottwin.worldstate.ROAD_ENTITY_NAME
+import plottwin.worldstate.isRoadEntity
+import plottwin.worldstate.isTreeEntity
+import plottwin.worldstate.isWaterEntity
 
 const val EYE_HEIGHT_METERS = 1.7f
 const val STANDOFF_METERS = 14.0
@@ -23,10 +27,64 @@ fun plotViewpoints(state: CurrentState): List<Viewpoint> {
     val terrain = requireNotNull(state.terrain) { "viewpoints need a base-terrain row" }.grid
     val frame = sceneFrameOf(terrain)
     val walkViewpoints = state.entities
-        .filter { (_, placed) -> placed.height.value > 0.0 }
+        .filter { (name, placed) -> placed.height.value > 0.0 && isNamedSubject(name) }
         .map { (name, placed) -> walkHeightViewpoint(name, placed, terrain, frame) }
-    return listOf(overheadViewpoint(terrain, frame)) + walkViewpoints + orbitViewpoints(terrain, frame)
+    val naturalViewpoints = listOfNotNull(woodsViewpoint(state, terrain, frame), roadViewpoint(state, terrain, frame))
+    return listOf(overheadViewpoint(terrain, frame)) + walkViewpoints + naturalViewpoints + orbitViewpoints(terrain, frame)
 }
+
+// a wood is one place to stand in, not a walk viewpoint per crown
+private fun isNamedSubject(entityName: String): Boolean =
+    !isTreeEntity(entityName) && !isWaterEntity(entityName) && !isRoadEntity(entityName)
+
+fun woodsViewpoint(state: CurrentState, terrain: TerrainGrid, frame: SceneFrame): Viewpoint? {
+    val trees = state.entities.filterKeys(::isTreeEntity)
+    if (trees.isEmpty()) return null
+    val centroids = trees.mapValues { (_, placed) -> footprintCentroid(placed.footprint) }
+    val standing = GroundPoint(
+        east = Meters(centroids.values.sumOf { it.east.value } / centroids.size),
+        north = Meters(centroids.values.sumOf { it.north.value } / centroids.size),
+    )
+    val lookAt = trees.entries
+        .filter { (name, _) -> distanceMeters(centroids.getValue(name), standing) > 4.0 }
+        .maxByOrNull { (_, placed) -> placed.height.value }
+        ?: return null
+    val lookAtCentroid = centroids.getValue(lookAt.key)
+    val eye = Vec3(
+        frame.sceneX(standing.east.value),
+        groundHeightAt(terrain, standing) + EYE_HEIGHT_METERS,
+        frame.sceneZ(standing.north.value),
+    )
+    val target = Vec3(
+        frame.sceneX(lookAtCentroid.east.value),
+        groundHeightAt(terrain, lookAtCentroid) + lookAt.value.height.value.toFloat() * 0.5f,
+        frame.sceneZ(lookAtCentroid.north.value),
+    )
+    return Viewpoint("walk-height-in-woods", Scene3dCameraPose(eye = eye, target = target), subject = null)
+}
+
+fun roadViewpoint(state: CurrentState, terrain: TerrainGrid, frame: SceneFrame): Viewpoint? {
+    val road = state.entities[ROAD_ENTITY_NAME] ?: return null
+    val centerNorth = road.footprint.sumOf { it.north.value } / road.footprint.size
+    val westmost = road.footprint.minOf { it.east.value }
+    val eastmost = road.footprint.maxOf { it.east.value }
+    val standing = GroundPoint(Meters(westmost + (eastmost - westmost) * 0.15), Meters(centerNorth))
+    val ahead = GroundPoint(Meters(westmost + (eastmost - westmost) * 0.85), Meters(centerNorth))
+    val eye = Vec3(
+        frame.sceneX(standing.east.value),
+        groundHeightAt(terrain, standing) + EYE_HEIGHT_METERS,
+        frame.sceneZ(standing.north.value),
+    )
+    val target = Vec3(
+        frame.sceneX(ahead.east.value),
+        groundHeightAt(terrain, ahead) + EYE_HEIGHT_METERS * 0.8f,
+        frame.sceneZ(ahead.north.value),
+    )
+    return Viewpoint("on-road", Scene3dCameraPose(eye = eye, target = target), subject = null)
+}
+
+private fun distanceMeters(first: GroundPoint, second: GroundPoint): Double =
+    kotlin.math.hypot(first.east.value - second.east.value, first.north.value - second.north.value)
 
 fun overheadViewpoint(terrain: TerrainGrid, frame: SceneFrame): Viewpoint {
     val plotSpan = plotSpanMeters(terrain)

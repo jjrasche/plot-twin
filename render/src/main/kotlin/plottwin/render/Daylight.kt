@@ -39,7 +39,7 @@ class Daylight(val moment: ZonedDateTime, val sun: SunRay) {
     val skylight: Rgb = mix(LOW_SKY_TINT, HIGH_SKY_TINT, highness) * SKY_STRENGTH
     val horizonTint: Rgb = mix(LOW_HAZE_TINT, HIGH_HAZE_TINT, highness)
     val zenithTint: Rgb = mix(LOW_ZENITH_TINT, HIGH_ZENITH_TINT, highness)
-    val sunGlow: Rgb = mix(LOW_SUN_TINT, HIGH_SUN_TINT, highness) * (0.55f + 0.45f * airMass)
+    val sunGlow: Rgb = mix(LOW_SUN_TINT, HIGH_SUN_TINT, highness) * (0.35f + 0.30f * airMass)
 
     val sunDirection: SceneDirection = sceneDirectionOf(sun)
 }

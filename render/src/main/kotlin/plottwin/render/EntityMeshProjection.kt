@@ -6,6 +6,9 @@ import plottwin.worldstate.TerrainGrid
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity
+import plottwin.worldstate.isRoadEntity
+import plottwin.worldstate.isTreeEntity
+import plottwin.worldstate.isWaterEntity
 
 const val WALKLINE_HALF_WIDTH_METERS = 0.3
 const val WALKLINE_LIFT_METERS = 0.05f
@@ -23,7 +26,11 @@ fun entityMeshOf(
     terrain: TerrainGrid,
     frame: SceneFrame,
     daylight: Daylight,
+    canopyAlbedo: Rgb? = null,
 ): Scene3dMesh {
+    if (isTreeEntity(entityName)) return treeMeshOf(placed, terrain, frame, daylight, canopyAlbedo)
+    if (isWaterEntity(entityName)) return waterMeshOf(placed, terrain, frame, daylight)
+    if (isRoadEntity(entityName)) return roadMeshOf(placed, terrain, frame, daylight)
     val albedo = rgbOfHex(entityColors[entityName] ?: DEFAULT_ENTITY_COLOR)
     return if (placed.footprint.size < 3) walklineRibbonMeshOf(placed.footprint, terrain, frame, albedo, daylight)
     else extrudedPrismMeshOf(placed.footprint, placed.height, terrain, frame, albedo, daylight)

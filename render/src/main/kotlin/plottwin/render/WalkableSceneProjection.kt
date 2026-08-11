@@ -10,6 +10,10 @@ import kotlinx.serialization.json.Json
 import plottwin.worldstate.TerrainGrid
 import plottwin.solvers.Violation
 import plottwin.worldstate.CurrentState
+import plottwin.worldstate.GroundPoint
+import plottwin.worldstate.Meters
+import plottwin.worldstate.PlacedEntity
+import plottwin.worldstate.isTreeEntity
 
 const val TERRAIN_ENTITY_ID = "terrain"
 const val RENDER_DOWNSAMPLE_FACTOR = 4
@@ -34,7 +38,8 @@ fun projectWalkableScene(
     val albedoOverride = terrainAlbedoTriples?.let { averagedAlbedoOf(it, terrain, RENDER_DOWNSAMPLE_FACTOR) }
     meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading, albedoOverride)
     for ((entityName, placed) in state.entities) {
-        meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight)
+        val canopyAlbedo = if (isTreeEntity(entityName)) naipAlbedoUnder(placed, terrain, terrainAlbedoTriples) else null
+        meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight, canopyAlbedo)
     }
     violations.forEachIndexed { rank, violation ->
         meshes[violationMarkerId(violation, rank)] = violationMarkerMeshOf(violation, terrain, frame)
@@ -50,6 +55,19 @@ fun projectWalkableScene(
 }
 
 fun violationMarkerId(violation: Violation, rank: Int): String = "violation-${violation.ruleName}-$rank"
+
+// the crown as the airplane saw it: the NAIP pixel under the crown center colors the canopy
+fun naipAlbedoUnder(placed: PlacedEntity, terrain: TerrainGrid, triples: FloatArray?): Rgb? {
+    if (triples == null) return null
+    val centroid = GroundPoint(
+        east = Meters(placed.footprint.sumOf { it.east.value } / placed.footprint.size),
+        north = Meters(placed.footprint.sumOf { it.north.value } / placed.footprint.size),
+    )
+    val column = (centroid.east.value / terrain.cellSize.value).toInt().coerceIn(0, terrain.columns - 1)
+    val row = (centroid.north.value / terrain.cellSize.value).toInt().coerceIn(0, terrain.rows - 1)
+    val cell = terrain.indexOf(column, row)
+    return Rgb(triples[cell * 3], triples[cell * 3 + 1], triples[cell * 3 + 2])
+}
 
 // full-res rgb triples averaged down per channel, so a render cell carries its cells' mean color
 fun averagedAlbedoOf(triples: FloatArray, terrain: TerrainGrid, downsampleFactor: Int): List<Rgb> {

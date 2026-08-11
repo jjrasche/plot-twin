@@ -1,0 +1,641 @@
+{
+ "site": {
+  "latitude_degrees": 42.68317626142,
+  "longitude_degrees": -84.619591093007
+ },
+ "grid": {
+  "cells": 90,
+  "cell_size_meters": 1.0
+ },
+ "trees": [
+  {
+   "east_meters": 77.5,
+   "north_meters": 17.5,
+   "height_meters": 25.09,
+   "crown_radius_meters": 5.15
+  },
+  {
+   "east_meters": 40.5,
+   "north_meters": 16.5,
+   "height_meters": 23.95,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 41.5,
+   "north_meters": 9.5,
+   "height_meters": 23.82,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 42.5,
+   "north_meters": 12.5,
+   "height_meters": 24.53,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 37.5,
+   "north_meters": 15.5,
+   "height_meters": 23.46,
+   "crown_radius_meters": 5.61
+  },
+  {
+   "east_meters": 81.5,
+   "north_meters": 15.5,
+   "height_meters": 23.48,
+   "crown_radius_meters": 4.4
+  },
+  {
+   "east_meters": 46.5,
+   "north_meters": 10.5,
+   "height_meters": 22.25,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 41.5,
+   "north_meters": 21.5,
+   "height_meters": 22.97,
+   "crown_radius_meters": 5.51
+  },
+  {
+   "east_meters": 44.5,
+   "north_meters": 19.5,
+   "height_meters": 23.53,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 53.5,
+   "north_meters": 12.5,
+   "height_meters": 22.15,
+   "crown_radius_meters": 4.8
+  },
+  {
+   "east_meters": 52.5,
+   "north_meters": 15.5,
+   "height_meters": 23.29,
+   "crown_radius_meters": 5.81
+  },
+  {
+   "east_meters": 36.5,
+   "north_meters": 0.5,
+   "height_meters": 21.48,
+   "crown_radius_meters": 3.69
+  },
+  {
+   "east_meters": 29.5,
+   "north_meters": 0.5,
+   "height_meters": 20.7,
+   "crown_radius_meters": 4.07
+  },
+  {
+   "east_meters": 50.5,
+   "north_meters": 12.5,
+   "height_meters": 22.56,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 47.5,
+   "north_meters": 16.5,
+   "height_meters": 24.4,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 89.5,
+   "north_meters": 59.5,
+   "height_meters": 19.58,
+   "crown_radius_meters": 3.72
+  },
+  {
+   "east_meters": 38.5,
+   "north_meters": 12.5,
+   "height_meters": 22.12,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 49.5,
+   "north_meters": 20.5,
+   "height_meters": 22.72,
+   "crown_radius_meters": 5.83
+  },
+  {
+   "east_meters": 25.5,
+   "north_meters": 89.5,
+   "height_meters": 19.12,
+   "crown_radius_meters": 1.91
+  },
+  {
+   "east_meters": 40.5,
+   "north_meters": 0.5,
+   "height_meters": 19.6,
+   "crown_radius_meters": 3.87
+  },
+  {
+   "east_meters": 10.5,
+   "north_meters": 39.5,
+   "height_meters": 17.93,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 46.5,
+   "north_meters": 21.5,
+   "height_meters": 20.14,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 49.5,
+   "north_meters": 25.5,
+   "height_meters": 18.13,
+   "crown_radius_meters": 3.55
+  },
+  {
+   "east_meters": 31.5,
+   "north_meters": 9.5,
+   "height_meters": 18.02,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 22.5,
+   "north_meters": 60.5,
+   "height_meters": 18.91,
+   "crown_radius_meters": 3.54
+  },
+  {
+   "east_meters": 16.5,
+   "north_meters": 82.5,
+   "height_meters": 17.46,
+   "crown_radius_meters": 5.68
+  },
+  {
+   "east_meters": 11.5,
+   "north_meters": 78.5,
+   "height_meters": 18.6,
+   "crown_radius_meters": 4.58
+  },
+  {
+   "east_meters": 50.5,
+   "north_meters": 47.5,
+   "height_meters": 19.45,
+   "crown_radius_meters": 5.2
+  },
+  {
+   "east_meters": 4.5,
+   "north_meters": 3.5,
+   "height_meters": 18.02,
+   "crown_radius_meters": 2.74
+  },
+  {
+   "east_meters": 16.5,
+   "north_meters": 40.5,
+   "height_meters": 16.71,
+   "crown_radius_meters": 5.2
+  },
+  {
+   "east_meters": 0.5,
+   "north_meters": 44.5,
+   "height_meters": 16.97,
+   "crown_radius_meters": 4.37
+  },
+  {
+   "east_meters": 2.5,
+   "north_meters": 46.5,
+   "height_meters": 16.78,
+   "crown_radius_meters": 5.03
+  },
+  {
+   "east_meters": 9.5,
+   "north_meters": 82.5,
+   "height_meters": 17.84,
+   "crown_radius_meters": 3.94
+  },
+  {
+   "east_meters": 19.5,
+   "north_meters": 80.5,
+   "height_meters": 17.49,
+   "crown_radius_meters": 5.51
+  },
+  {
+   "east_meters": 8.5,
+   "north_meters": 45.5,
+   "height_meters": 16.35,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 34.5,
+   "north_meters": 5.5,
+   "height_meters": 18.45,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 14.5,
+   "north_meters": 20.5,
+   "height_meters": 16.77,
+   "crown_radius_meters": 4.57
+  },
+  {
+   "east_meters": 31.5,
+   "north_meters": 78.5,
+   "height_meters": 16.31,
+   "crown_radius_meters": 3.87
+  },
+  {
+   "east_meters": 28.5,
+   "north_meters": 22.5,
+   "height_meters": 15.85,
+   "crown_radius_meters": 4.1
+  },
+  {
+   "east_meters": 10.5,
+   "north_meters": 20.5,
+   "height_meters": 16.12,
+   "crown_radius_meters": 4.12
+  },
+  {
+   "east_meters": 29.5,
+   "north_meters": 57.5,
+   "height_meters": 16.04,
+   "crown_radius_meters": 4.3
+  },
+  {
+   "east_meters": 25.5,
+   "north_meters": 68.5,
+   "height_meters": 18.33,
+   "crown_radius_meters": 5.03
+  },
+  {
+   "east_meters": 23.5,
+   "north_meters": 0.5,
+   "height_meters": 16.22,
+   "crown_radius_meters": 3.16
+  },
+  {
+   "east_meters": 22.5,
+   "north_meters": 69.5,
+   "height_meters": 18.15,
+   "crown_radius_meters": 3.87
+  },
+  {
+   "east_meters": 27.5,
+   "north_meters": 59.5,
+   "height_meters": 16.08,
+   "crown_radius_meters": 5.33
+  },
+  {
+   "east_meters": 24.5,
+   "north_meters": 4.5,
+   "height_meters": 17.17,
+   "crown_radius_meters": 3.82
+  },
+  {
+   "east_meters": 14.5,
+   "north_meters": 35.5,
+   "height_meters": 14.93,
+   "crown_radius_meters": 4.3
+  },
+  {
+   "east_meters": 33.5,
+   "north_meters": 61.5,
+   "height_meters": 16.78,
+   "crown_radius_meters": 4.1
+  },
+  {
+   "east_meters": 19.5,
+   "north_meters": 89.5,
+   "height_meters": 15.97,
+   "crown_radius_meters": 3.49
+  },
+  {
+   "east_meters": 15.5,
+   "north_meters": 71.5,
+   "height_meters": 13.54,
+   "crown_radius_meters": 4.22
+  },
+  {
+   "east_meters": 22.5,
+   "north_meters": 74.5,
+   "height_meters": 15.14,
+   "crown_radius_meters": 3.72
+  },
+  {
+   "east_meters": 64.5,
+   "north_meters": 13.5,
+   "height_meters": 13.15,
+   "crown_radius_meters": 4.95
+  },
+  {
+   "east_meters": 23.5,
+   "north_meters": 14.5,
+   "height_meters": 12.85,
+   "crown_radius_meters": 5.68
+  },
+  {
+   "east_meters": 71.5,
+   "north_meters": 2.5,
+   "height_meters": 12.95,
+   "crown_radius_meters": 3.39
+  },
+  {
+   "east_meters": 70.5,
+   "north_meters": 5.5,
+   "height_meters": 12.72,
+   "crown_radius_meters": 3.61
+  },
+  {
+   "east_meters": 10.5,
+   "north_meters": 89.5,
+   "height_meters": 13.28,
+   "crown_radius_meters": 3.16
+  },
+  {
+   "east_meters": 61.5,
+   "north_meters": 0.5,
+   "height_meters": 12.7,
+   "crown_radius_meters": 2.31
+  },
+  {
+   "east_meters": 28.5,
+   "north_meters": 73.5,
+   "height_meters": 13.99,
+   "crown_radius_meters": 4.53
+  },
+  {
+   "east_meters": 24.5,
+   "north_meters": 20.5,
+   "height_meters": 12.82,
+   "crown_radius_meters": 5.63
+  },
+  {
+   "east_meters": 68.5,
+   "north_meters": 18.5,
+   "height_meters": 12.74,
+   "crown_radius_meters": 5.98
+  },
+  {
+   "east_meters": 3.5,
+   "north_meters": 63.5,
+   "height_meters": 11.78,
+   "crown_radius_meters": 3.14
+  },
+  {
+   "east_meters": 11.5,
+   "north_meters": 67.5,
+   "height_meters": 12.55,
+   "crown_radius_meters": 3.27
+  },
+  {
+   "east_meters": 63.5,
+   "north_meters": 17.5,
+   "height_meters": 11.47,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 16.5,
+   "north_meters": 76.5,
+   "height_meters": 15.12,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 0.5,
+   "north_meters": 65.5,
+   "height_meters": 12.66,
+   "crown_radius_meters": 2.69
+  },
+  {
+   "east_meters": 9.5,
+   "north_meters": 69.5,
+   "height_meters": 11.78,
+   "crown_radius_meters": 3.94
+  },
+  {
+   "east_meters": 31.5,
+   "north_meters": 67.5,
+   "height_meters": 13.63,
+   "crown_radius_meters": 4.42
+  },
+  {
+   "east_meters": 59.5,
+   "north_meters": 2.5,
+   "height_meters": 11.99,
+   "crown_radius_meters": 3.54
+  },
+  {
+   "east_meters": 12.5,
+   "north_meters": 88.5,
+   "height_meters": 15.04,
+   "crown_radius_meters": 4.72
+  },
+  {
+   "east_meters": 78.5,
+   "north_meters": 5.5,
+   "height_meters": 10.43,
+   "crown_radius_meters": 3.64
+  },
+  {
+   "east_meters": 57.5,
+   "north_meters": 0.5,
+   "height_meters": 10.15,
+   "crown_radius_meters": 3.11
+  },
+  {
+   "east_meters": 20.5,
+   "north_meters": 66.5,
+   "height_meters": 14.52,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 55.5,
+   "north_meters": 1.5,
+   "height_meters": 9.68,
+   "crown_radius_meters": 3.16
+  },
+  {
+   "east_meters": 63.5,
+   "north_meters": 22.5,
+   "height_meters": 11.93,
+   "crown_radius_meters": 3.75
+  },
+  {
+   "east_meters": 4.5,
+   "north_meters": 9.5,
+   "height_meters": 10.29,
+   "crown_radius_meters": 3.16
+  },
+  {
+   "east_meters": 66.5,
+   "north_meters": 22.5,
+   "height_meters": 11.11,
+   "crown_radius_meters": 4.1
+  },
+  {
+   "east_meters": 18.5,
+   "north_meters": 69.5,
+   "height_meters": 13.33,
+   "crown_radius_meters": 5.33
+  },
+  {
+   "east_meters": 12.5,
+   "north_meters": 61.5,
+   "height_meters": 8.79,
+   "crown_radius_meters": 1.58
+  },
+  {
+   "east_meters": 58.5,
+   "north_meters": 7.5,
+   "height_meters": 9.82,
+   "crown_radius_meters": 4.93
+  },
+  {
+   "east_meters": 45.5,
+   "north_meters": 1.5,
+   "height_meters": 13.38,
+   "crown_radius_meters": 3.34
+  },
+  {
+   "east_meters": 59.5,
+   "north_meters": 12.5,
+   "height_meters": 7.92,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 17.5,
+   "north_meters": 67.5,
+   "height_meters": 11.22,
+   "crown_radius_meters": 6.0
+  },
+  {
+   "east_meters": 31.5,
+   "north_meters": 89.5,
+   "height_meters": 10.86,
+   "crown_radius_meters": 1.35
+  },
+  {
+   "east_meters": 26.5,
+   "north_meters": 44.5,
+   "height_meters": 6.67,
+   "crown_radius_meters": 3.52
+  },
+  {
+   "east_meters": 25.5,
+   "north_meters": 42.5,
+   "height_meters": 7.01,
+   "crown_radius_meters": 3.27
+  },
+  {
+   "east_meters": 0.5,
+   "north_meters": 19.5,
+   "height_meters": 5.96,
+   "crown_radius_meters": 1.48
+  },
+  {
+   "east_meters": 61.5,
+   "north_meters": 78.5,
+   "height_meters": 5.36,
+   "crown_radius_meters": 2.69
+  },
+  {
+   "east_meters": 0.5,
+   "north_meters": 72.5,
+   "height_meters": 4.99,
+   "crown_radius_meters": 2.46
+  },
+  {
+   "east_meters": 0.5,
+   "north_meters": 75.5,
+   "height_meters": 4.99,
+   "crown_radius_meters": 2.46
+  },
+  {
+   "east_meters": 76.5,
+   "north_meters": 69.5,
+   "height_meters": 5.48,
+   "crown_radius_meters": 1.88
+  },
+  {
+   "east_meters": 16.5,
+   "north_meters": 7.5,
+   "height_meters": 5.56,
+   "crown_radius_meters": 3.57
+  },
+  {
+   "east_meters": 60.5,
+   "north_meters": 83.5,
+   "height_meters": 4.84,
+   "crown_radius_meters": 4.97
+  },
+  {
+   "east_meters": 70.5,
+   "north_meters": 89.5,
+   "height_meters": 4.06,
+   "crown_radius_meters": 3.89
+  },
+  {
+   "east_meters": 60.5,
+   "north_meters": 65.5,
+   "height_meters": 4.38,
+   "crown_radius_meters": 2.77
+  },
+  {
+   "east_meters": 49.5,
+   "north_meters": 89.5,
+   "height_meters": 3.72,
+   "crown_radius_meters": 4.37
+  },
+  {
+   "east_meters": 39.5,
+   "north_meters": 89.5,
+   "height_meters": 3.51,
+   "crown_radius_meters": 4.37
+  },
+  {
+   "east_meters": 45.5,
+   "north_meters": 84.5,
+   "height_meters": 3.43,
+   "crown_radius_meters": 6.0
+  }
+ ],
+ "structures": [],
+ "water": [],
+ "road": [
+  {
+   "footprint": [
+    {
+     "east_meters": 0.0,
+     "north_meters": 48.0
+    },
+    {
+     "east_meters": 90.0,
+     "north_meters": 48.0
+    },
+    {
+     "east_meters": 90.0,
+     "north_meters": 56.0
+    },
+    {
+     "east_meters": 0.0,
+     "north_meters": 56.0
+    }
+   ]
+  }
+ ],
+ "receipts": {
+  "tile_point_count": 3276414,
+  "square_point_count": 52021,
+  "noise_point_count": 57,
+  "class_histogram": {
+   "1": 28144,
+   "2": 23820
+  },
+  "first_return_count": 40009,
+  "chm_max_meters": 25.09,
+  "chm_mean_meters": 5.48,
+  "canopy_cover_fraction": 0.48,
+  "crown_maxima_count": 105,
+  "tree_count": 97
+ },
+ "provenance": {
+  "lidar_product": "USGS Lidar Point Cloud MI_31County_2016_A16 055430",
+  "lidar_url": "https://rockyweb.usgs.gov/vdelivery/Datasets/Staged/Elevation/LPC/Projects/MI_31County_2016_A16/MI_31Co_Eaton_2016/LAZ/USGS_LPC_MI_31County_2016_A16_055430.laz",
+  "dataset": "Lidar Point Cloud (LPC)",
+  "method": "CHM = per-cell max first-return height minus 1m 3DEP DEM ground; trees = 3x3 local maxima on 3x3-mean-smoothed CHM >= 3m, greedy radius suppression, crown radius from 8-ray half-height walk; structures = class-6 points (absence is a finding); water = class-9 else contiguous low-NIR dark NAIP blob; road = brightest gray NAIP row band",
+  "horizontal_crs": "EPSG:26916",
+  "vertical_datum": "NAVD88 (Geoid12B), lidar feet converted to meters"
+ }
+}
