@@ -8,7 +8,42 @@ only a pointer here.
 - when: 2026-08-09T04:00Z
 - seat: CLAIMED 2026-08-06 by pt-head
 
-## RUN 7 IN FLIGHT (2026-08-10 night) — the eyes get real
+## RUN 7 MORNING REPORT (2026-08-10 night → morning) — the eyes got real
+
+Lane 19 PASS and MERGED (lead-verified fresh: **186 tests, 0 failures, 0 skips**; was 175).
+97 trees stand as real geometry from the actual QL2 point cloud (52,021 points on the square,
+CHM max 25.09 m, cover 0.48); the road cuts the woods; class-6 and class-9 absence honestly
+ruled: no structures, no pond — the NAIP dark blob was canopy shade (CHM 9.5 m under it).
+Numeric gates: tree ratio 0.92 (±30%), rendered cover 0.431 vs 0.480 (±0.15), skyline
+roughness 1.468 wooded vs 0.635 bare, tallest crown raises the occluder 25.1 m (trees shade
+ground through D-015).
+
+### D-019 cycle ledger (lead's eye, committed scorecard S1–S7)
+| cycle | change | woods luma | overhead luma | S7 |
+|---|---|---|---|---|
+| 1 | worker's build as merged | 0.1408 | 0.4096 | 1 — reads as A wooded parcel; ground near-black |
+| 2 | litter blend under crowns | ≈same | ≈same | 1 — no visible change; diagnosis: inter-crown NAIP shadow |
+| 3 | de-shadowed albedo (luma floor .18, hue kept) | ≈same | ≈same | 1 — bytes changed, light term dominates |
+| 4 | scattered-skylight floor .30 | 0.1485 | — | 1 — measured +5.5%, invisible |
+| 5 | sunlit-surround bounce .14 + floor .24 | **0.1783** | — | 2 — forest floor reads as ground |
+| 6 | crowns read de-shadowed NAIP | 0.1783 (plateau) | **0.4365** | 2 — cold read: that parcel |
+Stop condition met: plateau over two cycles, S7=2, no dimension at 0, full suite green.
+S1 trees-at-walk-height 2 · S2 canopy-matches-NAIP 2 · S3 road 2 · S4 pond n/a (honest
+absence) · S5 skyline-rough 2 · S6 heights-believable 2 · S7 2.
+The lesson the cycles taught (kept for the next visual run): measure the region, don't stare
+at the sheet — three albedo-side edits read as identical until the luma numbers separated
+the light term from the color term.
+
+### Walk it
+`bash gradlew :app:run --args="C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/compiled/parcel.json"`
+(full-res: 900×900 ground + all 97 trees + road under the sky).
+
+### Still open (small)
+- shadow-direction self-suppression in a 97-caster forest (red banners are that check).
+- Sun-glow softened by lane 19's sky work — if Jim wants the tight bright disk back it needs
+  finer near-sun tessellation (lane's note), a taste call for his batch review.
+
+## RUN 7 WAS: IN FLIGHT (2026-08-10 night) — the eyes get real
 
 Rulings ledgered tonight: D-018 (lead merges own gate-green work; Jim by exception), D-019
 (visual deliverables gated by the lead's eye across measured cycles), D-020 (the parcel is

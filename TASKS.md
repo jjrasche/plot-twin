@@ -2,16 +2,12 @@
 
 ## Now
 
-- Jim rules: may the shared-case parcel's true coordinates enter the tracked fixture? The
-  parcel is public record and documented across common-ground, but the standing privacy rail
-  keeps all derived data gitignored — so the fixture still carries the run-5 point and the
-  geocode gate stays unarmed. One rename (capture/data/geocode.owner.json → geocode.json) +
-  one recapture arms everything if allowed.
-- Walk the true parcel (recaptured, gitignored cache):
-  `bash gradlew :app:run --args="capture/data/compiled/parcel.json"`;
+- Walk Isaac's parcel in true 3D (97 lidar trees, road, real light):
+  `bash gradlew :app:run --args="C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/compiled/parcel.json"`;
   see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`
 - Seam: Q-013 accepted with four contract asks + eaton-delta-twp sequencing ask (board:
   seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009
+- Shadow-direction check self-suppresses in a many-caster forest — the one red banner left
 
 ## Next
 
