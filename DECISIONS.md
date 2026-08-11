@@ -88,3 +88,20 @@ Hosek-Wilkie needs its fitted radiance coefficient tables vendored verbatim; han
 
 ## D-017 — the plot is georeferenced by a site row (2026-08-07, ruled) #state #solvers
 Latitude, longitude and time zone enter the log as a typed `site` row with the CAPTURE writer, because the sunshed solver cannot exist without them and nothing lives outside the log (D-001, D-011).
+
+## D-018 — the lead merges its own gate-green work; Jim ratifies by exception only (2026-08-10, ruled) #process
+Extends D-014 from plot-twin merges to the general rule: gate-green work lands on main by the
+lead's own call, and Jim is pulled in only for money, going public, or pushing to his devices.
+Never wait on Jim for a merge; everything else arrives documented in the ledger, reversible,
+reviewed at his batch sitting.
+
+## D-019 — visual deliverables are gated by the lead's own eyes across measured cycles (2026-08-10, ruled) #renderer #process
+Every visual deliverable iterates inside the run: the lead renders, looks, scores against
+bands committed BEFORE the first cycle, and adjusts until better-vs-worse is measured across
+cycles, not guessed from one frame. The edit loop lives in the run, never on Jim's desk. Born
+from the run-6 squished satellite-over-topology smear that shipped gate-green while not
+resembling ground: pixel checks bound correctness, only an eye bounds resemblance.
+
+## D-020 — the first parcel is Isaac's, 11157 W Jolly Rd, Delta Twp; coordinates are public (2026-08-10, ruled) #state #scope
+The shared-case parcel is public record and ratified for tracked fixtures — the run-6 privacy
+hold is lifted. The fixture and geocode gate carry the true point.
