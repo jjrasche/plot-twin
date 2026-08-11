@@ -44,15 +44,22 @@ fun averageDown(field: FloatArray, columns: Int, rows: Int, factor: Int): FloatA
     return averaged
 }
 
+// outdoor daylight never reads true black: haze and multiple bounce keep a floor under
+// every surface, so the darkest woods interior stays legible instead of clipping to void
+const val BLACK_POINT_LIFT = 0.025f
+
 fun litColor(albedo: Rgb, normal: SceneDirection, sunlitFraction: Float, skyOpenness: Float, daylight: Daylight): Rgb {
     val lambert = lambertOf(normal, daylight.sunDirection)
     val received = daylight.sunlight * (lambert * sunlitFraction) + daylight.skylight * skyOpenness
     return Rgb(
-        red = (albedo.red * received.red).coerceIn(0f, 1f),
-        green = (albedo.green * received.green).coerceIn(0f, 1f),
-        blue = (albedo.blue * received.blue).coerceIn(0f, 1f),
+        red = liftedChannel(albedo.red * received.red),
+        green = liftedChannel(albedo.green * received.green),
+        blue = liftedChannel(albedo.blue * received.blue),
     )
 }
+
+private fun liftedChannel(channel: Float): Float =
+    BLACK_POINT_LIFT + channel.coerceIn(0f, 1f) * (1f - BLACK_POINT_LIFT)
 
 fun lambertOf(normal: SceneDirection, sunDirection: SceneDirection): Float =
     (normal.east * sunDirection.east + normal.up * sunDirection.up + normal.north * sunDirection.north)

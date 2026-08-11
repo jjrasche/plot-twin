@@ -145,8 +145,22 @@ def apex_height_meters(chm: numpy.ndarray, row: int, column: int) -> float:
     return float(window.max())
 
 
-def extract_trees(chm: numpy.ndarray, smooth_chm: numpy.ndarray) -> tuple[list[dict], int]:
-    maxima = crown_maxima(smooth_chm)
+def road_row_band(road: list[dict]) -> tuple[int, int] | None:
+    if not road:
+        return None
+    norths = [point["north_meters"] for point in road[0]["footprint"]]
+    return int(min(norths)), int(max(norths))
+
+
+def extract_trees(chm: numpy.ndarray, smooth_chm: numpy.ndarray, road: list[dict]) -> tuple[list[dict], int]:
+    """A crown maximum on the road surface is overhanging canopy — no trunk grows from
+    asphalt — so road-band maxima are suppressed before trees are placed."""
+    band = road_row_band(road)
+    maxima = [
+        (row, column)
+        for row, column in crown_maxima(smooth_chm)
+        if band is None or not (band[0] <= row < band[1])
+    ]
     trees = [
         {
             "east_meters": column + 0.5,
@@ -284,11 +298,11 @@ def main() -> None:
     surface = first_return_surface(points)
     chm = canopy_height_model(surface, ground)
     smooth_chm = smoothed(chm)
-    trees, maxima_count = extract_trees(chm, smooth_chm)
     naip = naip_grids(center_east, center_north)
+    road = extract_road(naip)
+    trees, maxima_count = extract_trees(chm, smooth_chm, road)
     structures = extract_structures(points)
     water = extract_water(points, naip, chm)
-    road = extract_road(naip)
 
     histogram = collections.Counter(points["classification"].tolist())
     cover_fraction = float((chm >= CANOPY_COVER_HEIGHT_METERS).mean())

@@ -5,13 +5,18 @@ import kotlin.math.abs
 
 const val SKY_COVERAGE_BOUND = 0.98
 const val SKY_BANDING_LUMINANCE_BOUND = 12.0
+const val SURFACE_AS_SKY_BOUND = 0.05
 
 data class SkyRegionReading(
     val coverageAboveSkyline: Double,
     val maxAdjacentLuminanceJump: Double,
     val skyPixels: Int,
     val inspectedAboveSkyline: Int,
-)
+    val solidPixels: Int = 0,
+    val solidSkyPixels: Int = 0,
+) {
+    val solidSkyFraction: Double get() = if (solidPixels == 0) 0.0 else solidSkyPixels.toDouble() / solidPixels
+}
 
 fun skyMaskOf(image: BufferedImage, classifier: SkyClassifier): BooleanArray {
     val mask = BooleanArray(image.width * image.height)
@@ -36,6 +41,45 @@ fun observedSkylineOf(image: BufferedImage, classifier: SkyClassifier): IntArray
     return topmostRows
 }
 
+// Porous-scene reading: a woodlot shows sky through crown gaps below the topmost skyline,
+// so the claim becomes per-pixel — wherever no solid geometry projects the sky must show,
+// and wherever solid geometry projects it must NOT read as sky.
+fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, solid: VisibleSurface): SkyRegionReading {
+    val sky = skyMaskOf(image, classifier)
+    val unowned = BooleanArray(sky.size) { solid.owner[it] == NO_SURFACE }
+    // the painter antialiases edges the mask rasterizer draws hard, so both regions pull
+    // back two pixels from the boundary before any pixel is judged
+    val unownedInterior = erodedOnce(erodedOnce(unowned, image.width, image.height), image.width, image.height)
+    val owned = BooleanArray(unowned.size) { !unowned[it] }
+    val ownedInterior = erodedOnce(erodedOnce(owned, image.width, image.height), image.width, image.height)
+    var inspected = 0
+    var covered = 0
+    var solidPixels = 0
+    var solidSky = 0
+    for (pixel in sky.indices) {
+        if (unownedInterior[pixel]) {
+            inspected++
+            if (sky[pixel]) covered++
+        }
+        if (ownedInterior[pixel]) {
+            solidPixels++
+            if (sky[pixel]) solidSky++
+        }
+    }
+    val interior = intersect(erodedOnce(sky, image.width, image.height), unownedInterior)
+    return SkyRegionReading(
+        coverageAboveSkyline = if (inspected == 0) 1.0 else covered.toDouble() / inspected,
+        maxAdjacentLuminanceJump = maxAdjacentJumpOverInterior(image, interior),
+        skyPixels = sky.count { it },
+        inspectedAboveSkyline = inspected,
+        solidPixels = solidPixels,
+        solidSkyPixels = solidSky,
+    )
+}
+
+private fun intersect(first: BooleanArray, second: BooleanArray): BooleanArray =
+    BooleanArray(first.size) { first[it] && second[it] }
+
 fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, predictedSkyline: IntArray): SkyRegionReading {
     val sky = skyMaskOf(image, classifier)
     var inspected = 0
@@ -57,8 +101,10 @@ fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, predicte
 
 // Measured over the eroded sky interior: boundary pixels are sky-terrain blends whose
 // jump reads the silhouette edge, not the gradient.
-private fun maxAdjacentSkyLuminanceJumpOf(image: BufferedImage, sky: BooleanArray): Double {
-    val interior = erodedOnce(sky, image.width, image.height)
+private fun maxAdjacentSkyLuminanceJumpOf(image: BufferedImage, sky: BooleanArray): Double =
+    maxAdjacentJumpOverInterior(image, erodedOnce(sky, image.width, image.height))
+
+private fun maxAdjacentJumpOverInterior(image: BufferedImage, interior: BooleanArray): Double {
     var worstJump = 0.0
     for (row in 0 until image.height) {
         for (column in 0 until image.width) {
@@ -87,7 +133,15 @@ private fun neighborsOf(row: Int, column: Int, width: Int, height: Int): List<In
         (maxOf(0, column - 1)..minOf(width - 1, column + 1)).map { neighborColumn -> neighborRow * width + neighborColumn }
     }
 
-fun skyRegionFindings(viewpointName: String, reading: SkyRegionReading): List<EyeFinding> = listOf(
+fun skyRegionFindings(viewpointName: String, reading: SkyRegionReading): List<EyeFinding> = listOfNotNull(
+    if (reading.solidPixels == 0) null else EyeFinding(
+        check = "surface-reads-as-sky",
+        subject = viewpointName,
+        measured = reading.solidSkyFraction,
+        bound = SURFACE_AS_SKY_BOUND,
+        passed = reading.solidSkyFraction <= SURFACE_AS_SKY_BOUND,
+        detail = "${reading.solidSkyPixels} of ${reading.solidPixels} geometry-owned pixels classify as sky",
+    ),
     EyeFinding(
         check = "sky-above-skyline",
         subject = viewpointName,

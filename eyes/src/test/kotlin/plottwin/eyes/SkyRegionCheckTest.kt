@@ -14,6 +14,7 @@ import plottwin.solvers.ToyPlotFixture
 
 private const val OLD_DOME_CELLS = 96
 private const val OLD_RIM_HEIGHT_SHARE = 0.14f
+private const val OLD_GLOW_TIGHTNESS = 24.0f
 
 // The square-lattice dome with one colour per cell pair — the construction whose concentric
 // fan banding this check exists to catch.
@@ -54,7 +55,7 @@ private fun oldSkyColorToward(east: Float, up: Float, north: Float, radius: Floa
     val length = sqrt(east * east + up * up + north * north).coerceAtLeast(1e-6f)
     val towardSun =
         (east * daylight.sunDirection.east + up * daylight.sunDirection.up + north * daylight.sunDirection.north) / length
-    val glow = towardSun.coerceAtLeast(0f).pow(SUN_GLOW_TIGHTNESS)
+    val glow = towardSun.coerceAtLeast(0f).pow(OLD_GLOW_TIGHTNESS)
     return Rgb(
         red = (mixChannel(daylight.horizonTint.red, daylight.zenithTint.red, towardZenith) + daylight.sunGlow.red * glow).coerceIn(0f, 1f),
         green = (mixChannel(daylight.horizonTint.green, daylight.zenithTint.green, towardZenith) + daylight.sunGlow.green * glow).coerceIn(0f, 1f),

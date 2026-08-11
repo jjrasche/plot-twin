@@ -63,6 +63,21 @@ private fun triangleEdgesOf(triangles: List<Int>): List<Pair<Int, Int>> {
     return edges
 }
 
+// Coverage-honest skyline: the topmost pixel a solid surface actually claims per column,
+// so sub-pixel far geometry the painter fades to sky is not predicted as solid.
+fun predictedSkylineOf(solid: VisibleSurface): IntArray {
+    val topmostRows = IntArray(solid.width) { NOTHING_DRAWN }
+    for (column in 0 until solid.width) {
+        for (row in 0 until solid.height) {
+            if (solid.owner[row * solid.width + column] != NO_SURFACE) {
+                topmostRows[column] = row
+                break
+            }
+        }
+    }
+    return topmostRows
+}
+
 fun predictedSkylineOf(meshes: Collection<Scene3dMesh>, projector: ScreenProjector): IntArray {
     val topmostRows = IntArray(projector.width) { NOTHING_DRAWN }
     for (mesh in meshes) {

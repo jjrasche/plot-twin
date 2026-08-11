@@ -51,18 +51,6 @@
    "crown_radius_meters": 6.0
   },
   {
-   "east_meters": 54.5,
-   "north_meters": 49.5,
-   "height_meters": 21.27,
-   "crown_radius_meters": 6.0
-  },
-  {
-   "east_meters": 51.5,
-   "north_meters": 52.5,
-   "height_meters": 21.14,
-   "crown_radius_meters": 5.81
-  },
-  {
    "east_meters": 41.5,
    "north_meters": 21.5,
    "height_meters": 22.97,
@@ -117,12 +105,6 @@
    "crown_radius_meters": 3.72
   },
   {
-   "east_meters": 48.5,
-   "north_meters": 50.5,
-   "height_meters": 20.78,
-   "crown_radius_meters": 4.78
-  },
-  {
    "east_meters": 38.5,
    "north_meters": 12.5,
    "height_meters": 22.12,
@@ -139,12 +121,6 @@
    "north_meters": 89.5,
    "height_meters": 19.12,
    "crown_radius_meters": 1.91
-  },
-  {
-   "east_meters": 33.5,
-   "north_meters": 48.5,
-   "height_meters": 18.8,
-   "crown_radius_meters": 4.05
   },
   {
    "east_meters": 40.5,
@@ -175,12 +151,6 @@
    "north_meters": 9.5,
    "height_meters": 18.02,
    "crown_radius_meters": 6.0
-  },
-  {
-   "east_meters": 31.5,
-   "north_meters": 50.5,
-   "height_meters": 18.73,
-   "crown_radius_meters": 3.87
   },
   {
    "east_meters": 22.5,
@@ -315,22 +285,10 @@
    "crown_radius_meters": 3.82
   },
   {
-   "east_meters": 20.5,
-   "north_meters": 52.5,
-   "height_meters": 16.93,
-   "crown_radius_meters": 5.61
-  },
-  {
    "east_meters": 14.5,
    "north_meters": 35.5,
    "height_meters": 14.93,
    "crown_radius_meters": 4.3
-  },
-  {
-   "east_meters": 18.5,
-   "north_meters": 48.5,
-   "height_meters": 15.33,
-   "crown_radius_meters": 4.83
   },
   {
    "east_meters": 33.5,
@@ -355,12 +313,6 @@
    "north_meters": 74.5,
    "height_meters": 15.14,
    "crown_radius_meters": 3.72
-  },
-  {
-   "east_meters": 24.5,
-   "north_meters": 48.5,
-   "height_meters": 15.66,
-   "crown_radius_meters": 2.59
   },
   {
    "east_meters": 64.5,
@@ -409,12 +361,6 @@
    "north_meters": 20.5,
    "height_meters": 12.82,
    "crown_radius_meters": 5.63
-  },
-  {
-   "east_meters": 16.5,
-   "north_meters": 52.5,
-   "height_meters": 13.62,
-   "crown_radius_meters": 4.88
   },
   {
    "east_meters": 68.5,
@@ -681,8 +627,8 @@
   "chm_max_meters": 25.09,
   "chm_mean_meters": 5.48,
   "canopy_cover_fraction": 0.48,
-  "crown_maxima_count": 114,
-  "tree_count": 106
+  "crown_maxima_count": 105,
+  "tree_count": 97
  },
  "provenance": {
   "lidar_product": "USGS Lidar Point Cloud MI_31County_2016_A16 055430",

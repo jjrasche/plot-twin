@@ -26,7 +26,7 @@ const val ROAD_STRIP_METERS = 3.0
 val TRUNK_ALBEDO = rgbOfHex("5b4632")
 val FALLBACK_CANOPY_ALBEDO = rgbOfHex("4e7a3a")
 val WATER_ALBEDO = rgbOfHex("3a6d8c")
-val ROAD_ALBEDO = rgbOfHex("6a6a6e")
+val ROAD_ALBEDO = rgbOfHex("57524b")
 
 private class MeshBuilder {
     val vertices = ArrayList<Float>()
@@ -83,10 +83,21 @@ fun treeMeshOf(
         centerY = ground + treeHeight * (TRUNK_HEIGHT_SHARE + 1f) / 2f,
         semiHorizontal = crownRadius,
         semiVertical = treeHeight * (1f - TRUNK_HEIGHT_SHARE) / 2f,
-        albedo = liftedForVisibility(canopyAlbedo ?: FALLBACK_CANOPY_ALBEDO),
+        albedo = liftedForVisibility(foliageTintOf(canopyAlbedo)),
         daylight = daylight,
     )
     return builder.mesh()
+}
+
+// the NAIP pixel keeps its identity but leans toward foliage green: an airphoto pixel
+// under a crown is part shadow, and a pure shadow-blue tree reads as plastic
+private fun foliageTintOf(canopyAlbedo: Rgb?): Rgb {
+    val naip = canopyAlbedo ?: return FALLBACK_CANOPY_ALBEDO
+    return Rgb(
+        red = naip.red * 0.7f + FALLBACK_CANOPY_ALBEDO.red * 0.3f,
+        green = naip.green * 0.7f + FALLBACK_CANOPY_ALBEDO.green * 0.3f,
+        blue = naip.blue * 0.7f + FALLBACK_CANOPY_ALBEDO.blue * 0.3f,
+    )
 }
 
 // a NAIP pixel under deep canopy shadow would render a near-black tree; lift the floor
@@ -219,7 +230,14 @@ fun roadMeshOf(placed: PlacedEntity, terrain: TerrainGrid, frame: SceneFrame, da
     return builder.mesh()
 }
 
+// the drawn terrain is a downsampled average of this grid, so the drape rides the highest
+// nearby ground rather than one sample the coarser mesh may sit above
 private fun roadVertex(builder: MeshBuilder, east: Double, north: Double, terrain: TerrainGrid, frame: SceneFrame): Int {
-    val point = GroundPoint(Meters(east), Meters(north))
-    return builder.vertex(frame.sceneX(east), groundHeightAt(terrain, point) + ROAD_LIFT_METERS, frame.sceneZ(north))
+    val reach = terrain.cellSize.value * RENDER_DOWNSAMPLE_FACTOR
+    val nearbyGround = listOf(-reach, 0.0, reach).flatMap { alongEast ->
+        listOf(-reach, 0.0, reach).map { alongNorth ->
+            groundHeightAt(terrain, GroundPoint(Meters(east + alongEast), Meters(north + alongNorth)))
+        }
+    }.max()
+    return builder.vertex(frame.sceneX(east), nearbyGround + ROAD_LIFT_METERS, frame.sceneZ(north))
 }

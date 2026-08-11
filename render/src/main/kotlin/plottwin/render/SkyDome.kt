@@ -9,12 +9,12 @@ import kotlin.math.sqrt
 import plottwin.worldstate.TerrainGrid
 
 const val SKY_ENTITY_ID = "sky"
-const val SKY_DOME_RING_CELLS = 96
-const val SKY_DOME_SPOKE_CELLS = 256
-const val SKY_SKIRT_RING_CELLS = 3
-const val SKY_SKIRT_DROP_SHARE = 0.08f
+const val SKY_DOME_RING_CELLS = 144
+const val SKY_DOME_SPOKE_CELLS = 288
+const val SKY_SKIRT_RING_CELLS = 16
+const val SKY_SKIRT_DROP_SHARE = 0.25f
 const val SKY_DOME_RADIUS_MULTIPLE = 6.0f
-const val SUN_GLOW_TIGHTNESS = 24.0f
+const val SUN_GLOW_TIGHTNESS = 8.0f
 
 // scene3d draws heightfield entities in list order before every other mesh, so a dome expressed
 // as a heightfield and listed first is the one sky the batched painter can already draw.
@@ -101,7 +101,8 @@ private fun skyColorToward(east: Float, up: Float, north: Float, radius: Float, 
     val base = blend(daylight.horizonTint, daylight.zenithTint, sqrt(elevation))
     val length = sqrt(east * east + up * up + north * north).coerceAtLeast(1e-6f)
     val towardSun = (east * daylight.sunDirection.east + up * daylight.sunDirection.up + north * daylight.sunDirection.north) / length
-    val glow = towardSun.coerceAtLeast(0f).pow(SUN_GLOW_TIGHTNESS)
+    val glowFadedIntoSkirtBottomWhichBackgroundMatches = (1f + up / (SKY_SKIRT_DROP_SHARE * radius)).coerceIn(0f, 1f)
+    val glow = towardSun.coerceAtLeast(0f).pow(SUN_GLOW_TIGHTNESS) * glowFadedIntoSkirtBottomWhichBackgroundMatches
     return Rgb(
         red = (base.red + daylight.sunGlow.red * glow).coerceIn(0f, 1f),
         green = (base.green + daylight.sunGlow.green * glow).coerceIn(0f, 1f),
