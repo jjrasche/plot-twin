@@ -48,9 +48,14 @@ fun averageDown(field: FloatArray, columns: Int, rows: Int, factor: Int): FloatA
 // every surface, so the darkest woods interior stays legible instead of clipping to void
 const val BLACK_POINT_LIFT = 0.025f
 
+const val CANOPY_SCATTERED_SKYLIGHT_FLOOR = 0.30f
+const val SUNLIT_SURROUND_BOUNCE = 0.14f
+
 fun litColor(albedo: Rgb, normal: SceneDirection, sunlitFraction: Float, skyOpenness: Float, daylight: Daylight): Rgb {
     val lambert = lambertOf(normal, daylight.sunDirection)
-    val received = daylight.sunlight * (lambert * sunlitFraction) + daylight.skylight * skyOpenness
+    val bouncedOpenness = CANOPY_SCATTERED_SKYLIGHT_FLOOR + skyOpenness * (1f - CANOPY_SCATTERED_SKYLIGHT_FLOOR)
+    val received = daylight.sunlight * (lambert * sunlitFraction + SUNLIT_SURROUND_BOUNCE) +
+        daylight.skylight * bouncedOpenness
     return Rgb(
         red = liftedChannel(albedo.red * received.red),
         green = liftedChannel(albedo.green * received.green),
