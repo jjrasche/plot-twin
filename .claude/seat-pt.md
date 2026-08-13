@@ -337,3 +337,46 @@ and it nearly cost the lane.
 - NEEDS JIM: (1) merge/keep decision on factored-ui branch build/scene3d-batched-painter (Jim's repo, Jim's merge); (2) optimizer-PROPOSED regrades — measured ground is CAPTURE-only today; design-time earthworks need a ruling (distinct row type?); (3) smaller: standing render decimation factor, per-family violation-marker scaling, RejectionRow's embedded op now redundant w/ refs, int16 terrain quantization parked in favor of exact replay
 - worktrees still up: plot-twin-build-{schema,solvers,op-pipeline,provenance,walkable}, factored-ui-build-scene3d — prune after Jim reviews
 - status: stopping place — walk the toy plot: `bash gradlew :app:run` on main
+
+## RUN 8 (2026-08-12 night) — the 90m square dies
+
+Charter: Jim ratified common-ground's D-009 seam and told this run to consume it. Ingest the
+true parcel boundary; clip terrain, trees and render to the real property line; eye-gate the
+result. Plus: teach the shadow-direction check that a many-caster forest has no principal shadow.
+
+Charters 20 (boundary ingest) · 21 (boundary clip) · 22 (render the property line) ·
+23 (no principal shadow), at `.claude/charters/`. Wave 1 = 20 + 23 + a read-only ledger audit.
+
+### What the lead measured before chartering
+- Eaton County's open ArcGIS `Parcels_AGO/0` returns the parcel as a 5-vertex closed ring:
+  PARCELID 04003630009000, LPARCEL 040-036-300-090-00, SITEADDRESS "11157 JOLLY HWY",
+  OWNERNME1 "UPDIKE, ISAAC", Acreage 1.83922805, STATEDAREA 2. Extent lon -84.6197636 …
+  -84.6193838, lat 42.6832070 … 42.6853771 — a strip ~31 m E-W by ~241 m N-S, ~7444 m2.
+- The geocoded address point (42.68317626, -84.61959109) is ~3.4 m SOUTH of the parcel's south
+  line: it sits in the Jolly Hwy right-of-way, OUTSIDE the property. Every render to date was a
+  90m square centred on a point in the road.
+- `eaton-delta-twp` is NOT in common-ground's contract family (108 baked townships, none Eaton);
+  `data/jolly-rd/parcels-sweep-2026-08-04.json` was pulled with returnGeometry=false, so the
+  legacy family carries no boundary at all. Hence the county interim, labelled as such.
+- The cached NAIP clip is exactly the old 90m square (bounds 694976.7-695066.7 E,
+  4728335.3-4728425.3 N at 0.1 m) — ~200 m of the parcel has no imagery. The 3DEP DEM tile
+  covers 10 km x 10 km, so elevation is fine.
+
+### Ledger self-audit (charter-required pass; report-only, nothing retired)
+Conflicts: RESEARCH Q-004 still names Hosek-Wilkie as the conclusion D-016 rejected; Q-004a still
+calls texCoords draping affordable where run 5 measured `Scene3dMesh` exposes no texCoords (the
+API blocker lives only in this seat file); D-014's factored-ui merge carve-out vs D-018's general
+merge autonomy.
+Superseded premises: CLAUDE.md and README still say "Jim's 2-acre plot" where D-020 ruled the
+parcel is Isaac's and the county says 1.839 ac in a 31x241 m strip — every "810K cells for 2
+acres" figure descends from that; D-017's site row is a road-ROW point, not the extent origin;
+Q-005/Q-006 statuses say awaiting-ratification for work that shipped; README says "no code yet"
+at 186 tests.
+Stale precedent: D-011's core ruling (fixed 10cm, no adaptivity) SURVIVES the boundary polygon —
+this strip's bbox fills ~99.6% of the polygon at ~750K cells against the 810K D-011 sized, and
+D-015's 20 ms sweep budget holds. D-011 is silent on two new things: what a terrain-diff means on
+a masked cell (lead-ruled into charter 21: rejected with a typed violation), and its 4.3MB size
+receipt is unverified over the new extent. `CompiledParcelGateTest.kt:16` still pins 42.6006,
+-84.6547 (Eaton Rapids, ~15.6 km south) — folded into charter 21.
+Ledger gaps: no decision entry exists for the shadow check's promotion from advisory to a real
+gate, nor for the interim county source. Both load-bearing, both living only in this seat file.
