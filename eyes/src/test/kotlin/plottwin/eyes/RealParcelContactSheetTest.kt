@@ -44,7 +44,7 @@ class RealParcelContactSheetTest {
     }
 
     @Test
-    fun the_dem_predicted_skyline_agrees_with_the_rendered_skyline() {
+    fun every_viewpoint_carries_enough_skyline_to_compare_and_agrees_with_the_dem_prediction() {
         val scene = realParcelScene(RealParcelFixture.parcel(), boundary = RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val classifier = skyClassifierOf(scene.spec, scene.daylight)
@@ -57,12 +57,13 @@ class RealParcelContactSheetTest {
         comparisons.forEach { (name, comparison) ->
             println("[real-parcel] $name skyline agreement %.3f coverage %.3f".format(comparison.agreement, comparison.coverage))
         }
-        val gated = comparisons.filter { (_, comparison) -> comparison.coverage >= SKYLINE_COVERAGE_BOUND }
-        assertTrue(gated.isNotEmpty(), "no viewpoint had enough skyline coverage to compare")
+        val thin = comparisons.filter { (_, comparison) -> comparison.coverage < SKYLINE_COVERAGE_BOUND }
         assertTrue(
-            gated.all { (_, comparison) -> comparison.agreement >= SKYLINE_AGREEMENT_BOUND },
-            "skyline disagreement: ${gated.filter { it.second.agreement < SKYLINE_AGREEMENT_BOUND }.map { it.first }}",
+            thin.isEmpty(),
+            "too little skyline to compare at ${thin.map { "${it.first} %.3f".format(it.second.coverage) }}, bound $SKYLINE_COVERAGE_BOUND",
         )
+        val disagreeing = comparisons.filter { (_, comparison) -> comparison.agreement < SKYLINE_AGREEMENT_BOUND }
+        assertTrue(disagreeing.isEmpty(), "skyline disagreement: ${disagreeing.map { it.first }}")
     }
 
     @Test

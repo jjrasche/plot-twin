@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-const val QUESTION_HEADING_HEIGHT = 46
+const val QUESTION_HEADING_HEIGHT = 64
 const val PANEL_LABEL_HEIGHT = 46
 const val SHEET_PADDING = 10
 
@@ -18,7 +18,12 @@ data class TastePanel(val option: String, val cost: String, val image: BufferedI
 
 // The options for one question, plus the statement of what was held still across them. Everything
 // but the one variable must be constant inside a question or the comparison measures two things.
-data class TasteQuestion(val question: String, val heldConstant: String, val panels: List<TastePanel>)
+data class TasteQuestion(
+    val question: String,
+    val heldConstant: String,
+    val note: String,
+    val panels: List<TastePanel>,
+)
 
 // One sheet, one sitting: each question is a row of its own options, so three decisions read as
 // three rows rather than as nine unrelated pictures.
@@ -57,6 +62,8 @@ private fun drawQuestionHeading(canvas: Graphics2D, question: TasteQuestion, top
     canvas.color = Color(0x9A, 0xA6, 0xBC)
     canvas.font = Font(Font.SANS_SERIF, Font.PLAIN, 12)
     canvas.drawString("held constant: ${question.heldConstant}", SHEET_PADDING + 10, top + 38)
+    canvas.color = Color(0xE8, 0xB0, 0x74)
+    canvas.drawString(question.note, SHEET_PADDING + 10, top + 56)
 }
 
 private fun drawPanelRow(canvas: Graphics2D, question: TasteQuestion, top: Int, tileWidth: Int, tileHeight: Int) {

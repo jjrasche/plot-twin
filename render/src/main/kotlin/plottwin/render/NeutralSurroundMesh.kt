@@ -39,6 +39,7 @@ fun neutralSurroundMeshOf(
     frame: SceneFrame,
     daylight: Daylight,
     baseHaze: Float = SURROUND_BASE_HAZE,
+    albedo: Rgb = SURROUND_ALBEDO,
 ): Scene3dMesh {
     val centre = plotCentreOf(terrain)
     val datum = groundDatumOf(terrain)
@@ -58,7 +59,7 @@ fun neutralSurroundMeshOf(
     }
     return Scene3dMesh(
         vertices = vertices,
-        triColors = surroundColorsOf(spokes, rim, skyDomeRadiusOf(terrain) * SURROUND_HAZE_SCALE_SHARE, daylight, baseHaze),
+        triColors = surroundColorsOf(spokes, rim, skyDomeRadiusOf(terrain) * SURROUND_HAZE_SCALE_SHARE, daylight, baseHaze, albedo),
         gridCellsX = SURROUND_SPOKE_CELLS,
         gridCellsZ = SURROUND_RING_CELLS,
     )
@@ -148,8 +149,9 @@ private fun surroundColorsOf(
     hazeScale: Float,
     daylight: Daylight,
     baseHaze: Float,
+    albedo: Rgb,
 ): List<String> {
-    val lit = litColor(SURROUND_ALBEDO, SceneDirection(0f, 1f, 0f), sunlitFraction = 1f, skyOpenness = 1f, daylight = daylight)
+    val lit = litColor(albedo, SceneDirection(0f, 1f, 0f), sunlitFraction = 1f, skyOpenness = 1f, daylight = daylight)
     val triColors = ArrayList<String>(SURROUND_RING_CELLS * SURROUND_SPOKE_CELLS * 2)
     for (ring in 0 until SURROUND_RING_CELLS) {
         for (spoke in 0 until SURROUND_SPOKE_CELLS) {
