@@ -7,10 +7,10 @@
   7443.1. The render now draws only inside it — ground silhouette 0.8068 of the bbox against the
   mask's 0.8095 true-share — with the county's line standing as a kerb from the boundary row.
   Every pose is re-framed and `skyline-coverage` is green at all six (0.74–1.00).
-- The omission leaves the parcel in void: 0.65–0.76 of the below-skyline frame carries no
-  geometry at every orbit pose (0.13 at walk height, where crowns fill it), so no orbit frame
-  has a horizon. Ruled omitted; the alternative on the table is a neutral, visibly-not-mine
-  surround that carries a horizon while the overhead keeps the silhouette.
+- The void under the parcel is closed: a neutral render-side surround, whose hole is the property
+  line itself, took below-skyline void from 0.65–0.76 to 0.000 at every orbit pose. Open question
+  for Jim, not another cycle: it reads as pale mist rather than farmland, which is one haze
+  constant and a question about how his own land should look.
 - The road is NOT on Isaac's land. W Jolly Rd's right-of-way lies south of the south line (the
   address point sits 2.961 m south of the frame origin) and the southern rows inside the line
   carry 4.8–10 m of canopy. The old extraction only found a road because the 90m square reached
@@ -41,8 +41,6 @@
 
 - Dome into the render projection proper: today it joins at scene composition in eyes, which
   the app happens to reuse — a render-module concern living one module too high
-- Shadow-direction check should self-suppress (advisory) when the plot has no principal
-  shadow caster — bare terrain renders carry meaningless red readings
 - Spoil placement as optimizer search: v1 berms go where the op names them; scoring by
   viewshed+watershed per Q-005 is unbuilt. Terrace/swale/berm-as-primary-form still reject.
 - Aerial-perspective fog on the ground: needs a per-frame renderer hook in scene3d, since
@@ -68,3 +66,7 @@
 - Cinematic beauty-pass skin
 - Water-flow visual: particles advected along D8 arrows
 - Adaptive grid (quadtree) if uniform 10cm becomes a limit
+- Named future direction, explicitly not now: **pure peer-to-peer mesh sync between engines, no
+  hub.** Logged so that hub-by-omission never silently becomes permanent — today's architecture
+  has no hub only because nothing has needed one, which is an accident, and an unnamed accident
+  becomes a decision nobody made.
