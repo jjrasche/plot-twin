@@ -30,6 +30,7 @@ fun projectWalkableScene(
     violations: List<Violation>,
     daylight: Daylight,
     terrainAlbedoTriples: FloatArray? = null,
+    taste: LooksTaste = LooksTaste(),
 ): WalkableSceneSpec {
     val terrain = requireNotNull(state.terrain) { "cannot project a walkable scene before a base-terrain row is logged" }.grid
     val frame = sceneFrameOf(terrain)
@@ -41,7 +42,7 @@ fun projectWalkableScene(
     val renderTerrain = downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR)
     val boundaryRing = state.parcelBoundary?.ring
     if (boundaryRing != null) {
-        meshes[SURROUND_ENTITY_ID] = neutralSurroundMeshOf(boundaryRing, renderTerrain, frame, daylight)
+        meshes[SURROUND_ENTITY_ID] = neutralSurroundMeshOf(boundaryRing, renderTerrain, frame, daylight, taste.surroundBaseHaze, taste.surroundAlbedo)
     }
     meshes[TERRAIN_ENTITY_ID] = if (boundaryRing == null) {
         terrainMeshOf(renderTerrain, frame, shading, albedoOverride)

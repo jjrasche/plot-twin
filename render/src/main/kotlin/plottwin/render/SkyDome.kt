@@ -18,8 +18,13 @@ const val SUN_GLOW_TIGHTNESS = 8.0f
 
 // scene3d draws heightfield entities in list order before every other mesh, so a dome expressed
 // as a heightfield and listed first is the one sky the batched painter can already draw.
-fun withSkyDome(spec: WalkableSceneSpec, terrain: TerrainGrid, daylight: Daylight): WalkableSceneSpec {
-    val dome = skyDomeMeshOf(skyDomeRadiusOf(terrain), daylight, groundDatumOf(terrain))
+fun withSkyDome(
+    spec: WalkableSceneSpec,
+    terrain: TerrainGrid,
+    daylight: Daylight,
+    taste: LooksTaste = LooksTaste(),
+): WalkableSceneSpec {
+    val dome = skyDomeMeshOf(skyDomeRadiusOf(terrain), daylight, groundDatumOf(terrain), taste.sunGlowTightness)
     return spec.copy(
         world = spec.world.copy(
             entities = listOf(Scene3dEntity(id = SKY_ENTITY_ID)) + spec.world.entities,
@@ -37,7 +42,12 @@ fun skyDomeRadiusOf(terrain: TerrainGrid): Float =
 // Below the horizon a short skirt at full radius drops under every terrain silhouette.
 // The dome's equator stands on the ground datum, not on scene zero: a plot whose elevations are
 // hundreds of metres above the origin would otherwise look at its own horizon and see mid-sky.
-fun skyDomeMeshOf(radius: Float, daylight: Daylight, groundDatum: Float = 0f): Scene3dMesh {
+fun skyDomeMeshOf(
+    radius: Float,
+    daylight: Daylight,
+    groundDatum: Float = 0f,
+    glowTightness: Float = SUN_GLOW_TIGHTNESS,
+): Scene3dMesh {
     val ringVertexRows = SKY_SKIRT_RING_CELLS + SKY_DOME_RING_CELLS + 1
     val perRow = SKY_DOME_SPOKE_CELLS + 1
     val vertices = ArrayList<Float>(ringVertexRows * perRow * 3)
@@ -55,8 +65,8 @@ fun skyDomeMeshOf(radius: Float, daylight: Daylight, groundDatum: Float = 0f): S
     for (ring in 0 until ringVertexRows - 1) {
         for (spoke in 0 until SKY_DOME_SPOKE_CELLS) {
             val corner = ring * perRow + spoke
-            triColors.add(centroidColorOf(vertices, corner, corner + 1, corner + perRow, radius, daylight))
-            triColors.add(centroidColorOf(vertices, corner + 1, corner + perRow + 1, corner + perRow, radius, daylight))
+            triColors.add(centroidColorOf(vertices, corner, corner + 1, corner + perRow, radius, daylight, glowTightness))
+            triColors.add(centroidColorOf(vertices, corner + 1, corner + perRow + 1, corner + perRow, radius, daylight, glowTightness))
         }
     }
     return Scene3dMesh(
@@ -91,20 +101,28 @@ private fun centroidColorOf(
     third: Int,
     radius: Float,
     daylight: Daylight,
+    glowTightness: Float,
 ): String {
     val east = (vertices[first * 3] + vertices[second * 3] + vertices[third * 3]) / 3f
     val up = (vertices[first * 3 + 1] + vertices[second * 3 + 1] + vertices[third * 3 + 1]) / 3f
     val north = (vertices[first * 3 + 2] + vertices[second * 3 + 2] + vertices[third * 3 + 2]) / 3f
-    return hexOf(skyColorToward(east, up, north, radius, daylight))
+    return hexOf(skyColorToward(east, up, north, radius, daylight, glowTightness))
 }
 
-private fun skyColorToward(east: Float, up: Float, north: Float, radius: Float, daylight: Daylight): Rgb {
+private fun skyColorToward(
+    east: Float,
+    up: Float,
+    north: Float,
+    radius: Float,
+    daylight: Daylight,
+    glowTightness: Float,
+): Rgb {
     val elevation = (up / radius).coerceIn(0f, 1f)
     val base = blend(daylight.horizonTint, daylight.zenithTint, sqrt(elevation))
     val length = sqrt(east * east + up * up + north * north).coerceAtLeast(1e-6f)
     val towardSun = (east * daylight.sunDirection.east + up * daylight.sunDirection.up + north * daylight.sunDirection.north) / length
     val glowFadedIntoSkirtBottomWhichBackgroundMatches = (1f + up / (SKY_SKIRT_DROP_SHARE * radius)).coerceIn(0f, 1f)
-    val glow = towardSun.coerceAtLeast(0f).pow(SUN_GLOW_TIGHTNESS) * glowFadedIntoSkirtBottomWhichBackgroundMatches
+    val glow = towardSun.coerceAtLeast(0f).pow(glowTightness) * glowFadedIntoSkirtBottomWhichBackgroundMatches
     return Rgb(
         red = (base.red + daylight.sunGlow.red * glow).coerceIn(0f, 1f),
         green = (base.green + daylight.sunGlow.green * glow).coerceIn(0f, 1f),
