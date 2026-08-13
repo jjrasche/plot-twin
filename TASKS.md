@@ -2,15 +2,21 @@
 
 ## Now
 
-- The property line is now in the log (`parcel_boundary` row, interim pull from Eaton County's
-  open parcel service) but the GRID is still the 90m×90m square: `compile_parcel.py` cuts 900
-  cells @ 10cm centered on the geocoded point. Measured: the parcel is a 30.9m × 241m strip of
-  7445.4 m², and the old square held 1283.4 m² — 17.2% of the parcel, 15.8% of the square. The
-  address point itself sits 3.4 m SOUTH of the south line, in the Jolly Hwy right-of-way, so it
-  is an address, not the extent. Next: clip the grid to the boundary row.
+- The grid IS the property line's bounding box: 380 × 2419 cells @ 10cm = 919,220 cells, origin
+  695000.700 E 4728383.300 N (EPSG:26916), and the mask measures 7444 m² against the county's
+  7443.1. Two camera assumptions still hold the old square: framing a 1:6.4 strip by its long
+  axis puts the plot in 11–14% of the frame columns, so `skyline-coverage` fails its 0.5 bound
+  from overhead, orbit-1 and orbit-3 (agreement is 0.92–1.00 at all six poses), and the orbit-1
+  canopy-roughness baseline reads 3.455 wooded vs 3.667 bare on 82 drawn columns. The coverage
+  bound is unreachable by construction: the plot's own aspect caps it at 38/242 = 0.157.
+- The road is NOT on Isaac's land. W Jolly Rd's right-of-way lies south of the south line (the
+  address point sits 2.961 m south of the frame origin) and the southern rows inside the line
+  carry 4.8–10 m of canopy. The old extraction only found a road because the 90m square reached
+  45 m south of the address point; the brightest-gray band over a 242 m strip is sunlit treetops
+  (CHM 9–16 m), so the detector now also requires bare ground and honestly finds nothing.
 - Replace the interim county boundary with a seam-delivered one once common-ground's parcel
   layer covers eaton-delta-twp; the row says `interim-county-service` so the swap is a new row.
-- Walk Isaac's parcel in true 3D (97 lidar trees, road, real light):
+- Walk Isaac's parcel in true 3D (99 lidar trees inside the property line, real light):
   `bash gradlew :app:run --args="C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/compiled/parcel.json"`;
   see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`
 - Seam: Q-013 accepted with four contract asks + eaton-delta-twp sequencing ask (board:

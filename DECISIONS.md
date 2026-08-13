@@ -127,3 +127,34 @@ Two defaults taken, both reversible:
 - **the row carries its own provenance** — the first row in the log to do so. Base-terrain rows
   drop the DEM receipt at the log boundary today (it stays in `parcel.json`). Reversal: a shared
   provenance row referenced by seq, once a second source needs the same shape.
+
+## D-022 — the grid is the property line's bounding box plus a derived mask; the frame is checked, not assumed (2026-08-13, defaults taken) #terrain #state #land
+The extent stops being a fixed square and becomes the `parcel_boundary` ring's bounding box,
+snapped outward to whole 10cm cells: 380 × 2419 = 919,220 cells for Isaac's parcel. D-011's fixed
+10cm cells and `TerrainGrid`'s rectangle are untouched — an irregular extent is a different
+architecture. Cells outside the line exist and are marked not-ours.
+| option | one property line | verdict |
+|---|---|---|
+| rectangle of the ring's bbox + per-cell mask | yes | CHOSEN |
+| irregular-extent grid | yes, but re-shapes every solver and the renderer | rejected for now — the mask is additive, so this stays one commit away |
+
+Three defaults taken, all reversible:
+- **the mask is derived in the projection, never stored.** It is a pure function of the ring and
+  the grid, so a stored copy would be a second answer to where the property line runs, and the
+  reader could not tell which one the plot is. Reversal: add the packed array to a row and have
+  the projection verify it against the derivation — one commit, additive.
+- **the base-terrain row may name its frame too, and the projection rejects a log whose rows
+  disagree.** Two origins in one log mean its plot-local coordinates mean two things; a grid
+  sharing a log with a property line must be that line's own bbox, or reading fails loud. A row
+  that names no frame makes no claim and cannot disagree. Reversal: keep the frame only on the
+  boundary row and check the extent alone — one field.
+- **a terrain diff touching an outside-the-line cell is rejected at the writer** with a typed
+  violation naming the cell and the stolen area: you cannot regrade your neighbour's land, and
+  accepting the write would make the mask decoration. Reversal if a shared drive or a drainage
+  easement needs it: the rejection is a guard, not a schema change — one commit.
+
+The extent also retired a feature: **the road is not on this parcel.** W Jolly Rd's right-of-way
+lies south of the south line, the southern rows inside the line carry 4.8–10 m of canopy, and the
+old "brightest gray band" detector was reading sunlit treetops (CHM 9–16 m) as pavement over a
+242 m strip. The detector now also requires bare ground, and reports absence — like class-6
+structures, an absence finding rather than a silence.
