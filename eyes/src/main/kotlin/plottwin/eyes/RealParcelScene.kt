@@ -4,7 +4,7 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.nio.file.Files
+import plottwin.capture.CaptureCache
 import plottwin.capture.CapturedBoundary
 import plottwin.capture.CompiledParcel
 import plottwin.capture.ParcelFeatures
@@ -14,6 +14,7 @@ import plottwin.capture.appendParcelFeatures
 import plottwin.capture.appendRealParcel
 import plottwin.capture.readCapturedBoundary
 import plottwin.capture.readCompiledParcel
+import plottwin.capture.presentOrLoud
 import plottwin.capture.readParcelFeatures
 import plottwin.render.LooksTaste
 import plottwin.render.daylightOverPlot
@@ -51,10 +52,11 @@ fun realParcelSceneFromFile(
     taste: LooksTaste = LooksTaste(),
 ): PlotScene {
     val parcel = readCompiledParcel(parcelPath)
-    val featuresPath = parcelPath.resolveSibling("features.json")
-    val features = if (Files.exists(featuresPath)) readParcelFeatures(featuresPath) else null
-    val boundaryPath = boundaryPathBesideCompiled(parcelPath)
-    val boundary = if (Files.exists(boundaryPath)) readCapturedBoundary(boundaryPath) else null
+    // Absent siblings used to fall back to null, which drew the parcel with no trees and no
+    // property line while still calling itself the real-parcel scene. Silence is the one answer
+    // this cannot give.
+    val features = readParcelFeatures(presentOrLoud(parcelPath.resolveSibling("features.json"), CaptureCache.EXTRACT_FEATURES))
+    val boundary = readCapturedBoundary(presentOrLoud(boundaryPathBesideCompiled(parcelPath), CaptureCache.FETCH_BOUNDARY))
     return realParcelScene(parcel, features, boundary, moment ?: realParcelMidday(parcel), taste)
 }
 

@@ -9,6 +9,7 @@ Row 0 = southernmost row, column 0 = westernmost column (TerrainGrid convention)
 
 import argparse
 import base64
+import hashlib
 import json
 import pathlib
 
@@ -21,6 +22,25 @@ from parcel_frame import CELL_SIZE_METERS, UTM_ZONE_16N, ParcelFrame, frame_of, 
 FIXTURE_CELL_SIZE_METERS = 1.0
 DEM_EPOCH = "2017-12-01/2018-04-23"
 VERTICAL_DATUM = "NAVD88 (GEOID12B)"
+COMPILED_PARCEL_REPO_PATH = "capture/data/compiled/parcel.json"
+
+
+def binding_to(compiled_path: pathlib.Path, parcel: dict) -> dict:
+    """The tracked fixture's claim about the untracked cut written beside it.
+
+    The 10cm cut is 8.5 MB and gitignored, so a clone has the fixture and not the cut. Naming the
+    cut's exact bytes here is the only thing that can tell a cut compiled in this pass from one
+    left over from an earlier one, and it is the difference between a judged image and a claim.
+    """
+    return {
+        "path": COMPILED_PARCEL_REPO_PATH,
+        "sha256": hashlib.sha256(compiled_path.read_bytes()).hexdigest(),
+        "columns": parcel["columns"],
+        "rows": parcel["rows"],
+        "cell_size_meters": parcel["cell_size_meters"],
+        "elevation_min_meters": parcel["provenance"]["elevation_min_meters"],
+        "elevation_max_meters": parcel["provenance"]["elevation_max_meters"],
+    }
 
 
 def cell_center_axes(origin: float, cells: int, cell_size: float) -> numpy.ndarray:
@@ -135,9 +155,11 @@ def main() -> None:
     }
 
     parcel = {"site": site} | compile_grid(dem, naip, dem_band, naip_bands, parcel_frame, dem_manifest)
-    write_json(DATA_DIR / "compiled" / "parcel.json", parcel)
+    compiled_path = DATA_DIR / "compiled" / "parcel.json"
+    write_json(compiled_path, parcel)
 
     fixture = {"site": site} | compile_grid(dem, naip, dem_band, naip_bands, fixture_frame, dem_manifest)
+    fixture["provenance"]["compiled_parcel"] = binding_to(compiled_path, parcel)
     fixture_path = pathlib.Path(__file__).resolve().parent.parent / "src" / "testFixtures" / "resources" / "real_parcel_1m.json"
     write_json(fixture_path, fixture)
 
@@ -155,6 +177,7 @@ def main() -> None:
         )
     )
     print("fixture receipt: %d columns x %d rows at %.2f m" % (fixture_frame.columns, fixture_frame.rows, fixture_frame.cell_size))
+    print("binding receipt: the fixture names %s sha256 %s" % (COMPILED_PARCEL_REPO_PATH, fixture["provenance"]["compiled_parcel"]["sha256"]))
     print(
         "elevation receipt: min %.3f m, max %.3f m, range %.3f m (%s, %s)"
         % (

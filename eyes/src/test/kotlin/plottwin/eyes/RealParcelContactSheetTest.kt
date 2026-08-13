@@ -1,14 +1,12 @@
 package plottwin.eyes
 
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
+import plottwin.capture.CaptureCache
 import plottwin.capture.RealParcelFixture
 import plottwin.capture.albedoTriplesOf
+import plottwin.capture.fixtureBindingDisagreementsOf
 import plottwin.capture.parcelBoundaryRowOf
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
@@ -24,8 +22,8 @@ class RealParcelContactSheetTest {
         val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
-        val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_contact_sheet.png"))
-        println("[real-parcel] wrote ${sheet.absolutePath}")
+        val sheet = writeContactSheet(inspections, judgedSheetFile("real_parcel_fixture_contact_sheet"))
+        announceSheet(sheet)
         println("[real-parcel] sun ${scene.daylight.sun}")
         println(findingsReportOf(inspections))
 
@@ -68,8 +66,12 @@ class RealParcelContactSheetTest {
 
     @Test
     fun the_full_resolution_compiled_parcel_renders_offline_when_the_capture_cache_is_populated() {
-        val compiled = Path.of(System.getProperty("user.dir"), "..", "capture", "data", "compiled", "parcel.json").normalize()
-        assumeTrue(Files.exists(compiled), "capture cache absent — run capture/scripts/compile_parcel.py first")
+        val compiled = CaptureCache.compiledParcel()
+        // Asserted before a pixel is drawn: a sheet rendered from a cut the tracked fixture does
+        // not name is an image no reader of this repo can reproduce, which is what a receipt is for.
+        val disagreements = fixtureBindingDisagreementsOf(RealParcelFixture.parcel(), compiled)
+        assertTrue(disagreements.isEmpty(), disagreements.joinToString("\n"))
+        println("[real-parcel] fixture binds ${compiled.fileName} at sha256 ${RealParcelFixture.parcel().provenance.compiledParcel?.sha256}")
         val scene = realParcelSceneFromFile(compiled)
         val terrain = scene.state.terrain!!.grid
         val expectedExtent = gridExtentOf(parcelBoundaryRowOf(RealParcelFixture.boundary()), terrain.cellSize)
@@ -78,8 +80,8 @@ class RealParcelContactSheetTest {
         assertEquals(expectedExtent, GridExtent(terrain.columns, terrain.rows), "the full-res cut is not the property line's bounding box")
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
-        val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_full_res_contact_sheet.png"))
-        println("[real-parcel] wrote ${sheet.absolutePath}")
+        val sheet = writeContactSheet(inspections, judgedSheetFile("real_parcel_full_res_contact_sheet"))
+        announceSheet(sheet)
         val failures = inspections
             .flatMap { failedFindings(it.findings) }
             .filterNot { it.advisory }

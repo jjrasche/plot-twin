@@ -1,11 +1,8 @@
 package plottwin.capture
 
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
 
 private const val GEOCODE_SITE_TOLERANCE_METERS = 30.0
 
@@ -32,10 +29,8 @@ class GeocodeStageGateTest {
     }
 
     @Test
-    fun the_parcel_address_geocodes_onto_the_site_row_when_the_owner_address_is_cached() {
-        val cached = Path.of(System.getProperty("user.dir"), "data", "geocode.json")
-        assumeTrue(Files.exists(cached), "no cached owner-address geocode — run capture/scripts/geocode.py \"<address>\"")
-        val located = readGeocodedAddress(cached)
+    fun the_parcel_address_geocodes_onto_the_site_row() {
+        val located = readGeocodedAddress(CaptureCache.ownerGeocode())
         val site = siteRowOf(RealParcelFixture.parcel())
         val distance = groundDistanceMeters(
             located.latitudeDegrees, located.longitudeDegrees,

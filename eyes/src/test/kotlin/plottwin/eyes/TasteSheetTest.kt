@@ -2,14 +2,12 @@ package plottwin.eyes
 
 import ai.factoredui.compose.math.Vec3
 import ai.factoredui.compose.scene3d.Scene3dCameraPose
-import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
+import plottwin.capture.CaptureCache
 import plottwin.capture.readCompiledParcel
 import plottwin.render.LooksTaste
 import plottwin.render.Rgb
@@ -38,15 +36,13 @@ val WARM_LAND_TONES = mapOf(
 
 class TasteSheetTest {
 
-    private fun compiledParcelPath(): Path =
-        Path.of(System.getProperty("user.dir"), "..", "capture", "data", "compiled", "parcel.json").normalize()
+    private fun compiledParcelPath(): Path = CaptureCache.compiledParcel()
 
     @Test
     fun the_taste_sheet_holds_three_questions_each_varying_one_thing() {
-        assumeTrue(Files.exists(compiledParcelPath()), "capture cache absent - run capture/scripts/compile_parcel.py first")
         val questions = listOf(surroundQuestion(), sunDiskQuestion(), ownerPoseQuestion())
-        val sheet = writeTasteSheet(questions, File(System.getProperty("user.dir"), "build/taste_sheet.png"))
-        println("[taste] wrote ${sheet.absolutePath}")
+        val sheet = writeTasteSheet(questions, judgedSheetFile("taste_sheet"))
+        announceSheet(sheet)
         assertTrue(questions.all { it.panels.size >= 2 }, "a question with one panel is not a comparison")
         assertTrue(
             questions.all { question -> question.panels.map { it.option }.toSet().size == question.panels.size },
@@ -57,7 +53,6 @@ class TasteSheetTest {
     // An option that cannot be told from the parcel is not a surround, it is a second parcel.
     @Test
     fun every_surround_option_on_the_sheet_still_reads_as_not_mine() {
-        assumeTrue(Files.exists(compiledParcelPath()), "capture cache absent")
         for (haze in listOf(SURROUND_HAZE_MOST_LAND, SURROUND_BASE_HAZE, SURROUND_HAZE_MORE_MIST)) {
             val scene = realParcelSceneFromFile(compiledParcelPath(), taste = LooksTaste(surroundBaseHaze = haze))
             val gap = surroundPaletteGapOf(scene)
@@ -73,7 +68,6 @@ class TasteSheetTest {
     // it fails the day a warm surround becomes separable and the option starts existing.
     @Test
     fun no_warm_land_tone_can_be_told_from_the_parcel_it_would_surround() {
-        assumeTrue(Files.exists(compiledParcelPath()), "capture cache absent")
         for ((toneName, albedo) in WARM_LAND_TONES) {
             val gap = surroundPaletteGapOf(
                 realParcelSceneFromFile(compiledParcelPath(), taste = LooksTaste(surroundAlbedo = albedo)),

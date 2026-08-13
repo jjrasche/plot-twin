@@ -1,12 +1,9 @@
 package plottwin.capture
 
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import plottwin.worldstate.GridExtent
 import plottwin.worldstate.Meters
 import plottwin.worldstate.WorldLog
@@ -16,16 +13,11 @@ private const val SQUARE_METERS_PER_ACRE = 4046.8564224
 private const val MASK_AREA_AGREEMENT_SHARE = 0.01
 private const val TEN_CENTIMETRE_CELL = 0.1
 
-private fun cachedParcelPath(): Path =
-    Path.of(System.getProperty("user.dir"), "..", "capture", "data", "compiled", "parcel.json").normalize()
-
 class CompiledParcelCacheGateTest {
 
     @Test
     fun the_ten_centimetre_cut_is_the_property_lines_bounding_box_and_its_mask_measures_the_acreage() {
-        val path = cachedParcelPath()
-        assumeTrue(Files.exists(path), "capture cache absent - run capture/scripts/compile_parcel.py first")
-        val parcel = readCompiledParcel(path)
+        val parcel = readCompiledParcel(CaptureCache.compiledParcel())
         WorldLog.openInMemory().use { log ->
             appendParcelBoundary(log, RealParcelFixture.boundary())
             appendRealParcel(log, parcel)
