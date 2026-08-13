@@ -148,6 +148,22 @@ compiled grid. 0.75 sits 0.213 above the toy floor and 0.217 below the woodlot c
 | widen the bearing tolerance until the woodlot passes | no - the toy plot stops catching wrong bearings too | rejected |
 | drop the check on real parcels | no - a check that cannot fail is not a check | rejected |
 
+**Amended 2026-08-13 (re-measured after charter 28 made the full-res arm unconditional).** The
+frozen figures above described a render that no longer exists: charter 22's neutral surround and
+dome changed what counts as sky, so the check's own annulus population changed under them, and the
+parcel now has six poses rather than seven. Re-measured, the woodlot's assumed-caster share runs
+**0.009-0.188** across both arms (fixture and full-res agree to within 0.006 at every pose, which is
+its own evidence the 1m fixture is a faithful downsample), against 24-31 casters sharing the ring.
+The floor stays at 0.75 and is NOT re-frozen: a threshold moved after seeing a count is a new
+experiment, not a fix. The margin simply grew - 0.562 clear of the woodlot ceiling where the
+original freeze recorded 0.217 - so the ruling is safer than written, never weaker.
+Two things the re-measurement surfaced. The assumed caster is **not** the top caster at five of the
+six poses (at overhead tree-001 holds 0.081 while tree-014 holds 0.136), which is the charter-23
+default - key suppression on the ASSUMED caster's share, not the top one's - doing exactly the work
+it was chosen for. And the rule worth carrying: **a criterion is frozen against a render, so when
+the render changes the freeze must be re-measured, not re-frozen.** Nothing would have shown this
+if the measurement did not print its populations on every run.
+
 ## D-023 — the grid is the property line's bounding box plus a derived mask; the frame is checked, not assumed (2026-08-13, defaults taken) #terrain #state #land
 The extent stops being a fixed square and becomes the `parcel_boundary` ring's bounding box,
 snapped outward to whole 10cm cells: 380 × 2419 = 919,220 cells for Isaac's parcel. D-011's fixed
