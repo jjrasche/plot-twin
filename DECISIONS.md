@@ -241,3 +241,33 @@ Four defaults taken, all reversible:
   junction with it says nothing about that, and the painter can drop a triangle that straddles the
   camera plane, which read as a 110-luma step. Sky pixels are all still sampled. Reversal: pass the
   backdrop classifier for both, and eliminate the dropped triangles instead.
+
+## D-026 — the shadow-direction check's gate history, recorded because it lived only in the seat file (2026-08-13, ruled) #eyes #process
+The check was promoted from advisory to a real gate on 2026-08-06 (run 3) and no entry ever said
+so, which is how the rest of this stayed invisible. The same commit that promoted it also excused
+it BY NAME in the toy contact-sheet assertion and added a substitute in its place: two thirds of
+viewpoints within tolerance, none pointing into the sun's own half-plane. That substitute was a
+defensible weaker gate. On 2026-08-08 (run 5) the by-name exclusion was copied into the new
+real-parcel assertion **without the substitute**, and the real-parcel path then ran ungated through
+runs 5, 6 and 7 — where four of seven poses were wrong, the worst by 173.7 degrees.
+Both exclusions are gone (2026-08-13). The toy one is now a pin tolerating exactly one known
+failure by name — the terrain-attribution defect at orbit-4 — proven to go red if the pin is moved.
+D-022 governs how the check gates from here.
+The rule this entry exists to carry: **an exemption is only as good as the substitute beside it,
+and copying the exemption without the substitute is how a green gate outlives its justification.**
+
+## D-027 — Eaton County's parcel service is an authorized INTERIM boundary source, with an expiry (2026-08-13, ruled by Jim) #land #provenance
+Jim authorized it on 2026-08-12 when the shared parcel-layer seam turned out not to cover its own
+founding parcel: common-ground bakes 108 townships, none in Eaton, and the legacy jolly-rd sweep was
+pulled with geometry off, so it carries no boundary at all. Recorded here because D-007 and Q-002
+still read as the complete source list (USGS 3DEP + NAIP + QL2 lidar) and would otherwise have the
+next run re-litigating this.
+| option | verdict |
+|---|---|
+| GET-only county pull, one shot, row tagged `interim-county-service` | CHOSEN — the seam stays the standing path and the row names itself as not having come through it |
+| wait for the seam to bake eaton-delta-twp | rejected — blocks the founding parcel on another project's queue |
+| read common-ground's non-contract files by path | rejected — the option their own D-009 rejects, and jolly-rd has no geometry to read anyway |
+**Expiry, and it is the point of the entry:** this authorization ends when the seam delivers
+`eaton-delta-twp` under the contract. The swap is then one source change, and the log shows honestly
+which rows predate the seam. It does not generalize — no other county service is authorized by this,
+and plot-twin builds no scheduled collector for a layer common-ground owns (D-009 stands).

@@ -85,6 +85,14 @@ objection, argue it with numbers and take the cheap half instead: the sha256 of 
 goes into its D-019 ledger line at the moment the score is written, so a lost image is at least
 detectable rather than silently substituted. State which you took.
 
+## One stale descendant handed to you from the record lane
+`solvers/src/testFixtures/kotlin/plottwin/solvers/ToyPlotFixture.kt:32` carries the comment
+`// the home 2 acres: Delta Township, Eaton County, Michigan` on the TOY fixture's site row. It is
+wrong twice — the toy plot is a synthetic 90x90 m square, and the real parcel is Isaac's 1.839-acre
+strip. The record lane found it and correctly left it, because it is code and outside that lane's
+rails. Fix the comment to say what the toy fixture actually is. Do not change the fixture's numbers:
+the toy plot is legitimately 900x900 and D-015's measurement of it stands.
+
 ## Bands (pre-committed)
 - **PASS**: a fresh clone with no `capture/data/` fails LOUDLY and says how to fix itself (prove it —
   move the cache aside, run the gate, paste the output, restore it); the caster measurement no longer
