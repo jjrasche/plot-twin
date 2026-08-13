@@ -321,3 +321,30 @@ Three defaults taken, all reversible:
 - **the compiled cut stays untracked.** The cache is 512 MB, 500 of it the DEM tile; the cut alone
   is 8.5 MB and a judged sheet 0.6 MB, so a three-cycle visual run costs ~1.9 MB of tracked PNG.
   Reversal if that weight is unwanted: keep only the sha256 lines, which are printed either way.
+
+## D-029 — the report is the exception channel; the record is the repo (2026-08-13, ruled by Jim) #process
+Jim talks only to the orchestrator seat; project heads never queue questions to him directly, and a
+head that does has made a routing decision that was not its to make. Everything else — verdicts,
+numbers, defaults taken, receipts — lands in the seat file and this ledger, where the orchestrator
+reads it. The morning report is exactly three sections: BLOCKERS (only what has no reversible
+default — if it has one, take it and it is not a blocker), GOOD SURPRISES (findings that change
+what is possible; progress is assumed and is never a surprise), and a one-line DREAM CHECK naming
+what this project is ultimately for, so drift is caught in a line rather than a month.
+| option | verdict |
+|---|---|
+| three strict sections, full record in seat + ledger | CHOSEN — the reader's attention goes to what needed them |
+| the ranked queue this replaces | rejected — it mixed the one thing needing a ruling with everything that did not, and trained the reader to skim |
+Detail deliberately relocated, not suppressed. **The gap this repo must not paper over: an
+orchestrator outside this machine cannot read the file board or this repo, so the transport is
+named (`snapshot` packs a repo for a reader with no git) rather than assumed.** Carried into the
+machine-wide `overnight-build` skill because it binds every project running a lead, not only this one.
+
+## D-030 — leads renew every 3 runs, and the seat file is what makes it cheap (2026-08-13, ruled by Jim) #process
+A lead restarts on a fresh instance every 3 runs, or immediately when its context exceeds
+comfortable recall of the constitution. Long-context drift is a known failure mode; renewal is
+hygiene, not failure. The honest test is not token count: **it is whether the lead can recall this
+repo's constitution and ledger without re-reading them** — re-deriving its own project's rules from
+files or from subagents means it is already past the line.
+The seat file is the memory, which makes a restart also the TEST of the seat file: if a restart
+loses something, the file was incomplete, and the fix is the file, never keeping the old instance
+alive. Every renewal is logged in the seat file with a one-line handoff note.
