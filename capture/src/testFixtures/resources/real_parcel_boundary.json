@@ -52,35 +52,45 @@
  ],
  "ring_local_closed": [
   [
-   54.85741286096163,
-   289.84395408444107
+   30.88128379371483,
+   241.88253593817353
   ],
   [
-   61.89038684696425,
-   48.909301036037505
+   37.914257779717445,
+   0.9478828897699714
   ],
   [
-   31.016698035877198,
-   48.02306053414941
+   7.040568968630396,
+   0.06164238788187504
   ],
   [
-   23.982434559613466,
-   288.9998418893665
+   0.006305492366664112,
+   241.03842374309897
   ],
   [
-   54.85741286096163,
-   289.84395408444107
+   30.88128379371483,
+   241.88253593817353
   ]
  ],
  "plot_local_origin": {
   "crs": "EPSG:26916",
-  "easting_meters": 694976.7238709328,
-  "northing_meters": 4728335.338581854,
-  "derived_from": "site 42.68317626142, -84.619591093007 reprojected to EPSG:26916, minus 45.0 m on each axis (compile_parcel.py grid half-width)"
+  "easting_meters": 695000.7000000001,
+  "northing_meters": 4728383.3,
+  "derived_from": "the ring's own bounding-box south-west corner in EPSG:26916, snapped outward to a whole 0.1 m cell"
+ },
+ "grid_extent_at_cell_size": {
+  "cell_size_meters": 0.1,
+  "columns": 380,
+  "rows": 2419
+ },
+ "address_point_local": {
+  "east_meters": 21.023870932753198,
+  "north_meters": -2.9614181462675333,
+  "derived_from": "site 42.68317626142, -84.619591093007 reprojected to EPSG:26916, minus the origin"
  },
  "provenance": {
   "source": "https://services2.arcgis.com/c9l1e4fKpsCnqD7H/arcgis/rest/services/Parcels_AGO/FeatureServer/0 PARCELID=04003630009000",
-  "pulled_at_utc": "2026-08-13T04:05:35.356021Z",
+  "pulled_at_utc": "2026-08-13T04:33:23.231213Z",
   "observed_at": "2026-07-21T18:51:44.545000Z",
   "observed_at_absent_reason": null,
   "observed_at_scope": "layer-level editingInfo.dataLastEditDate; no per-feature currency field exists",

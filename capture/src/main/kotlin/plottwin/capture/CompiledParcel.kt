@@ -5,21 +5,31 @@ import kotlin.io.path.readText
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import plottwin.worldstate.GroundFrame
 import plottwin.worldstate.Meters
 import plottwin.worldstate.RawElevation
 import plottwin.worldstate.SiteRow
 import plottwin.worldstate.decodeHeightsBase64
 
-// compile_parcel.py output; row 0 = southernmost, column 0 = westernmost (TerrainGrid convention)
+// compile_parcel.py output; row 0 = southernmost, column 0 = westernmost (TerrainGrid convention).
+// The grid is the parcel boundary's bounding box, so the cut declares the frame it was cut in.
 @Serializable
 data class CompiledParcel(
     val site: CompiledSite,
     val columns: Int,
     val rows: Int,
     @SerialName("cell_size_meters") val cellSizeMeters: Double,
+    val frame: CompiledFrame,
     @SerialName("heights_base64") val heightsBase64: String,
     @SerialName("albedo_base64") val albedoBase64: String? = null,
     val provenance: CaptureProvenance,
+)
+
+@Serializable
+data class CompiledFrame(
+    val crs: String,
+    @SerialName("origin_easting_meters") val originEastingMeters: Double,
+    @SerialName("origin_northing_meters") val originNorthingMeters: Double,
 )
 
 @Serializable
@@ -54,6 +64,13 @@ fun rawElevationOf(parcel: CompiledParcel): RawElevation = RawElevation(
     rows = parcel.rows,
     cellSize = Meters(parcel.cellSizeMeters),
     surfaceHeights = decodeHeightsBase64(parcel.heightsBase64, parcel.columns * parcel.rows),
+    frame = groundFrameOf(parcel.frame),
+)
+
+fun groundFrameOf(frame: CompiledFrame): GroundFrame = GroundFrame(
+    crs = frame.crs,
+    originEasting = Meters(frame.originEastingMeters),
+    originNorthing = Meters(frame.originNorthingMeters),
 )
 
 fun siteRowOf(parcel: CompiledParcel): SiteRow = SiteRow(

@@ -6,8 +6,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-// extract_features.py output: lidar-derived trees/structures/water/road for the 90m square,
-// coordinates parcel-local meters (0..90, row 0 = southernmost)
+// extract_features.py output: lidar-derived trees/structures/water/road inside the property line,
+// coordinates plot-local meters in the boundary's frame (row 0 = southernmost)
 @Serializable
 data class ParcelFeatures(
     val trees: List<FeatureTree>,
@@ -50,12 +50,15 @@ data class FeatureRoad(
 
 @Serializable
 data class FeatureReceipts(
-    @SerialName("square_point_count") val squarePointCount: Int,
+    @SerialName("extent_point_count") val extentPointCount: Int,
     @SerialName("class_histogram") val classHistogram: Map<String, Int>,
     @SerialName("first_return_count") val firstReturnCount: Int,
     @SerialName("chm_max_meters") val chmMaxMeters: Double,
     @SerialName("canopy_cover_fraction") val canopyCoverFraction: Double,
     @SerialName("crown_maxima_count") val crownMaximaCount: Int,
+    @SerialName("inside_boundary_crown_maxima_count") val insideBoundaryCrownMaximaCount: Int,
+    @SerialName("inside_boundary_cell_count") val insideBoundaryCellCount: Int,
+    @SerialName("extent_cell_count") val extentCellCount: Int,
     @SerialName("tree_count") val treeCount: Int,
 )
 

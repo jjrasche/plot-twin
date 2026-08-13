@@ -38,7 +38,19 @@ fun projectWalkableScene(
     val reflectanceTriples = terrainAlbedoTriples?.let { deshadowedAlbedo(it) }
     val groundTriples = reflectanceTriples?.let { forestFloorAlbedo(it, terrain, state.entities) }
     val albedoOverride = groundTriples?.let { averagedAlbedoOf(it, terrain, RENDER_DOWNSAMPLE_FACTOR) }
-    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading, albedoOverride)
+    val renderTerrain = downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR)
+    val boundaryRing = state.parcelBoundary?.ring
+    if (boundaryRing != null) {
+        meshes[SURROUND_ENTITY_ID] = neutralSurroundMeshOf(boundaryRing, renderTerrain, frame, daylight)
+    }
+    meshes[TERRAIN_ENTITY_ID] = if (boundaryRing == null) {
+        terrainMeshOf(renderTerrain, frame, shading, albedoOverride)
+    } else {
+        parcelGroundMeshOf(boundaryRing, renderTerrain, frame, shading, albedoOverride)
+    }
+    if (boundaryRing != null) {
+        meshes[PROPERTY_LINE_ENTITY_ID] = propertyLineMeshOf(boundaryRing, renderTerrain, frame)
+    }
     for ((entityName, placed) in state.entities) {
         val canopyAlbedo = if (isTreeEntity(entityName)) naipAlbedoUnder(placed, terrain, reflectanceTriples) else null
         meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight, canopyAlbedo)
@@ -141,13 +153,23 @@ fun averagedAlbedoOf(triples: FloatArray, terrain: TerrainGrid, downsampleFactor
     return List(coarseRed.size) { Rgb(coarseRed[it], coarseGreen[it], coarseBlue[it]) }
 }
 
+// The window opens on a corner of the plot, half a step off both its axes, standing back by a
+// share of its own longest span: a 90 m square and a 31 x 242 m ribbon both open in frame.
+const val OVERVIEW_STANDOFF_SHARE = 0.25f
+const val OVERVIEW_HEIGHT_SHARE = 0.18f
+
 fun overviewCameraOf(terrain: TerrainGrid): Scene3dCameraState {
     val plotWidth = (terrain.columns * terrain.cellSize.value).toFloat()
     val plotDepth = (terrain.rows * terrain.cellSize.value).toFloat()
+    val longestSpan = maxOf(plotWidth, plotDepth)
     val lowest = terrain.surfaceHeights.min()
     val highest = terrain.surfaceHeights.max()
     return Scene3dCameraState(
-        position = listOf(-plotWidth * 0.3f, highest + plotWidth * 0.45f, -plotDepth * 0.85f),
+        position = listOf(
+            -(plotWidth / 2f + longestSpan * OVERVIEW_STANDOFF_SHARE),
+            highest + longestSpan * OVERVIEW_HEIGHT_SHARE,
+            -(plotDepth / 2f + longestSpan * OVERVIEW_STANDOFF_SHARE),
+        ),
         target = listOf(0f, (lowest + highest) / 2f, 0f),
     )
 }

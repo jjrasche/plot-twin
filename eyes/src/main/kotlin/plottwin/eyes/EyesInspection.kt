@@ -38,7 +38,8 @@ fun inspectViewpoint(
     val findings = ArrayList<EyeFinding>()
     findings += skylineFindings(viewpoint.name, compareSkylines(observedSkyline, predictedSkyline))
     if (classifier != null) {
-        findings += skyRegionFindings(viewpoint.name, skyRegionReadingOf(image, classifier, solid))
+        val dome = domeClassifierOf(scene.spec, scene.daylight) ?: classifier
+        findings += skyRegionFindings(viewpoint.name, skyRegionReadingOf(image, classifier, solid, dome))
     }
     findings += histogramFindings(viewpoint.name, luminanceHistogramOf(image))
     findings += shadowFindingAt(scene, viewer, viewpoint, image, classifier, shadowedGround)

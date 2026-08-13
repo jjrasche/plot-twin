@@ -4,18 +4,24 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import plottwin.capture.RealParcelFixture
 import plottwin.capture.albedoTriplesOf
+import plottwin.capture.parcelBoundaryRowOf
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
+import plottwin.render.TERRAIN_ENTITY_ID
+import plottwin.worldstate.GridExtent
+import plottwin.worldstate.ROAD_ENTITY_NAME
+import plottwin.worldstate.gridExtentOf
 
 class RealParcelContactSheetTest {
 
     @Test
     fun the_real_parcel_renders_from_every_named_viewpoint_and_passes_pixel_checks() {
-        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features())
+        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
         val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_contact_sheet.png"))
@@ -23,10 +29,14 @@ class RealParcelContactSheetTest {
         println("[real-parcel] sun ${scene.daylight.sun}")
         println(findingsReportOf(inspections))
 
-        assertTrue(inspections.size >= 7, "expected overhead + woods + road + orbit viewpoints, got ${inspections.size}")
         val poseNames = inspections.map { it.viewpoint.name }
+        assertEquals(expectedPoseCountOf(scene.state), inspections.size, "poses drifted from what the log holds")
         assertTrue("walk-height-in-woods" in poseNames, "missing the walk-height pose inside the woods")
-        assertTrue("on-road" in poseNames, "missing the pose on the road corridor")
+        assertEquals(
+            scene.state.entities.containsKey(ROAD_ENTITY_NAME),
+            "on-road" in poseNames,
+            "the on-road pose and the road corridor row disagree",
+        )
         val failures = inspections
             .flatMap { failedFindings(it.findings) }
             .filterNot { it.advisory }
@@ -35,7 +45,7 @@ class RealParcelContactSheetTest {
 
     @Test
     fun the_dem_predicted_skyline_agrees_with_the_rendered_skyline() {
-        val scene = realParcelScene(RealParcelFixture.parcel())
+        val scene = realParcelScene(RealParcelFixture.parcel(), boundary = RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val classifier = skyClassifierOf(scene.spec, scene.daylight)
         val comparisons = plotViewpoints(scene.state).map { viewpoint ->
@@ -61,7 +71,10 @@ class RealParcelContactSheetTest {
         assumeTrue(Files.exists(compiled), "capture cache absent — run capture/scripts/compile_parcel.py first")
         val scene = realParcelSceneFromFile(compiled)
         val terrain = scene.state.terrain!!.grid
-        assertTrue(terrain.columns == 900 && terrain.rows == 900 && terrain.cellSize.value == 0.1, "expected the 10cm 900x900 grid")
+        val expectedExtent = gridExtentOf(parcelBoundaryRowOf(RealParcelFixture.boundary()), terrain.cellSize)
+        println("[real-parcel] full-res grid ${terrain.columns}x${terrain.rows} at ${terrain.cellSize.value} m")
+        assertEquals(0.1, terrain.cellSize.value, "the full-res cut is not the 10cm grid")
+        assertEquals(expectedExtent, GridExtent(terrain.columns, terrain.rows), "the full-res cut is not the property line's bounding box")
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
         val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_full_res_contact_sheet.png"))
@@ -75,25 +88,33 @@ class RealParcelContactSheetTest {
     @Test
     fun naip_color_visibly_changes_the_rendered_parcel() {
         val parcel = RealParcelFixture.parcel()
-        val nairColored = realParcelScene(parcel)
+        val nairColored = realParcelScene(parcel, boundary = RealParcelFixture.boundary())
         val moment = realParcelMidday(parcel)
         val daylight = daylightOverPlot(nairColored.state, moment)
         val grassOnly = nairColored.copy(spec = projectWalkableScene(nairColored.state, emptyList(), daylight))
         requireNotNull(albedoTriplesOf(parcel)) { "fixture carries no NAIP albedo" }
 
         val overhead = plotViewpoints(nairColored.state).first { it.name == "overhead" }
-        val withNaip = PlotViewer(nairColored.spec).capture(overhead.pose)
+        val viewer = PlotViewer(nairColored.spec)
+        val withNaip = viewer.capture(overhead.pose)
         val withGrass = PlotViewer(grassOnly.spec).capture(overhead.pose)
+        // Only the parcel's own ground carries NAIP, so only its own pixels can answer whether the
+        // texture arrived: the sky and the neutral surround are identical in both arms and would
+        // otherwise dilute the share, or worse, carry it.
+        val groundOnly = nairColored.spec.meshesByEntity.filterKeys { it == TERRAIN_ENTITY_ID }
+        val ground = rasterizeVisibleSurfaces(groundOnly, viewer.projectorFor(overhead.pose))
         var differing = 0
         var compared = 0
-        for (row in 0 until withNaip.height step 2) {
-            for (column in 0 until withNaip.width step 2) {
-                compared++
-                if (withNaip.getRGB(column, row) != withGrass.getRGB(column, row)) differing++
-            }
+        for (pixel in ground.owner.indices) {
+            if (ground.owner[pixel] == NO_SURFACE) continue
+            compared++
+            val column = pixel % ground.width
+            val row = pixel / ground.width
+            if (withNaip.getRGB(column, row) != withGrass.getRGB(column, row)) differing++
         }
         val differingShare = differing.toDouble() / compared
-        println("[real-parcel] NAIP vs grass albedo: %.1f%% of sampled pixels differ".format(differingShare * 100))
-        assertTrue(differingShare > 0.2, "NAIP albedo changed only ${differingShare * 100}% of pixels — texture not visible")
+        println("[real-parcel] NAIP vs grass albedo: %.1f%% of %d ground pixels differ".format(differingShare * 100, compared))
+        assertTrue(differingShare > 0.9, "NAIP albedo changed only ${differingShare * 100}% of the parcel's ground — texture not visible")
     }
+
 }

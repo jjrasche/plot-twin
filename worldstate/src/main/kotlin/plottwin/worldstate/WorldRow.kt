@@ -120,6 +120,7 @@ data class BaseTerrainRow(
     val rows: Int,
     val cellSize: Meters,
     val heightsBase64: String,
+    val frame: GroundFrame? = null,
 ) : WorldRow
 
 @Serializable

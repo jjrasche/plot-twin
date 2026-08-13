@@ -7,6 +7,7 @@ class RawElevation(
     val rows: Int,
     val cellSize: Meters,
     val surfaceHeights: FloatArray,
+    val frame: GroundFrame? = null,
 )
 
 fun interface TerrainOperator {
@@ -19,5 +20,6 @@ val GriddedElevationOperator: TerrainOperator = TerrainOperator { raw ->
         rows = raw.rows,
         cellSize = raw.cellSize,
         heightsBase64 = encodeHeightsBase64(raw.surfaceHeights),
+        frame = raw.frame,
     )
 }

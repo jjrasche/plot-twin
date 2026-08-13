@@ -1,8 +1,10 @@
 """Location -> QL2 lidar point cloud tile(s) via the USGS TNM Access API.
 
 Usage: python capture/scripts/fetch_lidar.py 42.68317626142 -84.619591093007
-Downloads every LAZ tile whose footprint covers the point (plus the 90m square around it)
-into capture/data/lidar/ and writes a manifest with title, URL, date and byte size.
+Downloads every LAZ tile whose footprint covers the property line - the boundary's own WGS84
+ring is the query box when a boundary is cached, because a point-and-margin box would miss the
+far end of a deep parcel and the miss would be silent. Writes a manifest with title, URL,
+date and byte size into capture/data/lidar/.
 """
 
 import argparse
@@ -11,17 +13,29 @@ import re
 import urllib.parse
 
 from capture_paths import DATA_DIR, http_get, http_get_json, write_json
+from parcel_frame import boundary_path, read_boundary
 
 TNM_URL = "https://tnmaccess.nationalmap.gov/api/v1/products"
 DATASET = "Lidar Point Cloud (LPC)"
-PARCEL_HALFWIDTH_DEGREES = 0.0006  # ~50m: covers the 90m square around the site point
+FALLBACK_HALFWIDTH_DEGREES = 0.0006  # ~50m around the site point, used only before a boundary exists
+
+
+def query_box(latitude: float, longitude: float) -> tuple[float, float, float, float]:
+    if not boundary_path().exists():
+        return (
+            longitude - FALLBACK_HALFWIDTH_DEGREES,
+            latitude - FALLBACK_HALFWIDTH_DEGREES,
+            longitude + FALLBACK_HALFWIDTH_DEGREES,
+            latitude + FALLBACK_HALFWIDTH_DEGREES,
+        )
+    ring = read_boundary()["ring_wgs84_closed"]
+    longitudes = [vertex[0] for vertex in ring]
+    latitudes = [vertex[1] for vertex in ring]
+    return min(longitudes), min(latitudes), max(longitudes), max(latitudes)
 
 
 def query_products(latitude: float, longitude: float) -> list[dict]:
-    bbox = (
-        f"{longitude - PARCEL_HALFWIDTH_DEGREES},{latitude - PARCEL_HALFWIDTH_DEGREES},"
-        f"{longitude + PARCEL_HALFWIDTH_DEGREES},{latitude + PARCEL_HALFWIDTH_DEGREES}"
-    )
+    bbox = ",".join(str(edge) for edge in query_box(latitude, longitude))
     query = urllib.parse.urlencode({"datasets": DATASET, "bbox": bbox, "outputFormat": "JSON"})
     return http_get_json(f"{TNM_URL}?{query}")["items"]
 

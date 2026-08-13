@@ -23,6 +23,7 @@ data class CapturedBoundary(
     @SerialName("ring_utm_closed") val ringUtmClosed: List<List<Double>>,
     @SerialName("ring_local_closed") val ringLocalClosed: List<List<Double>>,
     @SerialName("plot_local_origin") val plotLocalOrigin: CapturedOrigin,
+    @SerialName("address_point_local") val addressPointLocal: CapturedLocalPoint,
     val provenance: CapturedBoundaryProvenance,
 )
 
@@ -31,6 +32,12 @@ data class CapturedOrigin(
     val crs: String,
     @SerialName("easting_meters") val eastingMeters: Double,
     @SerialName("northing_meters") val northingMeters: Double,
+)
+
+@Serializable
+data class CapturedLocalPoint(
+    @SerialName("east_meters") val eastMeters: Double,
+    @SerialName("north_meters") val northMeters: Double,
 )
 
 @Serializable
@@ -74,6 +81,11 @@ fun parcelBoundaryRowOf(boundary: CapturedBoundary): ParcelBoundaryRow = ParcelB
         sha256 = boundary.provenance.sha256,
         contract = boundary.provenance.contract,
     ),
+)
+
+fun addressPointOf(boundary: CapturedBoundary): GroundPoint = GroundPoint(
+    east = Meters(boundary.addressPointLocal.eastMeters),
+    north = Meters(boundary.addressPointLocal.northMeters),
 )
 
 fun projectedRingOf(row: ParcelBoundaryRow): List<List<Double>> = row.ring.map { vertex ->

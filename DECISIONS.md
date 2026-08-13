@@ -144,3 +144,97 @@ compiled grid. 0.75 sits 0.213 above the toy floor and 0.217 below the woodlot c
 | measure the caster population, suppress where no principal caster exists | yes - red still means wrong | CHOSEN |
 | widen the bearing tolerance until the woodlot passes | no - the toy plot stops catching wrong bearings too | rejected |
 | drop the check on real parcels | no - a check that cannot fail is not a check | rejected |
+
+## D-023 — the grid is the property line's bounding box plus a derived mask; the frame is checked, not assumed (2026-08-13, defaults taken) #terrain #state #land
+The extent stops being a fixed square and becomes the `parcel_boundary` ring's bounding box,
+snapped outward to whole 10cm cells: 380 × 2419 = 919,220 cells for Isaac's parcel. D-011's fixed
+10cm cells and `TerrainGrid`'s rectangle are untouched — an irregular extent is a different
+architecture. Cells outside the line exist and are marked not-ours.
+| option | one property line | verdict |
+|---|---|---|
+| rectangle of the ring's bbox + per-cell mask | yes | CHOSEN |
+| irregular-extent grid | yes, but re-shapes every solver and the renderer | rejected for now — the mask is additive, so this stays one commit away |
+
+Three defaults taken, all reversible:
+- **the mask is derived in the projection, never stored.** It is a pure function of the ring and
+  the grid, so a stored copy would be a second answer to where the property line runs, and the
+  reader could not tell which one the plot is. Reversal: add the packed array to a row and have
+  the projection verify it against the derivation — one commit, additive.
+- **the base-terrain row may name its frame too, and the projection rejects a log whose rows
+  disagree.** Two origins in one log mean its plot-local coordinates mean two things; a grid
+  sharing a log with a property line must be that line's own bbox, or reading fails loud. A row
+  that names no frame makes no claim and cannot disagree. Reversal: keep the frame only on the
+  boundary row and check the extent alone — one field.
+- **a terrain diff touching an outside-the-line cell is rejected at the writer** with a typed
+  violation naming the cell and the stolen area: you cannot regrade your neighbour's land, and
+  accepting the write would make the mask decoration. Reversal if a shared drive or a drainage
+  easement needs it: the rejection is a guard, not a schema change — one commit.
+
+The extent also retired a feature: **the road is not on this parcel.** W Jolly Rd's right-of-way
+lies south of the south line, the southern rows inside the line carry 4.8–10 m of canopy, and the
+old "brightest gray band" detector was reading sunlit treetops (CHM 9–16 m) as pavement over a
+242 m strip. The detector now also requires bare ground, and reports absence — like class-6
+structures, an absence finding rather than a silence.
+
+## D-024 - the drawn ground IS the property line, and a pose is a bearing the plot's own box sizes (2026-08-13, defaults taken) #renderer #eyes
+scene3d's batched painter can only draw a rectangular heightfield, so the render grid's rows
+become the ring's own horizontal cuts: every drawn vertex sits on or inside the line, the
+neighbours' land is never drawn as ground, and the batched painter keeps its speed. The line
+itself is a low unlit kerb laid inside the ring - an annotation like a violation marker, not a
+structure claimed to exist. Poses stop carrying distances: one rule, asked twice, solves the
+nearest distance at which named corners still hold inside a named share of the frame.
+| option | silhouette exact | keeps the batched painter | verdict |
+|---|---|---|---|
+| render heightfield warped to the ring's row cuts | yes | yes | CHOSEN |
+| ground as a generic per-triangle mesh with outside cells dropped | yes | no - 115K triangles back on the 6.9fps path D-008 rejected | rejected |
+| outside cells painted the background colour | no - ground drawn and disguised as sky | yes | rejected |
+
+Three defaults taken, all reversible:
+- **one interval per row.** The cut assumes each row meets the ring twice; a ring that breaks
+  it fails at the mesh rather than painting the gap between two lobes as ground. True of every
+  convex parcel. Reversal: clip cells against the ring and drop the fringe into a small generic
+  mesh - one new mesh, no truth change.
+- **the orbit sweep turns half a step off the axes when a square-on frame would leave the land
+  under nine tenths of the frame's width.** A 1:6.4 ribbon seen down its own axis fills at most
+  0.292 of the width at any distance, so two of four frames were slivers; measured, not assumed,
+  so the square toy plot keeps its square-on sweep. Cost: nobody now sees straight down the
+  parcel's length. Reversal: one constant, or a named seventh pose.
+- **the painter's far-to-near chunk order reads vertex row 0 as representative**, which on a
+  tapered ring is a near-degenerate row, so chunk ordering is approximate by up to the taper's
+  own offset. Harmless at this parcel's 6 m of relief; it would matter on a steep one. Reversal:
+  order chunks from the ring's own bounding box - a factored-ui change, so the owner's.
+
+## D-025 - the neighbours' land is a render-side backdrop, and the plot may not hover (2026-08-13, ruled by the lead, defaults taken) #renderer #eyes
+Omitting outside-the-line ground made the silhouette honest and the frame a prop: 0.65-0.76 of
+every orbit frame below the skyline was void, and at two poses the trunk forest showed under the
+terrain edge. The ruling: draw a neutral surround. It is flat, untextured, unshadowed and
+un-entitied; its inner boundary IS the property line, so it never overlaps the parcel and is never
+measured as part of it; and it is not state - no row describes it, `projectWalkableScene` derives
+it from the boundary row and the terrain each time. Measured after: void 0.000-0.001 at every
+orbit pose, and 0 pixels of open sky beneath the parcel's ground at all six.
+| option | horizon | can be mistaken for the parcel | verdict |
+|---|---|---|---|
+| annulus whose hole is the ring, drawn before the ground | yes | no - it never overlaps, and its palette is gated clear | CHOSEN |
+| leave the void (charter 22 cycle 1) | no | no | rejected - reads as a model on a table |
+| extend the measured terrain past the line | yes | yes - it would BE the neighbours' land as data | rejected (D-001: not in the log, not drawn as truth) |
+
+Four defaults taken, all reversible:
+- **the dome now stands on the plot's ground datum.** A ground plane cannot carry a horizon under a
+  sky whose own horizon sits 265 m below the plot: the pale band was 17 degrees low, so the
+  surround's rim would have met mid-blue and stepped 44 luma. Dome and surround now share one datum
+  and one radius, so the rim lands exactly on the dome's equator and there is no seam to see. The
+  toy plot sits near zero elevation, so nothing there moved. Reversal: drop the datum argument.
+- **haze is baked as distance beyond the line**, starting at 0.45 and reaching the horizon tint,
+  which is also the scene background. Camera-independent colour cannot do per-frame fog, and every
+  pose looks at the plot, so distance from the line stands in for distance from the eye. The base
+  haze is also what holds the ring steps under the eye's banding threshold. Reversal: one constant;
+  lower it for more land presence and pay in banding and in palette margin.
+- **the surround starts one render cell inside the line.** The ground samples the ring by row and
+  the surround by spoke, so the two chords disagree between samples and left 12 pixels of sky at
+  the seam. The overlap is drawn over by the ground: a seam that cannot open rather than one that
+  is usually closed. Reversal: share one boundary polyline, at ~68K triangles instead of 22K.
+- **the sky-banding reading is measured over the dome's own palette, not the whole backdrop.**
+  Banding is a claim about how smoothly the sky was painted; the surround is a second surface whose
+  junction with it says nothing about that, and the painter can drop a triangle that straddles the
+  camera plane, which read as a 110-luma step. Sky pixels are all still sampled. Reversal: pass the
+  backdrop classifier for both, and eliminate the dropped triangles instead.

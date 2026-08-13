@@ -7,7 +7,7 @@ import kotlin.math.floor
 import kotlin.math.hypot
 import kotlin.math.sin
 import kotlin.math.tan
-import plottwin.geometry.isInsidePolygon
+import plottwin.worldstate.isInsidePolygon
 import plottwin.render.SceneFrame
 import plottwin.render.groundHeightAt
 import plottwin.render.sceneFrameOf
