@@ -10,7 +10,7 @@ import plottwin.worldstate.TerrainGrid
 
 const val SURROUND_ENTITY_ID = "surround"
 const val SURROUND_SPOKE_CELLS = 288
-const val SURROUND_RING_CELLS = 28
+const val SURROUND_RING_CELLS = 40
 const val SURROUND_GROUND_BLEND_RINGS = 3
 // The ground mesh samples the ring by row and the surround by spoke, so the two polylines agree
 // on the line but not on their chords between samples. The surround starts one render cell inside
@@ -19,9 +19,13 @@ const val SURROUND_GROUND_BLEND_RINGS = 3
 const val SURROUND_SEAM_OVERLAP_CELLS = 1.0
 // haze reaches half strength this far beyond the property line, as a share of the dome's radius
 const val SURROUND_HAZE_SCALE_SHARE = 0.12f
-// Aerial perspective: distant land goes blue, and a blue-dominant surround also sits clear of the
-// green-and-earth palette the parcel itself draws, so no pixel of one can be read as the other.
-val SURROUND_ALBEDO = Rgb(0.27f, 0.31f, 0.42f)
+// The nearest surround already starts this far into haze. It is what keeps the surround reading as
+// distant land rather than as a dark plane the parcel sits on - and because it shortens the whole
+// tonal range, it is also what keeps the ring steps below the eye's banding threshold.
+const val SURROUND_BASE_HAZE = 0.45f
+// A land tone, not a water tone: the separation from the parcel's own greens and earths comes from
+// haze, which is blue-dominant where soil and foliage never are, not from painting the ground blue.
+val SURROUND_ALBEDO = Rgb(0.34f, 0.35f, 0.32f)
 
 // The neighbours' land drawn as what it is TO THIS PLOT: flat, untextured, unshadowed ground
 // that carries a horizon, so the parcel stops reading as a cut-out slab hanging in sky. It is
@@ -158,7 +162,7 @@ private fun surroundColorsOf(
 }
 
 private fun hazeAt(beyondLine: Float, hazeScale: Float): Float =
-    1f - kotlin.math.exp(-beyondLine / hazeScale)
+    SURROUND_BASE_HAZE + (1f - SURROUND_BASE_HAZE) * (1f - kotlin.math.exp(-beyondLine / hazeScale))
 
 private fun hazedToward(near: Rgb, horizon: Rgb, haze: Float): Rgb = Rgb(
     red = near.red + (horizon.red - near.red) * haze,

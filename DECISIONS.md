@@ -203,3 +203,38 @@ Three defaults taken, all reversible:
   tapered ring is a near-degenerate row, so chunk ordering is approximate by up to the taper's
   own offset. Harmless at this parcel's 6 m of relief; it would matter on a steep one. Reversal:
   order chunks from the ring's own bounding box - a factored-ui change, so the owner's.
+
+## D-025 - the neighbours' land is a render-side backdrop, and the plot may not hover (2026-08-13, ruled by the lead, defaults taken) #renderer #eyes
+Omitting outside-the-line ground made the silhouette honest and the frame a prop: 0.65-0.76 of
+every orbit frame below the skyline was void, and at two poses the trunk forest showed under the
+terrain edge. The ruling: draw a neutral surround. It is flat, untextured, unshadowed and
+un-entitied; its inner boundary IS the property line, so it never overlaps the parcel and is never
+measured as part of it; and it is not state - no row describes it, `projectWalkableScene` derives
+it from the boundary row and the terrain each time. Measured after: void 0.000-0.001 at every
+orbit pose, and 0 pixels of open sky beneath the parcel's ground at all six.
+| option | horizon | can be mistaken for the parcel | verdict |
+|---|---|---|---|
+| annulus whose hole is the ring, drawn before the ground | yes | no - it never overlaps, and its palette is gated clear | CHOSEN |
+| leave the void (charter 22 cycle 1) | no | no | rejected - reads as a model on a table |
+| extend the measured terrain past the line | yes | yes - it would BE the neighbours' land as data | rejected (D-001: not in the log, not drawn as truth) |
+
+Four defaults taken, all reversible:
+- **the dome now stands on the plot's ground datum.** A ground plane cannot carry a horizon under a
+  sky whose own horizon sits 265 m below the plot: the pale band was 17 degrees low, so the
+  surround's rim would have met mid-blue and stepped 44 luma. Dome and surround now share one datum
+  and one radius, so the rim lands exactly on the dome's equator and there is no seam to see. The
+  toy plot sits near zero elevation, so nothing there moved. Reversal: drop the datum argument.
+- **haze is baked as distance beyond the line**, starting at 0.45 and reaching the horizon tint,
+  which is also the scene background. Camera-independent colour cannot do per-frame fog, and every
+  pose looks at the plot, so distance from the line stands in for distance from the eye. The base
+  haze is also what holds the ring steps under the eye's banding threshold. Reversal: one constant;
+  lower it for more land presence and pay in banding and in palette margin.
+- **the surround starts one render cell inside the line.** The ground samples the ring by row and
+  the surround by spoke, so the two chords disagree between samples and left 12 pixels of sky at
+  the seam. The overlap is drawn over by the ground: a seam that cannot open rather than one that
+  is usually closed. Reversal: share one boundary polyline, at ~68K triangles instead of 22K.
+- **the sky-banding reading is measured over the dome's own palette, not the whole backdrop.**
+  Banding is a claim about how smoothly the sky was painted; the surround is a second surface whose
+  junction with it says nothing about that, and the painter can drop a triangle that straddles the
+  camera plane, which read as a 110-luma step. Sky pixels are all still sampled. Reversal: pass the
+  backdrop classifier for both, and eliminate the dropped triangles instead.

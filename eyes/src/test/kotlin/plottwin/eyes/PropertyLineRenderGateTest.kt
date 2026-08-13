@@ -27,6 +27,11 @@ const val OVERHEAD_ACROSS_FRAME_FLOOR = 0.7
 // under the ground start two pixels below it
 const val PAINTER_EDGE_PIXELS = 2
 
+fun lumaSpanOf(colors: List<Int>): String {
+    val luma = colors.map { 0.299 * ((it shr 16) and 0xFF) + 0.587 * ((it shr 8) and 0xFF) + 0.114 * (it and 0xFF) }
+    return "%.0f..%.0f".format(luma.min(), luma.max())
+}
+
 fun chebyshevBetween(first: Int, second: Int): Int = maxOf(
     kotlin.math.abs(((first shr 16) and 0xFF) - ((second shr 16) and 0xFF)),
     kotlin.math.abs(((first shr 8) and 0xFF) - ((second shr 8) and 0xFF)),
@@ -174,6 +179,7 @@ class PropertyLineRenderGateTest {
             "[line] surround palette ${surroundColors.size} colours, parcel palette ${parcelColors.size}, closest pair $closest apart (tolerance $SKY_MATCH_TOLERANCE): surround %06x vs parcel %06x"
                 .format(closestPair.second and 0xFFFFFF, closestPair.third and 0xFFFFFF),
         )
+        println("[line] surround luma ${lumaSpanOf(surroundColors)}, parcel luma ${lumaSpanOf(parcelColors)}")
         assertTrue(
             closest > SKY_MATCH_TOLERANCE,
             "a surround colour sits $closest from a colour the parcel draws, inside the classifier's $SKY_MATCH_TOLERANCE tolerance",
