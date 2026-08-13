@@ -37,7 +37,7 @@ Runner fans out, aggregates, ranks by severity (ranking is the runner's); leaves
 hard → gates, soft → scores; the same rule can flip by source (permit = hard, taste = soft). Weights are configurable, versioned rows. Weight is a rule's input; severity is a violation's output. Nothing is random: objective decides, deterministic tie-break settles. Landmarks the owner references become named entity rows (anything referenced twice earns a name).
 
 ## D-007 — terrain is 2.5D: 10cm grid + vector entities with heights; LiDAR-first (2026-08-05, locked) #terrain
-~810K cells for 2 acres; entities are exact polygons carrying heights (80ft tree = trunk cylinder + canopy ellipsoid). Q-002 confirmed free QL2 LiDAR + 1m DEM + NAIP cover the parcel (Delta Twp, Eaton Co, MI); phone-survey fallback only if data's missing. Units: feet/inches at every owner-facing surface, meters internal. Toy-loop rooms: greenhouse + pergola.
+~919K cells for the first parcel's 1.839 acres (the original "~810K for 2 acres" was approximate scale off a wrong parcel size; D-023 sizes the real extent from the property line, and it is not a budget); entities are exact polygons carrying heights (80ft tree = trunk cylinder + canopy ellipsoid). Q-002 confirmed free QL2 LiDAR + 1m DEM + NAIP cover the parcel (Delta Twp, Eaton Co, MI); phone-survey fallback only if data's missing. Units: feet/inches at every owner-facing surface, meters internal. Toy-loop rooms: greenhouse + pergola.
 | option | verdict |
 |---|---|
 | 2.5D heightmap + entity heights | CHOSEN — covers shadows/viewshed/drainage |
@@ -53,7 +53,7 @@ Reads state, draws, owns no truth; violation overlays at location+magnitude. Q-0
 | three.js | yes (differently) | rejected — factored-ui is the one UI; fallback only if the rebuild fails its bands |
 
 ## D-009 — standalone repo, Genesis-shaped, common-ground data spine (2026-08-05, locked) #scope
-Not built inside Genesis (no dependency); typed rows + log make the eventual port row-writing. common-ground ingests constraint layers (wetland · flood · parcel · zoning); this repo's land solvers read them as files — no duplicate collectors; a generic ETL earns existence only when pulling on a schedule. plot-twin generalizes: one model per plot — the home 2 acres first, corridor parcels next.
+Not built inside Genesis (no dependency); typed rows + log make the eventual port row-writing. common-ground ingests constraint layers (wetland · flood · parcel · zoning); this repo's land solvers read them as files — no duplicate collectors; a generic ETL earns existence only when pulling on a schedule. plot-twin generalizes: one model per plot — Isaac's 1.839 acres on W Jolly Rd first, corridor parcels next.
 
 ## D-010 — process rules (2026-08-05, locked) #process
 Loop before capture. rationale governance adopted before any code. Tap-to-lock vs intent-only is UX policy, not architecture — every writer terminates as the same typed row. Repo is public. Never cite decision/question IDs at the owner — say the thing itself.
@@ -72,8 +72,9 @@ The prose is the why (owner-facing rationale); the typed constraint is the imple
 Measured geometry (LiDAR/survey/photo ingestion) and placed geometry (optimizer output) carry different writer signatures. Rows answer "who says the ground is here" vs "who decided the greenhouse goes here". Default taken by the lead after both charter-1 and charter-3 workers independently hit the single-writer wall; surfaced to the owner.
 **Amended 2026-08-08 (per Q-005): for terrain rows the writer role derives from the surface, it is not a free signature.** Terrain rows carry a surface id — `measured`, or `proposed(<name>)` with the measured baseline seq the proposal branched from — and the role follows: measured ground ⇒ CAPTURE, proposed ground ⇒ OPTIMIZER; the log rejects any other pairing. A `surface_realized` row (CAPTURE-only) retires a proposal once capture confirms it was built; the proposal is never rewritten, and measured-now minus proposal is the as-built deviation. A tightening of the two-roles ruling, not a loosening.
 
-## D-014 — the lead merges plot-twin at its own discretion (2026-08-06, ruled) #process
+## D-014 — the lead merges plot-twin at its own discretion (2026-08-06, ruled; RETIRED 2026-08-13 into D-018) #process
 Verified-gate branches land on main by the lead's call; no per-merge ratification. factored-ui merges remain the owner's.
+**Retired 2026-08-13, superseded by D-018.** D-018 generalized the merge autonomy and, read literally, freed the one thing this entry reserved. Its live clause — factored-ui merges are the owner's — moves into D-018 as a fourth exception; nothing else here stands on its own. Kept as history, not deleted.
 
 ## D-015 — one CPU line sweep is both the sunshed solver and the renderer's light (2026-08-07, ruled) #solvers #renderer
 Q-004's horizon sweep is built once, in `:solvers`, and read twice: the solver integrates it over a day into direct-sun hours; the renderer evaluates it at one moment into a lit fraction and, over eight azimuths, into sky openness. Measured on the 900x900 toy plot (810,000 cells): one sweep 20 ms, a whole solstice day at 15-minute samples 1976 ms — cheap enough that the renderer sweeps at solver resolution and averages down, which is where its soft shadow edges come from. Entities are rasterised into the same occluder surface as the ground, so a greenhouse shades a bed for the same reason a hill does.
@@ -94,6 +95,8 @@ Extends D-014 from plot-twin merges to the general rule: gate-green work lands o
 lead's own call, and Jim is pulled in only for money, going public, or pushing to his devices.
 Never wait on Jim for a merge; everything else arrives documented in the ledger, reversible,
 reviewed at his batch sitting.
+**Amended 2026-08-13 (D-014 retired into this entry): a fourth exception — merges in factored-ui
+are the owner's, because it is his repo.**
 
 ## D-019 — visual deliverables are gated by the lead's own eyes across measured cycles (2026-08-10, ruled) #renderer #process
 Every visual deliverable iterates inside the run: the lead renders, looks, scores against
