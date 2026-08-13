@@ -26,6 +26,34 @@ tonight's work. So:
 - Reversal path if the lead or Jim wants a true irregular extent instead: one commit, because
   the mask is additive and nothing downstream loses information.
 
+## The frame problem — read this before you change one line of the compiler
+Charter 20 found the hole and the lead has ruled it, because it is the one way this charter
+silently corrupts the log. Every `GroundPoint` in the log — the 97 trees, the road, the base
+terrain — is metres against an origin that existed **only inside `compile_parcel.py`**
+(`site_utm` minus 45 m, the old square's south-west corner). D-021 gave the boundary row an
+explicit `GroundFrame` (CRS + origin easting/northing); no other row has one. **So if you recut
+the grid, the origin moves and every existing entity row silently relocates** — the trees would
+keep their numbers and change their meaning, which is the worst failure this repo can have.
+
+Lead ruling, two parts:
+1. **The frame becomes shared state that rows are checked against, not a constant in a script.**
+   Rows carrying plot-local coordinates are valid only in one frame per log, and **the projection
+   REJECTS a log whose rows disagree on frame** — fail loud, at read time, with a test that
+   proves it fires. A frame mismatch must be impossible to read past.
+2. **The new origin is the boundary bbox's south-west corner**, and the whole capture is
+   re-derived into it in one pass, so the log is internally consistent rather than migrated.
+   Do not write a coordinate-shifting migration for rows you are about to regenerate from source.
+
+Reversal if the lead or Jim wants the frame on the site row instead (D-021 names that path):
+one field move plus the fixture, no data loss.
+
+## Getting the cached inputs into your worktree
+`capture/data/` is gitignored, so your fresh worktree has none of it. The DEM and the lidar tile
+are immutable cached downloads — copy them in from the main checkout at
+`C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/` (`dem/` ~479 MB, `lidar/` ~20 MB,
+`geocode.json`). Do NOT copy `naip/` — it is the old square's clip and you are re-fetching it.
+Do NOT write into the main checkout's data directory; it is shared and another lane reads it.
+
 ## Two things the ledger audit found for you (lead-ruled, so you do not re-derive them)
 - **What a terrain-diff means on a cell outside the property line.** D-011 rules terrain-diff
   semantics as "rectangular patch, last write wins" and is silent on masked cells, because no
