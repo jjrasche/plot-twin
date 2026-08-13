@@ -37,9 +37,9 @@ every change and why. The owner walks the result — on screen now, through a ph
 actual ground later — and what they see is always derived from state that machines can check.
 The twin is where a long build gets designed, argued with, and kept honest: every structure
 placed before it's bought, every constraint (drainage, sun, access, permit) enforced before a
-shovel moves. First plot: Isaac's 1.839 acres on W Jolly Rd. Next: the common-ground corridor parcels — the
-design tool that turns "which land" (common-ground's job) into "what grows here." Success = a
-plot's next decade of decisions each ran through the loop first.
+shovel moves. First plot: Isaac's 1.839 acres on W Jolly Rd. Next: the common-ground corridor
+parcels — the design tool that turns "which land" (common-ground's job) into "what grows here."
+Success = a plot's next decade of decisions each ran through the loop first.
 
 ## Rules
 
