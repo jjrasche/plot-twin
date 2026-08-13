@@ -56,14 +56,6 @@ class ParcelFrame:
         self.rows = cells_spanning(north_reach, cell_size)
 
     @property
-    def center_east(self) -> float:
-        return self.origin_east + self.columns * self.cell_size / 2.0
-
-    @property
-    def center_north(self) -> float:
-        return self.origin_north + self.rows * self.cell_size / 2.0
-
-    @property
     def cell_count(self) -> int:
         return self.columns * self.rows
 

@@ -75,7 +75,8 @@ class GroundFrameGateTest {
             log.append(terrainOver(20, 50, frame), WriterRole.CAPTURE)
             val state = log.currentState()
             assertNotNull(state.parcelBoundary)
-            assertEquals(GridExtent(20, 50), GridExtent(assertNotNull(state.terrain).grid.columns, state.terrain!!.grid.rows))
+            val grid = assertNotNull(state.terrain).grid
+            assertEquals(GridExtent(20, 50), GridExtent(grid.columns, grid.rows))
         }
     }
 

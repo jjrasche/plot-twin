@@ -12,8 +12,6 @@ class ParcelMask(val columns: Int, val rows: Int, val cellSize: Meters, private 
 
     val insideAreaSquareMeters: Double get() = insideCellCount * cellSize.value * cellSize.value
 
-    fun isInsideBoundary(cell: Int): Boolean = inside[cell]
-
     fun isInsideBoundary(column: Int, row: Int): Boolean = inside[row * columns + column]
 
     fun centerOf(column: Int, row: Int): GroundPoint = GroundPoint(
