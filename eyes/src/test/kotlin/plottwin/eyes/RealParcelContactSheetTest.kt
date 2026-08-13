@@ -12,13 +12,9 @@ import plottwin.capture.albedoTriplesOf
 import plottwin.capture.parcelBoundaryRowOf
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
-import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GridExtent
 import plottwin.worldstate.ROAD_ENTITY_NAME
 import plottwin.worldstate.gridExtentOf
-import plottwin.worldstate.isRoadEntity
-import plottwin.worldstate.isTreeEntity
-import plottwin.worldstate.isWaterEntity
 
 class RealParcelContactSheetTest {
 
@@ -113,13 +109,4 @@ class RealParcelContactSheetTest {
         assertTrue(differingShare > 0.2, "NAIP albedo changed only ${differingShare * 100}% of pixels — texture not visible")
     }
 
-}
-
-private fun expectedPoseCountOf(state: CurrentState): Int {
-    val namedSubjects = state.entities.count { (name, placed) ->
-        placed.height.value > 0.0 && !isTreeEntity(name) && !isWaterEntity(name) && !isRoadEntity(name)
-    }
-    val woods = if (state.entities.keys.any(::isTreeEntity)) 1 else 0
-    val road = if (state.entities.containsKey(ROAD_ENTITY_NAME)) 1 else 0
-    return 1 + ORBIT_STEPS + namedSubjects + woods + road
 }

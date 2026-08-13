@@ -2,6 +2,7 @@ package plottwin.eyes
 
 import kotlin.math.PI
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import plottwin.capture.RealParcelFixture
 import plottwin.solvers.ToyPlotFixture
@@ -19,7 +20,7 @@ class NoPrincipalShadowGateTest {
         }
         println(readings.joinToString("\n") { it.line() })
 
-        assertTrue(readings.size >= 7, "expected at least seven woodlot poses, got ${readings.size}")
+        assertEquals(expectedPoseCountOf(scene.state), readings.size, "woodlot poses drifted from what the log holds")
         assertTrue(
             readings.all { it.advisory },
             "a 97-caster woodlot still gated a bearing:\n${readings.filterNot { it.advisory }.joinToString("\n") { it.line() }}",
