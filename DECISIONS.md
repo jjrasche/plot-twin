@@ -127,3 +127,20 @@ Two defaults taken, both reversible:
 - **the row carries its own provenance** — the first row in the log to do so. Base-terrain rows
   drop the DEM receipt at the log boundary today (it stays in `parcel.json`). Reversal: a shared
   provenance row referenced by seq, once a second source needs the same shape.
+
+## D-022 — a shadow-direction reading gates only where one caster owns the shade it reads (2026-08-13, ruled) #eyes #renderer
+The check estimates a principal shadow bearing from one occluder. On a 97-tree woodlot that
+quantity does not exist, so the check now measures whether it exists before claiming it:
+each ground sample is attributed to the first body its ray to the sun meets, the shares are
+counted inside the check's own screen annulus past its own sky and caster masks, and a
+reading gates only when the caster it assumed holds at least 0.75 of that shade. Below the
+floor the reading is ADVISORY and states the distribution that suppressed it.
+Floor frozen against sampled output from both arms before any suppression existed: the toy
+plot's greenhouse held 0.963-1.000 across three moments and seven poses; Isaac's parcel gave
+its tallest tree 0.129-0.533 across the same poses on both the fixture and the full-res
+compiled grid. 0.75 sits 0.213 above the toy floor and 0.217 below the woodlot ceiling.
+| option | trains the lead to trust the banner | verdict |
+|---|---|---|
+| measure the caster population, suppress where no principal caster exists | yes - red still means wrong | CHOSEN |
+| widen the bearing tolerance until the woodlot passes | no - the toy plot stops catching wrong bearings too | rejected |
+| drop the check on real parcels | no - a check that cannot fail is not a check | rejected |
