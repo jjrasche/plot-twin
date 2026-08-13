@@ -25,6 +25,8 @@ PARCEL_LAYER_URL = (
 HALF_WIDTH_METERS = CELLS_PER_SIDE * CELL_SIZE_METERS / 2.0
 INTERIM_CONTRACT = "interim-county-service"
 WGS84 = "EPSG:4326"
+SQUARE_METERS_PER_ACRE = 4046.8564224
+AREA_AGREEMENT_SHARE = 0.01
 
 
 def feature_query_url(parcel_id: str) -> str:
@@ -84,6 +86,38 @@ def ring_area_square_meters(closed_ring: list[list[float]]) -> float:
     return abs(twice_area) / 2.0
 
 
+def turn_of(origin: list[float], through: list[float], to: list[float]) -> float:
+    return (through[0] - origin[0]) * (to[1] - origin[1]) - (through[1] - origin[1]) * (to[0] - origin[0])
+
+
+def segments_cross(first: tuple[list[float], list[float]], second: tuple[list[float], list[float]]) -> bool:
+    return (
+        turn_of(first[0], first[1], second[0]) * turn_of(first[0], first[1], second[1]) < 0
+        and turn_of(second[0], second[1], first[0]) * turn_of(second[0], second[1], first[1]) < 0
+    )
+
+
+def refuse_unless_simple(closed_ring: list[list[float]]) -> None:
+    vertices = closed_ring[:-1]
+    edges = [(vertices[index], vertices[(index + 1) % len(vertices)]) for index in range(len(vertices))]
+    for first in range(len(edges)):
+        for second in range(first + 2, len(edges)):
+            if first == 0 and second == len(edges) - 1:
+                continue
+            if segments_cross(edges[first], edges[second]):
+                raise SystemExit(f"county ring self-intersects at edges {first} and {second}; refusing to log it")
+
+
+def refuse_unless_area_agrees(derived_square_meters: float, stated_acres: float) -> None:
+    stated_square_meters = stated_acres * SQUARE_METERS_PER_ACRE
+    disagreement = abs(derived_square_meters / stated_square_meters - 1.0)
+    if disagreement >= AREA_AGREEMENT_SHARE:
+        raise SystemExit(
+            "derived area %.1f m2 disagrees with the county's %.1f m2 by %.2f%%"
+            % (derived_square_meters, stated_square_meters, 100.0 * disagreement)
+        )
+
+
 def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
     metadata = json.loads(http_get(f"{PARCEL_LAYER_URL}?f=json"))
     observed_at, observed_at_absent_reason = layer_currency(metadata)
@@ -99,6 +133,10 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
     origin_north = site_north - HALF_WIDTH_METERS
 
     local_ring = local_ring_of(utm_ring, origin_east, origin_north)
+    derived_square_meters = ring_area_square_meters(local_ring)
+    refuse_unless_simple(local_ring)
+    refuse_unless_area_agrees(derived_square_meters, attributes["Acreage"])
+
     return {
         "parcel_id": attributes["PARCELID"],
         "low_parcel_id": attributes["LPARCEL"],
@@ -106,7 +144,7 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
         "owner_name": attributes["OWNERNME1"],
         "acres_county_stated": attributes["Acreage"],
         "acres_state_equalized": attributes["STATEDAREA"],
-        "area_square_meters_derived": ring_area_square_meters(local_ring),
+        "area_square_meters_derived": derived_square_meters,
         "ring_wgs84_closed": closed_ring,
         "ring_utm_closed": utm_ring,
         "ring_local_closed": local_ring,

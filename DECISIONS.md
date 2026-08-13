@@ -105,3 +105,25 @@ resembling ground: pixel checks bound correctness, only an eye bounds resemblanc
 ## D-020 — the first parcel is Isaac's, 11157 W Jolly Rd, Delta Twp; coordinates are public (2026-08-10, ruled) #state #scope
 The shared-case parcel is public record and ratified for tracked fixtures — the run-6 privacy
 hold is lifted. The fixture and geocode gate carry the true point.
+
+## D-021 — the property line is a `parcel_boundary` row carrying its own frame and receipt (2026-08-13, defaults taken) #state #provenance #land
+Measured ground, so a CAPTURE row (D-013): the ring in plot-local metres stored open (the
+closing vertex is the wrap, and a repeated one makes the ring non-simple), the county's stated
+acreage, and the pull's receipt. Interim source is Eaton County's open parcel service, named on
+the row as `interim-county-service` — when the shared parcel-layer seam delivers, it appends a
+new boundary row and this one stays as history.
+| option | log holds truth | verdict |
+|---|---|---|
+| boundary as a typed log row | yes | CHOSEN |
+| boundary as a side file the renderer/compiler reads | no — the extent would live outside the log | rejected (D-001, D-011) |
+
+Two defaults taken, both reversible:
+- **the frame rides on the boundary row** (`GroundFrame`: CRS + origin easting/northing). Every
+  other row's ground coordinates are metres against an origin that exists only inside
+  `compile_parcel.py`, so the log could not put its own coordinates back on Earth; the boundary
+  is the first row that must survive a regrid, so it says where its origin is. Reversal: move
+  the frame to the site row where georeferencing already lives — one field move plus the
+  fixture, no data loss.
+- **the row carries its own provenance** — the first row in the log to do so. Base-terrain rows
+  drop the DEM receipt at the log boundary today (it stays in `parcel.json`). Reversal: a shared
+  provenance row referenced by seq, once a second source needs the same shape.
