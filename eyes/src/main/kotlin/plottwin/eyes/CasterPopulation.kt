@@ -42,13 +42,10 @@ fun shadowedGroundOf(
     val casters = castersOf(state)
     if (casters.isEmpty()) return emptyList()
     val frame = sceneFrameOf(terrain)
-    val towardSunEast = sin(Math.toRadians(sun.azimuthDegrees))
-    val towardSunNorth = cos(Math.toRadians(sun.azimuthDegrees))
-    val rise = tan(Math.toRadians(maxOf(sun.altitudeDegrees, SHADOW_RAY_MINIMUM_ALTITUDE_DEGREES)))
-    val reach = minOf(casters.maxOf { it.heightMeters } / rise, SHADOW_RAY_MAXIMUM_METERS)
+    val march = sunMarchOf(sun, casters.maxOf { it.heightMeters }, sampleMeters)
     val shadowed = ArrayList<ShadowedGroundPoint>()
     forEachGroundSample(terrain, sampleMeters) { standing ->
-        val caster = firstCasterAlongRay(terrain, casters, standing, towardSunEast, towardSunNorth, rise, reach, sampleMeters)
+        val caster = firstCasterAlongRay(terrain, casters, standing, march)
         if (caster != null) shadowed.add(ShadowedGroundPoint(caster, scenePointOf(terrain, frame, standing)))
     }
     return shadowed
@@ -134,6 +131,7 @@ private class ShadowCaster(val name: String, val footprint: List<GroundPoint>, v
             point.north.value >= southEdge && point.north.value <= northEdge
 }
 
+// sorted so two casters overlapping at one probe always resolve to the same name
 private fun castersOf(state: CurrentState): List<ShadowCaster> =
     state.entities.entries
         .filter { (_, placed) -> isShadowCaster(placed) }
@@ -143,30 +141,47 @@ private fun castersOf(state: CurrentState): List<ShadowCaster> =
 private fun isShadowCaster(placed: PlacedEntity): Boolean =
     placed.footprint.size >= 3 && placed.height.value > 0.0
 
+// The walk a sunward ray takes: how far it steps east and north per metre travelled, how fast
+// it climbs, how far it bothers to go, and how finely it is sampled.
+private class SunMarch(
+    val towardSunEast: Double,
+    val towardSunNorth: Double,
+    val rise: Double,
+    val reach: Double,
+    val stepMeters: Double,
+)
+
+private fun sunMarchOf(sun: SunRay, tallestCasterMeters: Double, stepMeters: Double): SunMarch {
+    val rise = tan(Math.toRadians(maxOf(sun.altitudeDegrees, SHADOW_RAY_MINIMUM_ALTITUDE_DEGREES)))
+    return SunMarch(
+        towardSunEast = sin(Math.toRadians(sun.azimuthDegrees)),
+        towardSunNorth = cos(Math.toRadians(sun.azimuthDegrees)),
+        rise = rise,
+        reach = minOf(tallestCasterMeters / rise, SHADOW_RAY_MAXIMUM_METERS),
+        stepMeters = stepMeters,
+    )
+}
+
 private fun firstCasterAlongRay(
     terrain: TerrainGrid,
     casters: List<ShadowCaster>,
     standing: GroundPoint,
-    towardSunEast: Double,
-    towardSunNorth: Double,
-    rise: Double,
-    reach: Double,
-    stepMeters: Double,
+    march: SunMarch,
 ): String? {
     val standingHeight = groundHeightAt(terrain, standing)
-    var along = stepMeters
-    while (along <= reach) {
+    var along = march.stepMeters
+    while (along <= march.reach) {
         val probe = GroundPoint(
-            east = Meters(standing.east.value + along * towardSunEast),
-            north = Meters(standing.north.value + along * towardSunNorth),
+            east = Meters(standing.east.value + along * march.towardSunEast),
+            north = Meters(standing.north.value + along * march.towardSunNorth),
         )
-        val rayHeight = standingHeight + along * rise
+        val rayHeight = standingHeight + along * march.rise
         for (caster in casters) {
             if (!caster.mayContain(probe)) continue
             if (!isInsidePolygon(probe, caster.footprint)) continue
             if (groundHeightAt(terrain, probe) + caster.heightMeters > rayHeight) return caster.name
         }
-        along += stepMeters
+        along += march.stepMeters
     }
     return null
 }

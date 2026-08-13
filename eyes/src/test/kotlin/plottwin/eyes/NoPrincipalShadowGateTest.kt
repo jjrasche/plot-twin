@@ -7,6 +7,7 @@ import plottwin.capture.RealParcelFixture
 import plottwin.solvers.ToyPlotFixture
 
 const val MUTATED_BEARING_RADIANS = PI / 2
+const val WOODLOT_MINIMUM_CASTERS = 4
 
 class NoPrincipalShadowGateTest {
 
@@ -27,6 +28,15 @@ class NoPrincipalShadowGateTest {
             readings.all { "shade in this annulus comes from" in it.detail },
             "an advisory reading did not state the distribution it rests on:\n${readings.joinToString("\n") { it.line() }}",
         )
+    }
+
+    private fun populationsOf(scene: PlotScene, viewer: PlotViewer): List<CasterPopulation> {
+        val shadowedGround = shadowedGroundOf(scene.state, scene.daylight.sun)
+        val classifier = skyClassifierOf(scene.spec, scene.daylight)
+        return plotViewpoints(scene.state).mapNotNull { viewpoint ->
+            shadowReadingAt(scene, viewer, viewpoint, viewer.capture(viewpoint.pose), classifier, shadowedGround)
+                ?.population
+        }
     }
 
     @Test
