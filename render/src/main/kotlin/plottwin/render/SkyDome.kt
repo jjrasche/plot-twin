@@ -19,7 +19,7 @@ const val SUN_GLOW_TIGHTNESS = 8.0f
 // scene3d draws heightfield entities in list order before every other mesh, so a dome expressed
 // as a heightfield and listed first is the one sky the batched painter can already draw.
 fun withSkyDome(spec: WalkableSceneSpec, terrain: TerrainGrid, daylight: Daylight): WalkableSceneSpec {
-    val dome = skyDomeMeshOf(skyDomeRadiusOf(terrain), daylight)
+    val dome = skyDomeMeshOf(skyDomeRadiusOf(terrain), daylight, groundDatumOf(terrain))
     return spec.copy(
         world = spec.world.copy(
             entities = listOf(Scene3dEntity(id = SKY_ENTITY_ID)) + spec.world.entities,
@@ -35,7 +35,9 @@ fun skyDomeRadiusOf(terrain: TerrainGrid): Float =
 // Polar lattice: rows are rings uniform in the horizon-to-zenith blend parameter, columns are
 // azimuth spokes, so iso-colour contours align with the triangulation instead of cutting it.
 // Below the horizon a short skirt at full radius drops under every terrain silhouette.
-fun skyDomeMeshOf(radius: Float, daylight: Daylight): Scene3dMesh {
+// The dome's equator stands on the ground datum, not on scene zero: a plot whose elevations are
+// hundreds of metres above the origin would otherwise look at its own horizon and see mid-sky.
+fun skyDomeMeshOf(radius: Float, daylight: Daylight, groundDatum: Float = 0f): Scene3dMesh {
     val ringVertexRows = SKY_SKIRT_RING_CELLS + SKY_DOME_RING_CELLS + 1
     val perRow = SKY_DOME_SPOKE_CELLS + 1
     val vertices = ArrayList<Float>(ringVertexRows * perRow * 3)
@@ -58,7 +60,7 @@ fun skyDomeMeshOf(radius: Float, daylight: Daylight): Scene3dMesh {
         }
     }
     return Scene3dMesh(
-        vertices = vertices,
+        vertices = List(vertices.size) { if (it % 3 == 1) vertices[it] + groundDatum else vertices[it] },
         triColors = triColors,
         gridCellsX = SKY_DOME_SPOKE_CELLS,
         gridCellsZ = ringVertexRows - 1,

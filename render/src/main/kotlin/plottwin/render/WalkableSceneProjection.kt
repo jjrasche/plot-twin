@@ -40,6 +40,9 @@ fun projectWalkableScene(
     val albedoOverride = groundTriples?.let { averagedAlbedoOf(it, terrain, RENDER_DOWNSAMPLE_FACTOR) }
     val renderTerrain = downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR)
     val boundaryRing = state.parcelBoundary?.ring
+    if (boundaryRing != null) {
+        meshes[SURROUND_ENTITY_ID] = neutralSurroundMeshOf(boundaryRing, renderTerrain, frame, daylight)
+    }
     meshes[TERRAIN_ENTITY_ID] = if (boundaryRing == null) {
         terrainMeshOf(renderTerrain, frame, shading, albedoOverride)
     } else {
