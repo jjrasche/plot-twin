@@ -42,6 +42,46 @@ data class SiteRow(
     val timeZoneId: String,
 ) : WorldRow
 
+// The frame every GroundPoint in the log is measured in: plot-local metres east and north of
+// this projected origin. Without it the log's ground coordinates cannot be put back on Earth.
+@Serializable
+data class GroundFrame(
+    val crs: String,
+    val originEasting: Meters,
+    val originNorthing: Meters,
+)
+
+@Serializable
+data class BoundaryProvenance(
+    val source: String,
+    val pulledAtUtc: String,
+    val observedAt: String? = null,
+    val observedAtAbsentReason: String? = null,
+    val sha256: String,
+    val contract: String,
+) {
+    init {
+        require((observedAt == null) == (observedAtAbsentReason != null)) {
+            "a boundary carries the source's own currency date, or the reason it has none - never both, never neither"
+        }
+    }
+}
+
+@Serializable
+@SerialName("parcel_boundary")
+data class ParcelBoundaryRow(
+    val parcelId: String,
+    val ring: List<GroundPoint>,
+    val frame: GroundFrame,
+    val acresStated: Double,
+    val provenance: BoundaryProvenance,
+) : WorldRow {
+    init {
+        require(ring.size >= 3) { "a parcel boundary needs at least three vertices, got ${ring.size}" }
+        require(ring.first() != ring.last()) { "the ring is stored open: the closing vertex is the wrap" }
+    }
+}
+
 @Serializable
 @SerialName("rule")
 data class RuleRow(
@@ -147,5 +187,6 @@ fun geometryWriterFor(row: WorldRow): WriterRole? = when {
     row is BaseTerrainRow -> WriterRole.CAPTURE
     row is SurfaceRealizedRow -> WriterRole.CAPTURE
     row is SiteRow -> WriterRole.CAPTURE
+    row is ParcelBoundaryRow -> WriterRole.CAPTURE
     else -> null
 }

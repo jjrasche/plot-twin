@@ -74,7 +74,7 @@ def local_ring_of(utm_ring: list[list[float]], origin_east: float, origin_north:
 
 
 def ring_area_square_meters(closed_ring: list[list[float]]) -> float:
-    """Shoelace over the projected ring; the closing vertex is the wrap, not an extra edge."""
+    """Shoelace in the plot-local frame; absolute UTM coordinates cancel away the millimetres."""
     vertices = closed_ring[:-1]
     twice_area = sum(
         vertices[index][0] * vertices[(index + 1) % len(vertices)][1]
@@ -98,6 +98,7 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
     origin_east = site_east - HALF_WIDTH_METERS
     origin_north = site_north - HALF_WIDTH_METERS
 
+    local_ring = local_ring_of(utm_ring, origin_east, origin_north)
     return {
         "parcel_id": attributes["PARCELID"],
         "low_parcel_id": attributes["LPARCEL"],
@@ -105,10 +106,10 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
         "owner_name": attributes["OWNERNME1"],
         "acres_county_stated": attributes["Acreage"],
         "acres_state_equalized": attributes["STATEDAREA"],
-        "area_square_meters_derived": ring_area_square_meters(utm_ring),
+        "area_square_meters_derived": ring_area_square_meters(local_ring),
         "ring_wgs84_closed": closed_ring,
         "ring_utm_closed": utm_ring,
-        "ring_local_closed": local_ring_of(utm_ring, origin_east, origin_north),
+        "ring_local_closed": local_ring,
         "plot_local_origin": {
             "crs": UTM_ZONE_16N,
             "easting_meters": origin_east,

@@ -11,6 +11,7 @@ repositories {
 dependencies {
     api(project(":worldstate"))
     implementation(libs.kotlinx.serialization.json)
+    testImplementation(project(":geometry"))
     testImplementation(libs.kotlin.test)
     testImplementation(libs.sqlite.jdbc)
 }
