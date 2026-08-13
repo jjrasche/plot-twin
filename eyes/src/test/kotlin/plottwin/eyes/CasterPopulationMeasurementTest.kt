@@ -17,7 +17,7 @@ class CasterPopulationMeasurementTest {
             "toy-evening" to ToyPlotFixture.toyEvening,
         )
         val toyShares = toyMoments.flatMap { (label, moment) -> report(label, toyPlotScene(moment)) }
-        val realShares = report("real-parcel-fixture", realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features()))
+        val realShares = report("real-parcel-fixture", realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary()))
         val compiled = Path.of(System.getProperty("user.dir"), "..", "capture", "data", "compiled", "parcel.json").normalize()
         val fullResShares =
             if (Files.exists(compiled)) report("real-parcel-full-res", realParcelSceneFromFile(compiled)) else emptyList()

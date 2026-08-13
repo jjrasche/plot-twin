@@ -14,7 +14,7 @@ class NoPrincipalShadowGateTest {
 
     @Test
     fun the_woodlot_suppresses_its_bearing_and_states_the_distribution_that_bought_the_suppression() {
-        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features())
+        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary())
         val readings = inspectPlot(scene, PlotViewer(scene.spec)).map { inspection ->
             inspection.findings.first { it.check == "shadow-direction" }
         }

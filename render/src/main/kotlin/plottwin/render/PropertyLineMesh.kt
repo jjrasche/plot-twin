@@ -44,13 +44,9 @@ private fun appendKerbAlongEdge(
     val alongNorth = (to.north.value - from.north.value) / length
     val inward = inwardNormalOf(alongEast, alongNorth, ring)
     val steps = ceil(length / PROPERTY_LINE_SAMPLE_METERS).toInt().coerceAtLeast(1)
-    // corners overlap by half a kerb width so the four joins carry no missing wedge
-    val overlap = PROPERTY_LINE_WIDTH_METERS / 2.0
     for (step in 0 until steps) {
-        val nearMeters = -overlap + (length + 2 * overlap) * step / steps
-        val farMeters = -overlap + (length + 2 * overlap) * (step + 1) / steps
-        val near = alongEdge(from, alongEast, alongNorth, nearMeters)
-        val far = alongEdge(from, alongEast, alongNorth, farMeters)
+        val near = alongEdge(from, alongEast, alongNorth, length * step / steps)
+        val far = alongEdge(from, alongEast, alongNorth, length * (step + 1) / steps)
         appendKerbSegment(vertices, triangles, near, far, inward, terrain, frame)
     }
 }

@@ -20,7 +20,7 @@ class RealParcelContactSheetTest {
 
     @Test
     fun the_real_parcel_renders_from_every_named_viewpoint_and_passes_pixel_checks() {
-        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features())
+        val scene = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val inspections = inspectPlot(scene, viewer)
         val sheet = writeContactSheet(inspections, File(System.getProperty("user.dir"), "build/real_parcel_contact_sheet.png"))
@@ -44,7 +44,7 @@ class RealParcelContactSheetTest {
 
     @Test
     fun the_dem_predicted_skyline_agrees_with_the_rendered_skyline() {
-        val scene = realParcelScene(RealParcelFixture.parcel())
+        val scene = realParcelScene(RealParcelFixture.parcel(), boundary = RealParcelFixture.boundary())
         val viewer = PlotViewer(scene.spec)
         val classifier = skyClassifierOf(scene.spec, scene.daylight)
         val comparisons = plotViewpoints(scene.state).map { viewpoint ->
@@ -87,7 +87,7 @@ class RealParcelContactSheetTest {
     @Test
     fun naip_color_visibly_changes_the_rendered_parcel() {
         val parcel = RealParcelFixture.parcel()
-        val nairColored = realParcelScene(parcel)
+        val nairColored = realParcelScene(parcel, boundary = RealParcelFixture.boundary())
         val moment = realParcelMidday(parcel)
         val daylight = daylightOverPlot(nairColored.state, moment)
         val grassOnly = nairColored.copy(spec = projectWalkableScene(nairColored.state, emptyList(), daylight))

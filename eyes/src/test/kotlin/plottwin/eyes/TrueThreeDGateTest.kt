@@ -18,9 +18,9 @@ const val CANOPY_COVER_TOLERANCE = 0.15
 
 class TrueThreeDGateTest {
 
-    private fun woodedScene() = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features())
+    private fun woodedScene() = realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary())
 
-    private fun bareScene() = realParcelScene(RealParcelFixture.parcel())
+    private fun bareScene() = realParcelScene(RealParcelFixture.parcel(), boundary = RealParcelFixture.boundary())
 
     @Test
     fun canopy_entities_raise_the_occluder_surface_so_trees_cast_shade() {
