@@ -2,11 +2,18 @@
 
 ## Now
 
+- The rendered square is NOT the parcel boundary: `compile_parcel.py` cuts a fixed 90m×90m
+  square (900 cells @ 10cm) centered on the geocoded point — it never ingests the actual
+  property line. Jim flagged this 2026-08-11 looking at the render. Fix needs a real boundary
+  polygon (the exact gap Q-013's seam contract closes — common-ground's `parcels.geojson` is
+  named as the source plot-twin would consume) OR a stopgap pull from Eaton County's own GIS.
+  Until fixed, the render is an arbitrary crop around the address point, not the parcel shape.
 - Walk Isaac's parcel in true 3D (97 lidar trees, road, real light):
   `bash gradlew :app:run --args="C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/compiled/parcel.json"`;
   see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`
 - Seam: Q-013 accepted with four contract asks + eaton-delta-twp sequencing ask (board:
-  seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009
+  seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009 — this
+  ALSO unblocks the boundary-polygon fix above, so it's now double-motivated
 - Shadow-direction check self-suppresses in a many-caster forest — the one red banner left
 
 ## Next
