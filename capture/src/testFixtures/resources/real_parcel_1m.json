@@ -24,6 +24,15 @@
   "source_epoch": "2017-12-01/2018-04-23",
   "interpolation": "bilinear from 1m 3DEP DEM to 10cm cells; ~99% of cells are interpolation, support distance up to ~0.7m (Q-002)",
   "elevation_min_meters": 262.3048037719603,
-  "elevation_max_meters": 268.2344860839966
+  "elevation_max_meters": 268.2344860839966,
+  "compiled_parcel": {
+   "path": "capture/data/compiled/parcel.json",
+   "sha256": "e9df9bf6570501852700622dedd246e9a6a21a2702c85ac1c7df881a06d23be5",
+   "columns": 380,
+   "rows": 2419,
+   "cell_size_meters": 0.1,
+   "elevation_min_meters": 262.2637700653011,
+   "elevation_max_meters": 268.26131408692726
+  }
  }
 }

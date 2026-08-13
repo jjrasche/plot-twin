@@ -1,6 +1,8 @@
 package plottwin.capture
 
 import java.nio.file.Path
+import java.security.MessageDigest
+import kotlin.io.path.readBytes
 import kotlin.io.path.readText
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -51,6 +53,22 @@ data class CaptureProvenance(
     val interpolation: String,
     @SerialName("elevation_min_meters") val elevationMinMeters: Double,
     @SerialName("elevation_max_meters") val elevationMaxMeters: Double,
+    @SerialName("compiled_parcel") val compiledParcel: CompiledParcelBinding? = null,
+)
+
+// Written into the TRACKED 1m fixture by the same compile_parcel.py pass that writes the
+// untracked 10cm cut, naming that cut's exact bytes. The fixture is what every always-run test
+// measures; the 10cm cut is what a human's eye scores. Without this they are two artifacts with
+// nothing holding them to one run, and their provenance can disagree in silence.
+@Serializable
+data class CompiledParcelBinding(
+    val path: String,
+    val sha256: String,
+    val columns: Int,
+    val rows: Int,
+    @SerialName("cell_size_meters") val cellSizeMeters: Double,
+    @SerialName("elevation_min_meters") val elevationMinMeters: Double,
+    @SerialName("elevation_max_meters") val elevationMaxMeters: Double,
 )
 
 private val parcelCodec = Json { ignoreUnknownKeys = true }
@@ -78,6 +96,34 @@ fun siteRowOf(parcel: CompiledParcel): SiteRow = SiteRow(
     longitudeDegrees = parcel.site.longitudeDegrees,
     timeZoneId = parcel.site.timeZoneId,
 )
+
+fun sha256Of(path: Path): String =
+    MessageDigest.getInstance("SHA-256").digest(path.readBytes()).joinToString("") { "%02x".format(it) }
+
+// Every way the tracked fixture's recorded binding and the compiled cut on disk fail to name one
+// compile run, listed rather than thrown, so a red gate reports all of them at once.
+fun fixtureBindingDisagreementsOf(fixture: CompiledParcel, compiledPath: Path): List<String> {
+    val bound = fixture.provenance.compiledParcel
+        ?: return listOf("the tracked 1m fixture carries no compiled-parcel binding; re-run ${CaptureCache.COMPILE_PARCEL}")
+    val compiled = readCompiledParcel(compiledPath)
+    val onDisk = CompiledParcelBinding(
+        // carried, not compared: the record names a repo-relative path, the caller holds an absolute one
+        path = bound.path,
+        sha256 = sha256Of(compiledPath),
+        columns = compiled.columns,
+        rows = compiled.rows,
+        cellSizeMeters = compiled.cellSizeMeters,
+        elevationMinMeters = compiled.provenance.elevationMinMeters,
+        elevationMaxMeters = compiled.provenance.elevationMaxMeters,
+    )
+    if (onDisk == bound) return emptyList()
+    return listOf(
+        "the 1m fixture and $compiledPath do not name one compile run",
+        "  fixture says: $bound",
+        "  on disk is:   $onDisk",
+        "  re-run ${CaptureCache.COMPILE_PARCEL} so both are written in one pass",
+    )
+}
 
 fun albedoTriplesOf(parcel: CompiledParcel): FloatArray? {
     val encoded = parcel.albedoBase64 ?: return null

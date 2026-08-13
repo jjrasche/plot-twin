@@ -29,7 +29,8 @@ object ToyPlotFixture {
 
     val toyDate: LocalDate = LocalDate.of(2026, 8, 5)
 
-    // the home 2 acres: Delta Township, Eaton County, Michigan
+    // A synthetic 90 x 90 m square, not anyone's land: the sun needs a latitude, so this one sits
+    // in Eaton Rapids Twp, ~15.6 km south of the real parcel. D-015's sweep is measured on it.
     val toySite = SiteRow(latitudeDegrees = 42.6006, longitudeDegrees = -84.6547, timeZoneId = "America/Detroit")
 
     val toyMorning: ZonedDateTime = toyDate.atTime(9, 0).atZone(zoneOf(toySite))

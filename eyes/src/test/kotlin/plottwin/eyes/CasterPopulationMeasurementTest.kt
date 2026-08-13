@@ -1,9 +1,8 @@
 package plottwin.eyes
 
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import plottwin.capture.CaptureCache
 import plottwin.capture.RealParcelFixture
 import plottwin.solvers.ToyPlotFixture
 
@@ -18,14 +17,14 @@ class CasterPopulationMeasurementTest {
         )
         val toyShares = toyMoments.flatMap { (label, moment) -> report(label, toyPlotScene(moment)) }
         val realShares = report("real-parcel-fixture", realParcelScene(RealParcelFixture.parcel(), RealParcelFixture.features(), RealParcelFixture.boundary()))
-        val compiled = Path.of(System.getProperty("user.dir"), "..", "capture", "data", "compiled", "parcel.json").normalize()
-        val fullResShares =
-            if (Files.exists(compiled)) report("real-parcel-full-res", realParcelSceneFromFile(compiled)) else emptyList()
+        val fullResShares = report("real-parcel-full-res", realParcelSceneFromFile(CaptureCache.compiledParcel()))
 
         val realArm = realShares + fullResShares
         println("[population] toy arm assumed-shares: ${toyShares.map { "%.3f".format(it) }}")
         println("[population] real arm assumed-shares: ${realArm.map { "%.3f".format(it) }}")
-        assertTrue(toyShares.isNotEmpty() && realArm.isNotEmpty(), "both arms must produce measurements")
+        assertTrue(toyShares.isNotEmpty(), "the toy arm produced no measurements")
+        assertTrue(fullResShares.isNotEmpty(), "the full-res arm produced no measurements - the claim names the 10cm woodlot")
+        assertTrue(realShares.isNotEmpty(), "the fixture arm produced no measurements")
 
         val toyWithShade = toyShares.filter { it > 0.0 }
         assertTrue(
