@@ -13,10 +13,11 @@ private fun syntheticParcelJson(columns: Int = 3, rows: Int = 2): String {
     val albedo = ByteArray(columns * rows * 3) { (it * 7 % 256).toByte() }
     return """
         {
-          "site": {"latitude_degrees": 42.6006, "longitude_degrees": -84.6547, "time_zone_id": "America/Detroit"},
+          "site": {"latitude_degrees": 42.68317626142, "longitude_degrees": -84.619591093007, "time_zone_id": "America/Detroit"},
           "columns": $columns,
           "rows": $rows,
           "cell_size_meters": 0.1,
+          "frame": {"crs": "EPSG:26916", "origin_easting_meters": 695000.7, "origin_northing_meters": 4728383.3},
           "heights_base64": "${encodeHeightsBase64(heights)}",
           "albedo_base64": "${Base64.getEncoder().encodeToString(albedo)}",
           "provenance": {

@@ -52,7 +52,7 @@ private fun bedSunHours(state: CurrentState): Double {
     val hours = requireNotNull(UNCACHED_SUNSHED_FIELD.directSunHoursOf(state, summerDay, Surface.Measured))
     val grid = state.terrain!!.grid
     return (0 until grid.cellCount)
-        .filter { cell -> plottwin.geometry.isInsidePolygon(grid.centerOf(cell), bedFootprint) }
+        .filter { cell -> plottwin.worldstate.isInsidePolygon(grid.centerOf(cell), bedFootprint) }
         .minOf { cell -> hours[cell].toDouble() }
 }
 
@@ -90,7 +90,7 @@ class SunshedSweepTest {
         val violations = runSolvers(world, listOf(constraint))
         val sunshed = violations.single { it.ruleName == "bed-sun" }
         assertEquals(14.0 - bedSunHours(state), sunshed.magnitude, 1e-3)
-        assertTrue(plottwin.geometry.isInsidePolygon(sunshed.location, bedFootprint), "the violation should land in the bed")
+        assertTrue(plottwin.worldstate.isInsidePolygon(sunshed.location, bedFootprint), "the violation should land in the bed")
     }
 
     @Test

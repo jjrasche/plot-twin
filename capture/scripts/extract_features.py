@@ -34,6 +34,7 @@ MAX_CROWN_RADIUS_METERS = 6.0
 
 ROAD_BRIGHTNESS_SHARE = 0.75
 ROAD_GRAYNESS_FLOOR = 0.5
+ROAD_BARE_CEILING_METERS = 0.5
 
 WATER_NIR_CEILING = 60.0
 WATER_BRIGHTNESS_CEILING = 90.0
@@ -293,9 +294,10 @@ def largest_blob(mask: numpy.ndarray) -> list[tuple[int, int]] | None:
     return best
 
 
-def extract_road(naip: dict, inside: numpy.ndarray, ring_local: list[list[float]]) -> list[dict]:
-    """The road is the brightest gray east-west band; only the part on this plot is logged, so
-    the corridor ring is the band clipped to the property line."""
+def extract_road(naip: dict, chm: numpy.ndarray, inside: numpy.ndarray, ring_local: list[list[float]]) -> list[dict]:
+    """A road surface is bright, gray AND bare: pavement carries no canopy. Over a deep parcel
+    the brightest gray band is sunlit treetops, so brightness alone would log a woodlot as a
+    road. Only the part on this plot is logged, so the corridor is the band clipped to the line."""
     brightness = (naip["red"] + naip["green"] + naip["blue"]) / 3
     grayness = 1 - (
         numpy.abs(naip["red"] - naip["green"])
@@ -303,15 +305,15 @@ def extract_road(naip: dict, inside: numpy.ndarray, ring_local: list[list[float]
         + numpy.abs(naip["red"] - naip["blue"])
     ) / (brightness + 1)
     on_plot_rows = inside.any(axis=1)
-    row_brightness = numpy.where(inside, brightness, numpy.nan)
-    row_grayness = numpy.where(inside, grayness, numpy.nan)
     with numpy.errstate(invalid="ignore"):
-        mean_brightness = numpy.nanmean(row_brightness, axis=1)
-        mean_grayness = numpy.nanmean(row_grayness, axis=1)
+        mean_brightness = numpy.nanmean(numpy.where(inside, brightness, numpy.nan), axis=1)
+        mean_grayness = numpy.nanmean(numpy.where(inside, grayness, numpy.nan), axis=1)
+        mean_canopy = numpy.nanmean(numpy.where(inside, chm, numpy.nan), axis=1)
     road_rows = numpy.flatnonzero(
         on_plot_rows
         & (mean_brightness >= ROAD_BRIGHTNESS_SHARE * numpy.nanmax(mean_brightness))
         & (mean_grayness >= ROAD_GRAYNESS_FLOOR)
+        & (mean_canopy <= ROAD_BARE_CEILING_METERS)
     )
     if road_rows.size == 0:
         return []
@@ -416,7 +418,7 @@ def main() -> None:
     smooth_chm = smoothed(chm)
     inside = inside_boundary_mask(frame, ring_local)
     naip = naip_grids(frame)
-    road = extract_road(naip, inside, ring_local)
+    road = extract_road(naip, chm, inside, ring_local)
     trees, maxima_count, inside_maxima_count = extract_trees(chm, smooth_chm, road, ring_local)
     structures = extract_structures(points, ring_local)
     water = extract_water(points, naip, chm, inside, ring_local)
@@ -459,8 +461,8 @@ def main() -> None:
                 "local maxima on 3x3-mean-smoothed CHM >= 3m inside the property line, greedy "
                 "radius suppression, crown radius from 8-ray half-height walk; structures = "
                 "class-6 points on the plot (absence is a finding); water = class-9 else "
-                "contiguous low-NIR dark NAIP blob inside the line; road = brightest gray NAIP "
-                "row band clipped to the property line"
+                "contiguous low-NIR dark NAIP blob inside the line; road = brightest gray BARE "
+                "NAIP row band inside the line, clipped to the property line"
             ),
             "horizontal_crs": UTM_ZONE_16N,
             "vertical_datum": "NAVD88 (Geoid12B), lidar feet converted to meters",

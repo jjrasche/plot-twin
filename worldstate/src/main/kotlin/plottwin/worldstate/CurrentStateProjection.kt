@@ -26,6 +26,11 @@ data class CurrentState(
 ) {
     val pendingOps: List<OpRow> get() = pendingOpsBySeq.values.toList()
 
+    val parcelMask: ParcelMask? by lazy {
+        val boundary = parcelBoundary ?: return@lazy null
+        terrain?.let { measured -> parcelMaskOf(boundary, measured.grid) }
+    }
+
     fun terrainOn(surface: Surface): ProjectedTerrain? = when (surface) {
         Surface.Measured -> terrain
         is Surface.Proposed -> proposedTerrain[surface.name]
@@ -42,8 +47,10 @@ data class CurrentState(
     }
 }
 
-fun projectCurrentState(log: List<LoggedRow>): CurrentState =
-    log.fold(CurrentState.EMPTY) { state, logged -> applyRow(state, logged) }
+fun projectCurrentState(log: List<LoggedRow>): CurrentState {
+    requireOneGroundFrame(log)
+    return log.fold(CurrentState.EMPTY) { state, logged -> applyRow(state, logged) }
+}
 
 private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = when (val row = logged.row) {
     is EntityRow -> placeEntity(state, row.entityName, row.footprint, row.height)

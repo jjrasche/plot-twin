@@ -22,6 +22,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
     private val refsCodec = ListSerializer(RowRef.serializer())
     private val ruleTriggers = mutableListOf<(RuleRow) -> Unit>()
     private val opTriggers = mutableListOf<(Long, OpRow) -> Unit>()
+    private val boundaryWatch = BoundaryWatch()
 
     companion object {
         const val BEFORE_FIRST_SEQ = 0L
@@ -41,6 +42,7 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
         requireGeometryWriter(row, writer)
         if (row is OpRow) requireCoordinateFreeSlots(row)
         if (row is EarthworkRow && !isConserved(row)) throw EarthworkNotConserved(row)
+        if (row is TerrainDiffRow) requireDiffInsideBoundary(row)
         val seq = insertRow(row, writer, refs)
         notifyRuleTriggers(row)
         notifyOpTriggers(seq, row)
@@ -95,6 +97,12 @@ class WorldLog private constructor(private val connection: Connection) : AutoClo
                 """.trimIndent()
             )
         }
+    }
+
+    private fun requireDiffInsideBoundary(diff: TerrainDiffRow) {
+        val mask = boundaryWatch.maskOver(::readRowsAfter) ?: return
+        val violations = outsideBoundaryViolationsOf(diff, mask)
+        if (violations.isNotEmpty()) throw TerrainDiffOutsideBoundary(violations)
     }
 
     private fun requireGeometryWriter(row: WorldRow, writer: WriterRole) {

@@ -1,8 +1,9 @@
 package plottwin.capture
 
-// 90x90 cells at 1m, compiled by capture/scripts/compile_parcel.py from the real 3DEP tile + NAIP clip
+// The parcel boundary's bounding box at 1m, compiled by capture/scripts/compile_parcel.py from the
+// real 3DEP tile + NAIP clip; the 10cm cut of the same bbox is capture/data/compiled/parcel.json
 object RealParcelFixture {
-    const val RESOURCE = "/real_parcel_1m_90x90.json"
+    const val RESOURCE = "/real_parcel_1m.json"
     const val FEATURES_RESOURCE = "/real_parcel_features.json"
     const val BOUNDARY_RESOURCE = "/real_parcel_boundary.json"
 

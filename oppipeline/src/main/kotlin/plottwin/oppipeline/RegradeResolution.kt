@@ -1,7 +1,7 @@
 package plottwin.oppipeline
 
 import kotlin.math.max
-import plottwin.geometry.isInsidePolygon
+import plottwin.worldstate.isInsidePolygon
 import plottwin.worldstate.CONSERVATION_TOLERANCE_CUBIC_METERS
 import plottwin.worldstate.EarthworkRow
 import plottwin.worldstate.FactorProvenance

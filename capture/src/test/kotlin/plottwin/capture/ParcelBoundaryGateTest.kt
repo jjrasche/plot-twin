@@ -7,17 +7,19 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import plottwin.geometry.clipRingToBox
 import plottwin.geometry.distanceToSegment
-import plottwin.geometry.isInsidePolygon
+import plottwin.worldstate.isInsidePolygon
 import plottwin.geometry.isSimpleRing
 import plottwin.geometry.ringAreaSquareMeters
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters
 import plottwin.worldstate.ParcelBoundaryRow
+import plottwin.worldstate.gridExtentOf
 import plottwin.worldstate.WorldLog
 
 private const val SQUARE_METERS_PER_ACRE = 4046.8564224
 private const val AREA_AGREEMENT_SHARE = 0.01
 private const val ADDRESS_POINT_BAND_METERS = 10.0
+private const val GRID_CELL_SIZE_METERS = 0.1
 
 private fun groundPoint(east: Double, north: Double) = GroundPoint(Meters(east), Meters(north))
 
@@ -84,9 +86,7 @@ class ParcelBoundaryGateTest {
 
     @Test
     fun the_geocoded_address_point_sits_just_outside_the_south_line_not_inside_the_parcel() {
-        val parcel = RealParcelFixture.parcel()
-        val squareSideMeters = parcel.columns * parcel.cellSizeMeters
-        val addressPoint = groundPoint(squareSideMeters / 2.0, squareSideMeters / 2.0)
+        val addressPoint = addressPointOf(RealParcelFixture.boundary())
         val ring = loggedBoundary().ring
         val offset = distanceToRing(addressPoint, ring)
         println("[boundary] the geocoded address point sits %.3f m outside the property line".format(offset))
@@ -95,22 +95,22 @@ class ParcelBoundaryGateTest {
     }
 
     @Test
-    fun the_ninety_metre_square_covered_only_a_sliver_of_the_real_parcel() {
-        val parcel = RealParcelFixture.parcel()
-        val squareSideMeters = parcel.columns * parcel.cellSizeMeters
-        val ring = loggedBoundary().ring
+    fun the_grid_bounding_box_holds_the_whole_parcel_and_the_parcel_most_of_the_box() {
+        val boundary = loggedBoundary()
+        val extent = gridExtentOf(boundary, Meters(GRID_CELL_SIZE_METERS))
+        val boxEast = extent.columns * GRID_CELL_SIZE_METERS
+        val boxNorth = extent.rows * GRID_CELL_SIZE_METERS
+        val ring = boundary.ring
         val parcelArea = ringAreaSquareMeters(ring)
-        val overlapArea = ringAreaSquareMeters(
-            clipRingToBox(ring, groundPoint(0.0, 0.0), groundPoint(squareSideMeters, squareSideMeters))
-        )
-        val squareArea = squareSideMeters * squareSideMeters
+        val heldArea = ringAreaSquareMeters(clipRingToBox(ring, groundPoint(0.0, 0.0), groundPoint(boxEast, boxNorth)))
+        val boxArea = boxEast * boxNorth
         println(
-            "[boundary] the %.0fm square held %.1f m2 of the %.1f m2 parcel: %.4f of the parcel, %.4f of the square".format(
-                squareSideMeters, overlapArea, parcelArea, overlapArea / parcelArea, overlapArea / squareArea,
+            "[boundary] the %.1f x %.1f m grid box holds %.1f m2 of the %.1f m2 parcel: %.4f of the parcel, %.4f of the box".format(
+                boxEast, boxNorth, heldArea, parcelArea, heldArea / parcelArea, heldArea / boxArea,
             )
         )
-        assertTrue(overlapArea / parcelArea < 0.25, "the square covered ${overlapArea / parcelArea} of the parcel")
-        assertTrue(overlapArea / squareArea < 0.25, "the parcel filled ${overlapArea / squareArea} of the square")
+        assertEquals(parcelArea, heldArea, 1e-6, "the grid box clips the property line")
+        assertTrue(heldArea / boxArea > 0.75, "the parcel fills only ${heldArea / boxArea} of its own bounding box")
     }
 
     @Test

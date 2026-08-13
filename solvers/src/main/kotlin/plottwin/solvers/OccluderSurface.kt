@@ -2,7 +2,7 @@ package plottwin.solvers
 
 import kotlin.math.ceil
 import kotlin.math.floor
-import plottwin.geometry.isInsidePolygon
+import plottwin.worldstate.isInsidePolygon
 import plottwin.worldstate.CurrentState
 import plottwin.worldstate.GroundPoint
 import plottwin.worldstate.Meters

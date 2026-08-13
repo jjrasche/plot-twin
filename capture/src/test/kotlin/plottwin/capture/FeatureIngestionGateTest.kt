@@ -18,13 +18,16 @@ class FeatureIngestionGateTest {
     }
 
     @Test
-    fun tree_count_lands_within_thirty_percent_of_the_chm_crown_maxima() {
+    fun tree_count_lands_within_thirty_percent_of_the_crown_maxima_inside_the_property_line() {
         val receipts = RealParcelFixture.features().receipts
         val treeCount = ingestedState().entities.keys.count(::isTreeEntity)
-        println("[features] $treeCount tree rows vs ${receipts.crownMaximaCount} CHM crown maxima")
+        println(
+            "[features] $treeCount tree rows vs ${receipts.insideBoundaryCrownMaximaCount} CHM crown maxima " +
+                "inside the line (${receipts.crownMaximaCount} over the whole extent)"
+        )
         assertTrue(
-            treeCount >= receipts.crownMaximaCount * 0.7 && treeCount <= receipts.crownMaximaCount * 1.3,
-            "$treeCount trees outside +-30% of ${receipts.crownMaximaCount} crown maxima",
+            treeCount >= receipts.insideBoundaryCrownMaximaCount * 0.7 && treeCount <= receipts.insideBoundaryCrownMaximaCount * 1.3,
+            "$treeCount trees outside +-30% of ${receipts.insideBoundaryCrownMaximaCount} crown maxima inside the line",
         )
         assertEquals(receipts.treeCount, treeCount, "log tree rows drifted from the extraction receipt")
     }
@@ -58,10 +61,29 @@ class FeatureIngestionGateTest {
     }
 
     @Test
-    fun the_road_corridor_lands_as_a_capture_entity_row() {
-        val state = ingestedState()
-        val road = state.entities[ROAD_ENTITY_NAME]
-        assertTrue(road != null && road.footprint.size >= 3, "no road corridor entity landed")
+    fun the_road_corridor_lands_as_an_entity_row_exactly_when_pavement_is_on_the_plot() {
+        val features = RealParcelFixture.features()
+        val road = ingestedState().entities[ROAD_ENTITY_NAME]
+        println("[features] road corridors extracted inside the line: ${features.road.size}")
+        assertEquals(features.road.isNotEmpty(), road != null, "log road rows drifted from extraction")
+        assertTrue(road == null || road.footprint.size >= 3, "a road corridor landed without a footprint")
+    }
+
+    @Test
+    fun the_road_right_of_way_lies_south_of_this_property_line() {
+        val features = RealParcelFixture.features()
+        val southernmostTreeNorth = features.trees.minOf { it.northMeters }
+        println(
+            "[features] W Jolly Rd is off-plot: the address point sits " +
+                "%.3f m north of the frame origin, and the plot's southernmost trunk is at %.1f m".format(
+                    RealParcelFixture.boundary().addressPointLocal.northMeters, southernmostTreeNorth,
+                )
+        )
+        assertTrue(
+            RealParcelFixture.boundary().addressPointLocal.northMeters < 0.0,
+            "the geocoded address point is inside the grid, so the road may be on the plot after all",
+        )
+        assertTrue(features.road.isEmpty(), "a road corridor was extracted from ground the property line excludes")
     }
 
     @Test
