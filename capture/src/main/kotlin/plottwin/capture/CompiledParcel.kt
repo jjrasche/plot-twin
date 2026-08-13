@@ -107,6 +107,7 @@ fun fixtureBindingDisagreementsOf(fixture: CompiledParcel, compiledPath: Path): 
         ?: return listOf("the tracked 1m fixture carries no compiled-parcel binding; re-run ${CaptureCache.COMPILE_PARCEL}")
     val compiled = readCompiledParcel(compiledPath)
     val onDisk = CompiledParcelBinding(
+        // carried, not compared: the record names a repo-relative path, the caller holds an absolute one
         path = bound.path,
         sha256 = sha256Of(compiledPath),
         columns = compiled.columns,

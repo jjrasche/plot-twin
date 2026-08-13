@@ -65,7 +65,7 @@ class RealParcelContactSheetTest {
     }
 
     @Test
-    fun the_full_resolution_compiled_parcel_renders_offline_when_the_capture_cache_is_populated() {
+    fun the_full_resolution_compiled_parcel_renders_offline_from_the_cut_the_fixture_names() {
         val compiled = CaptureCache.compiledParcel()
         // Asserted before a pixel is drawn: a sheet rendered from a cut the tracked fixture does
         // not name is an image no reader of this repo can reproduce, which is what a receipt is for.
