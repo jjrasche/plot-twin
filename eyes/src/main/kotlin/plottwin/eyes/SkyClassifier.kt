@@ -60,6 +60,14 @@ fun skyClassifierOf(spec: WalkableSceneSpec, daylight: Daylight): SkyClassifier?
     return SkyClassifier(backdrop.map(::argbOfHex) + argbOfHex(hexOf(daylight.horizonTint)))
 }
 
+// The gradient question is narrower than the backdrop question: banding is a property of the
+// dome's own ramp, and the flat surround is a second surface whose junction with it says nothing
+// about how smoothly the sky was painted.
+fun domeClassifierOf(spec: WalkableSceneSpec, daylight: Daylight): SkyClassifier? {
+    val dome = spec.meshesByEntity[SKY_ENTITY_ID] ?: return null
+    return SkyClassifier(dome.triColors.toHashSet().map(::argbOfHex) + argbOfHex(hexOf(daylight.horizonTint)))
+}
+
 fun argbOfHex(hex: String): Int = (0xFF000000.toInt()) or hex.toInt(16)
 
 fun terrainAndEntityMeshesOf(spec: WalkableSceneSpec) =

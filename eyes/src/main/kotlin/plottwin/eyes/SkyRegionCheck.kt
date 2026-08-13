@@ -44,7 +44,12 @@ fun observedSkylineOf(image: BufferedImage, classifier: SkyClassifier): IntArray
 // Porous-scene reading: a woodlot shows sky through crown gaps below the topmost skyline,
 // so the claim becomes per-pixel — wherever no solid geometry projects the sky must show,
 // and wherever solid geometry projects it must NOT read as sky.
-fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, solid: VisibleSurface): SkyRegionReading {
+fun skyRegionReadingOf(
+    image: BufferedImage,
+    classifier: SkyClassifier,
+    solid: VisibleSurface,
+    gradientClassifier: SkyClassifier = classifier,
+): SkyRegionReading {
     val sky = skyMaskOf(image, classifier)
     val unowned = BooleanArray(sky.size) { solid.owner[it] == NO_SURFACE }
     // the painter antialiases edges the mask rasterizer draws hard, so both regions pull
@@ -66,7 +71,8 @@ fun skyRegionReadingOf(image: BufferedImage, classifier: SkyClassifier, solid: V
             if (sky[pixel]) solidSky++
         }
     }
-    val interior = intersect(erodedOnce(sky, image.width, image.height), unownedInterior)
+    val gradient = skyMaskOf(image, gradientClassifier)
+    val interior = intersect(erodedOnce(gradient, image.width, image.height), unownedInterior)
     return SkyRegionReading(
         coverageAboveSkyline = if (inspected == 0) 1.0 else covered.toDouble() / inspected,
         maxAdjacentLuminanceJump = maxAdjacentJumpOverInterior(image, interior),

@@ -12,6 +12,7 @@ import plottwin.capture.albedoTriplesOf
 import plottwin.capture.parcelBoundaryRowOf
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
+import plottwin.render.TERRAIN_ENTITY_ID
 import plottwin.worldstate.GridExtent
 import plottwin.worldstate.ROAD_ENTITY_NAME
 import plottwin.worldstate.gridExtentOf
@@ -94,19 +95,26 @@ class RealParcelContactSheetTest {
         requireNotNull(albedoTriplesOf(parcel)) { "fixture carries no NAIP albedo" }
 
         val overhead = plotViewpoints(nairColored.state).first { it.name == "overhead" }
-        val withNaip = PlotViewer(nairColored.spec).capture(overhead.pose)
+        val viewer = PlotViewer(nairColored.spec)
+        val withNaip = viewer.capture(overhead.pose)
         val withGrass = PlotViewer(grassOnly.spec).capture(overhead.pose)
+        // Only the parcel's own ground carries NAIP, so only its own pixels can answer whether the
+        // texture arrived: the sky and the neutral surround are identical in both arms and would
+        // otherwise dilute the share, or worse, carry it.
+        val groundOnly = nairColored.spec.meshesByEntity.filterKeys { it == TERRAIN_ENTITY_ID }
+        val ground = rasterizeVisibleSurfaces(groundOnly, viewer.projectorFor(overhead.pose))
         var differing = 0
         var compared = 0
-        for (row in 0 until withNaip.height step 2) {
-            for (column in 0 until withNaip.width step 2) {
-                compared++
-                if (withNaip.getRGB(column, row) != withGrass.getRGB(column, row)) differing++
-            }
+        for (pixel in ground.owner.indices) {
+            if (ground.owner[pixel] == NO_SURFACE) continue
+            compared++
+            val column = pixel % ground.width
+            val row = pixel / ground.width
+            if (withNaip.getRGB(column, row) != withGrass.getRGB(column, row)) differing++
         }
         val differingShare = differing.toDouble() / compared
-        println("[real-parcel] NAIP vs grass albedo: %.1f%% of sampled pixels differ".format(differingShare * 100))
-        assertTrue(differingShare > 0.2, "NAIP albedo changed only ${differingShare * 100}% of pixels — texture not visible")
+        println("[real-parcel] NAIP vs grass albedo: %.1f%% of %d ground pixels differ".format(differingShare * 100, compared))
+        assertTrue(differingShare > 0.9, "NAIP albedo changed only ${differingShare * 100}% of the parcel's ground — texture not visible")
     }
 
 }

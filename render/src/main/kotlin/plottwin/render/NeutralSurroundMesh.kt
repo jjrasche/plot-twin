@@ -9,10 +9,19 @@ import plottwin.worldstate.Meters
 import plottwin.worldstate.TerrainGrid
 
 const val SURROUND_ENTITY_ID = "surround"
-const val SURROUND_SPOKE_CELLS = 96
+const val SURROUND_SPOKE_CELLS = 288
 const val SURROUND_RING_CELLS = 28
 const val SURROUND_GROUND_BLEND_RINGS = 3
-val SURROUND_ALBEDO = Rgb(0.34f, 0.35f, 0.32f)
+// The ground mesh samples the ring by row and the surround by spoke, so the two polylines agree
+// on the line but not on their chords between samples. The surround starts one render cell inside
+// the line and the ground, drawn after it, covers the overlap - a seam that cannot open rather
+// than a seam that is usually closed.
+const val SURROUND_SEAM_OVERLAP_CELLS = 1.0
+// haze reaches half strength this far beyond the property line, as a share of the dome's radius
+const val SURROUND_HAZE_SCALE_SHARE = 0.12f
+// Aerial perspective: distant land goes blue, and a blue-dominant surround also sits clear of the
+// green-and-earth palette the parcel itself draws, so no pixel of one can be read as the other.
+val SURROUND_ALBEDO = Rgb(0.27f, 0.31f, 0.42f)
 
 // The neighbours' land drawn as what it is TO THIS PLOT: flat, untextured, unshadowed ground
 // that carries a horizon, so the parcel stops reading as a cut-out slab hanging in sky. It is
@@ -28,8 +37,9 @@ fun neutralSurroundMeshOf(
 ): Scene3dMesh {
     val centre = plotCentreOf(terrain)
     val datum = groundDatumOf(terrain)
+    val seamOverlap = terrain.cellSize.value * SURROUND_SEAM_OVERLAP_CELLS
     val spokes = List(SURROUND_SPOKE_CELLS + 1) { spokeVertex ->
-        surroundSpokeOf(ring, centre, terrain, 2.0 * Math.PI * spokeVertex / SURROUND_SPOKE_CELLS)
+        surroundSpokeOf(ring, centre, terrain, 2.0 * Math.PI * spokeVertex / SURROUND_SPOKE_CELLS, seamOverlap)
     }
     val rim = skyDomeRadiusOf(terrain).toDouble()
     val vertices = ArrayList<Float>((SURROUND_RING_CELLS + 1) * spokes.size * 3)
@@ -43,7 +53,7 @@ fun neutralSurroundMeshOf(
     }
     return Scene3dMesh(
         vertices = vertices,
-        triColors = surroundColorsOf(daylight),
+        triColors = surroundColorsOf(spokes, rim, skyDomeRadiusOf(terrain) * SURROUND_HAZE_SCALE_SHARE, daylight),
         gridCellsX = SURROUND_SPOKE_CELLS,
         gridCellsZ = SURROUND_RING_CELLS,
     )
@@ -70,10 +80,12 @@ private fun surroundSpokeOf(
     centre: GroundPoint,
     terrain: TerrainGrid,
     azimuth: Double,
+    seamOverlap: Double,
 ): SurroundSpoke {
     val east = sin(azimuth)
     val north = cos(azimuth)
-    val reach = ringExitReachOf(ring, centre, east, north)
+    val exitReach = ringExitReachOf(ring, centre, east, north)
+    val reach = (exitReach - seamOverlap).coerceAtLeast(exitReach / 2.0)
     val exit = GroundPoint(
         east = Meters(centre.east.value + east * reach),
         north = Meters(centre.north.value + north * reach),
@@ -122,16 +134,31 @@ private fun surroundHeightAt(innerHeight: Float, datum: Float, ringVertex: Int):
     return innerHeight + (datum - innerHeight) * towardDatum
 }
 
-// Haze, baked radially: every pose looks at the plot, so distance from the plot is distance from
-// the eye. The rim resolves to exactly the horizon tint, which is also the scene background, so
-// the ground dissolves into the sky rather than ending at a visible edge.
-private fun surroundColorsOf(daylight: Daylight): List<String> {
+// Haze, baked as distance beyond the property line: every pose looks at the plot, so ground
+// further past the line is ground further from the eye. It resolves to the horizon tint, which is
+// also the scene background, so the ground dissolves into the sky instead of ending at an edge.
+private fun surroundColorsOf(
+    spokes: List<SurroundSpoke>,
+    rim: Double,
+    hazeScale: Float,
+    daylight: Daylight,
+): List<String> {
     val lit = litColor(SURROUND_ALBEDO, SceneDirection(0f, 1f, 0f), sunlitFraction = 1f, skyOpenness = 1f, daylight = daylight)
-    val ringColors = List(SURROUND_RING_CELLS) { ring ->
-        hexOf(hazedToward(lit, daylight.horizonTint, (ring + 1).toFloat() / SURROUND_RING_CELLS))
+    val triColors = ArrayList<String>(SURROUND_RING_CELLS * SURROUND_SPOKE_CELLS * 2)
+    for (ring in 0 until SURROUND_RING_CELLS) {
+        for (spoke in 0 until SURROUND_SPOKE_CELLS) {
+            val inner = spokes[spoke].innerReach
+            val beyondLine = reachAt(inner, rim, ring) + reachAt(inner, rim, ring + 1) - 2 * inner
+            val color = hexOf(hazedToward(lit, daylight.horizonTint, hazeAt(beyondLine.toFloat() / 2f, hazeScale)))
+            triColors.add(color)
+            triColors.add(color)
+        }
     }
-    return ringColors.flatMap { color -> List(SURROUND_SPOKE_CELLS * 2) { color } }
+    return triColors
 }
+
+private fun hazeAt(beyondLine: Float, hazeScale: Float): Float =
+    1f - kotlin.math.exp(-beyondLine / hazeScale)
 
 private fun hazedToward(near: Rgb, horizon: Rgb, haze: Float): Rgb = Rgb(
     red = near.red + (horizon.red - near.red) * haze,

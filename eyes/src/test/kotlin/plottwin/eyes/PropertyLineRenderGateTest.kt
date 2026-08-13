@@ -8,6 +8,8 @@ import kotlin.test.assertTrue
 import plottwin.capture.RealParcelFixture
 import plottwin.capture.parcelBoundaryRowOf
 import plottwin.render.PROPERTY_LINE_ENTITY_ID
+import plottwin.render.SKY_ENTITY_ID
+import plottwin.render.SURROUND_ENTITY_ID
 import plottwin.render.PROPERTY_LINE_WIDTH_METERS
 import plottwin.render.TERRAIN_ENTITY_ID
 import plottwin.render.groundHeightAt
@@ -21,6 +23,15 @@ import plottwin.worldstate.isTreeEntity
 const val SILHOUETTE_AREA_TOLERANCE = 0.02
 const val BOUNDARY_EXTENT_TOLERANCE_METERS = 0.05
 const val OVERHEAD_ACROSS_FRAME_FLOOR = 0.7
+// the painter antialiases the edge the mask rasterizer draws hard, so judgements about what lies
+// under the ground start two pixels below it
+const val PAINTER_EDGE_PIXELS = 2
+
+fun chebyshevBetween(first: Int, second: Int): Int = maxOf(
+    kotlin.math.abs(((first shr 16) and 0xFF) - ((second shr 16) and 0xFF)),
+    kotlin.math.abs(((first shr 8) and 0xFF) - ((second shr 8) and 0xFF)),
+    kotlin.math.abs((first and 0xFF) - (second and 0xFF)),
+)
 
 class PropertyLineRenderGateTest {
 
@@ -142,6 +153,57 @@ class PropertyLineRenderGateTest {
         assertTrue(outside == 0, "$outside drawn ground cells fall outside the property line")
     }
 
+    // The surround only reads as "not mine" if no pixel of it can be confused with the parcel.
+    // Measured on the palettes rather than on one frame, so the margin is a property of the
+    // render and not of a camera angle.
+    @Test
+    fun the_surrounds_palette_stays_clear_of_every_colour_the_parcel_draws() {
+        val scene = parcelScene()
+        val surround = requireNotNull(scene.spec.meshesByEntity[SURROUND_ENTITY_ID]) { "no surround was drawn" }
+        val parcelColors = (scene.spec.meshesByEntity - SURROUND_ENTITY_ID - SKY_ENTITY_ID)
+            .values
+            .flatMap { it.triColors }
+            .toSet()
+            .map(::argbOfHex)
+        val surroundColors = surround.triColors.toSet().map(::argbOfHex)
+        val closestPair = surroundColors
+            .flatMap { backdrop -> parcelColors.map { parcel -> Triple(chebyshevBetween(backdrop, parcel), backdrop, parcel) } }
+            .minBy { it.first }
+        val closest = closestPair.first
+        println(
+            "[line] surround palette ${surroundColors.size} colours, parcel palette ${parcelColors.size}, closest pair $closest apart (tolerance $SKY_MATCH_TOLERANCE): surround %06x vs parcel %06x"
+                .format(closestPair.second and 0xFFFFFF, closestPair.third and 0xFFFFFF),
+        )
+        assertTrue(
+            closest > SKY_MATCH_TOLERANCE,
+            "a surround colour sits $closest from a colour the parcel draws, inside the classifier's $SKY_MATCH_TOLERANCE tolerance",
+        )
+    }
+
+    // The parcel may not hover: below the ground's own silhouette there must be neighbour ground,
+    // never open sky, or the frame reads as a cut-out prop on a table.
+    @Test
+    fun no_pose_sees_sky_beneath_the_parcels_own_ground() {
+        val scene = parcelScene()
+        val viewer = PlotViewer(scene.spec)
+        val withBackdrop = scene.spec.meshesByEntity - SKY_ENTITY_ID
+        val groundOwner = ownerIndexOf(withBackdrop, TERRAIN_ENTITY_ID)
+        for (viewpoint in plotViewpoints(scene.state)) {
+            val surface = rasterizeVisibleSurfaces(withBackdrop, viewer.projectorFor(viewpoint.pose))
+            var holes = 0
+            for (column in 0 until surface.width) {
+                val lowestGroundRow = (surface.height - 1 downTo 0)
+                    .firstOrNull { row -> surface.owner[row * surface.width + column] == groundOwner }
+                    ?: continue
+                for (row in lowestGroundRow + PAINTER_EDGE_PIXELS until surface.height) {
+                    if (surface.owner[row * surface.width + column] == NO_SURFACE) holes++
+                }
+            }
+            println("[line] %-22s %d pixels of open sky beneath the parcel's ground".format(viewpoint.name, holes))
+            assertTrue(holes == 0, "${viewpoint.name} sees $holes pixels of sky under the parcel")
+        }
+    }
+
     // Omitting the neighbours' land leaves the parcel standing in void wherever their ground
     // would have carried the horizon. This measures how much of each frame that is, so the
     // omission ruling can be re-read against a number instead of an impression.
@@ -149,10 +211,12 @@ class PropertyLineRenderGateTest {
     fun the_void_the_omission_leaves_under_each_frame_is_measured() {
         val scene = parcelScene()
         val viewer = PlotViewer(scene.spec)
-        val meshes = terrainAndEntityMeshesOf(scene.spec)
+        val plotMeshes = terrainAndEntityMeshesOf(scene.spec)
+        val withBackdrop = scene.spec.meshesByEntity - SKY_ENTITY_ID
         for (viewpoint in plotViewpoints(scene.state)) {
-            val surface = rasterizeVisibleSurfaces(meshes, viewer.projectorFor(viewpoint.pose))
-            val skyline = predictedSkylineOf(surface)
+            val projector = viewer.projectorFor(viewpoint.pose)
+            val skyline = predictedSkylineOf(rasterizeVisibleSurfaces(plotMeshes, projector))
+            val surface = rasterizeVisibleSurfaces(withBackdrop, projector)
             var belowSkyline = 0
             var voidBelowSkyline = 0
             for (column in 0 until surface.width) {
