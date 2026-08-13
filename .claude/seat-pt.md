@@ -380,3 +380,80 @@ receipt is unverified over the new extent. `CompiledParcelGateTest.kt:16` still 
 -84.6547 (Eaton Rapids, ~15.6 km south) — folded into charter 21.
 Ledger gaps: no decision entry exists for the shadow check's promotion from advisory to a real
 gate, nor for the interim county source. Both load-bearing, both living only in this seat file.
+
+### Charter 21 landed WEAK, and the lead rejected its recommendation (2026-08-13)
+Extent, mask, frame guard and terrain-diff guard all measure and are strong work. Three eyes
+checks red: skyline-coverage 0.11-0.14 on overhead/orbit-1/orbit-3 against a 0.50 bound, and
+orbit roughness wooded 3.455 vs bare 3.667 over 82 drawn columns. The lane recommended fixing the
+checks, reasoning that a 1:6.4 plot cannot fill a square frame's width.
+
+The lead looked at `real_parcel_full_res_contact_sheet.png` and ruled the opposite. Overhead reads
+as the real parcel - a deep narrow wooded ribbon, and that IS the run's win. Walk-height-in-woods
+is the strongest frame this project has made. But orbit-1 and orbit-3 show the plot as a small
+tuft floating in a large empty sky, and orbit-2/orbit-4 as a thin sliver near the horizon: a model
+on a table, not a place. Those poses were framed for a 90m square with a 127 m diagonal against a
+parcel now 242 m on its long axis. So the poses are broken and the coverage check is correctly
+reporting it. Charter 22 is bound not to touch the bound, the coverage formula or the roughness
+comparison to make them pass - one charter after the shadow lane found its own red had been
+excused by check NAME in an assertion, silencing a truthful instrument is the one move forbidden.
+Charter 21 stays unmerged; 22 branches off it and the two land together green.
+
+### Cell budget, ruled (charter 21's one question)
+919,220 cells at 10cm, 13.5% over CLAUDE.md's 810K. The 810K figure descends from the stale
+"2 acres, square" premise the ledger audit flagged, so it is the premise that was wrong, not the
+extent. D-015 measured one sunshed sweep at 20 ms over 810K cells, so ~23 ms here - not a limit.
+The budget line gets restated as approximate; irregular extent is NOT triggered. Its real trigger
+is a parcel whose bbox fill ratio falls well below this one's 0.81 (a diagonal or L-shaped lot),
+and the mask keeps it one commit away.
+
+### D-019 cycle ledger, run 8 (the lead's own eye on the full-res sheet)
+Cycle 1 - charter 21's extent, old poses framed for a 90m square:
+  shape reads (overhead is a deep wooded ribbon) but orbit-1/orbit-3 put the plot in 11-14% of
+  the frame as a tuft in empty sky; orbit-2/4 a sliver at the horizon. skyline-coverage 0.11-0.14
+  against its 0.50 bound. Ruled: the poses are broken, the check is truthful. S7 = 0 on the orbits.
+Cycle 2 - charter 22's re-framing, bound and formula untouched:
+  coverage 0.114 -> 0.852 overhead, 0.138 -> 0.716 orbit-1, 0.128 -> 0.720 orbit-3; roughness
+  inverted to wooded 0.823 vs bare 0.238. Overhead reads as the actual parcel with the orange line
+  closed all the way round, woods west, open east. Walk-height-in-woods remains the strongest frame
+  the project has made. Orbits now run corner to corner and fill the frame.
+  Two defects the lead's eye adds to the lane's own void finding: the parcel HOVERS (no horizon at
+  any orbit pose, 0.65-0.76 of the below-skyline frame empty), and at orbit-1/orbit-4 the camera
+  sees UNDER the slab - the trunk forest shows below the terrain edge, which reads as a cut-out
+  prop and is worse than empty sky. S7 = 1: unmistakably that parcel's SHAPE, but it reads as an
+  object rather than a place.
+  Jim's stated pass band for the run is the shape, and the shape is met. The hover is the next
+  cycle, not a failure of the band - charged as cycle 3 to the same lane.
+
+### Cycle 3 and the run's close (2026-08-13)
+Cycle 3 killed the hover: void under the skyline 0.65-0.76 -> 0.000 at every orbit pose, 0 pixels
+of sky beneath the ground at all six, gated by surface OWNER not by colour. The surround is an
+annulus whose hole is the property line itself, derived from the boundary row per frame, never in
+the log, palette gated 16 apart from every colour the parcel draws against a classifier tolerance
+of 10. It forced one real discovery: a ground plane cannot carry a horizon under a sky whose
+horizon sits 265 m below the plot, so dome and surround now share one ground datum and radius and
+the rim meets the equator by construction rather than by tuning.
+
+The lane also reported a failed tone cycle rather than hiding it - its first surround was
+blue-shifted for palette separation and read as WATER, every orbit a jetty in a lake, with
+concentric ring banding; both came off one knob.
+
+Lead's eye, cycle 3: the hover is dead and the orbits read as a place - the ribbon sits in land
+with a horizon behind it and trunks stand on ground instead of hanging over sky. Overhead still
+reads unmistakably as the true parcel and now carries MORE subject-vs-ground contrast than it did
+against sky. S7 = 2 on shape, which is Jim's stated band. Remaining and NOT pursued autonomously:
+the surround reads as pale mist rather than farmland. That is one constant (SURROUND_BASE_HAZE =
+0.45) and it is a question about how Jim's own land should look, so it goes to him rather than to
+another cycle - guessing at his taste is not a lead default.
+
+Two checks the lane touched, both flagged by it and both verified by the lead by reading the diff:
+sky-banding narrowed so the gradient claim is measured over the DOME's own ramp while the sky/solid
+correctness claims still use the full backdrop (banding is a property of the ramp; a flat
+surround's junction with it says nothing about ramp smoothness), and the surround is excluded from
+plot surface so the silhouette gate keeps measuring the parcel. The NAIP-albedo check had been
+green for the WRONG REASON - it compared whole frames where the grass-only arm has no dome, so its
+99.8% was measuring missing sky; it now measures the parcel's own ground at 98.8% of 39,993 pixels
+with the bound raised 0.2 -> 0.9. Strictly stronger than what it replaced.
+
+Run 8 closed at 233 tests, 0 failures, 0 skips on merged main, gate re-run fresh by the lead with
+the regenerated capture cache in place - the stale 90m-square cache would have failed the new
+derived-extent assertion, which is why the cache was replaced before the verdict.
