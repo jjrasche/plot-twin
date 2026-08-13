@@ -25,9 +25,11 @@
   seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009 — this
   ALSO unblocks the boundary-polygon fix above, so it's now double-motivated
 - Shadow-direction check self-suppresses in a many-caster forest — the one red banner left
-- The toy plot's half-plane assertion gates readings the caster-population floor already made
-  advisory: turn one orbit down-sun and the annulus catches 0 shaded samples, the bearing is
-  noise, and the assertion still reads it. Surfaced by re-framing, not resolved.
+- The toy plot's orbit-4 shadow-direction finding prints red (31.3 deg off on the base branch,
+  30.1 deg after re-framing) and the suite is green only because the toy assertion drops the
+  check by name. The caster-population floor cannot catch it: the greenhouse holds 1.000 of a
+  3-to-6 sample annulus, so a share floor passes what is barely any shade at all. A count floor
+  beside the share floor is the missing half.
 
 ## Next
 
