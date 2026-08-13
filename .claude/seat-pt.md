@@ -498,3 +498,40 @@ photograph, not of the detector, and the real road IS in the imagery south of th
 
 Common root of both: a check whose scope was narrowed to what it could pass - the exemption
 narrowed the assertion, the road band narrowed the tree population.
+
+## SEAT RENEWAL DUE — this instance is past the line (2026-08-13, D-030 self-applied)
+
+Seat claimed 2026-08-06. Runs led from this one instance: 3, 5, 6, 7, 8 — five, against a limit of
+three. D-030's honest test is recall, not tokens, and this seat fails it: tonight it re-derived
+plot-twin's own constitution, ledger and file layout from disk and from subagents repeatedly rather
+than from memory. Renewal is owed. Logging it rather than rationalising past it is the whole point
+of the rule, and a lead that treats renewal as demotion will always find a reason to continue.
+
+### Handoff note for the next instance
+**State:** main is green at 236 tests / 0 failures / 0 skips, and the gate now PRINTS what it ran
+per module and fails on any skip. Runs 1-8 are landed. D-001 through D-030 are current; read
+D-026 (how an exemption outlived its substitute), D-027 (the county source has an EXPIRY), and
+D-029/D-030 (this contract) before doing anything. No lanes are in flight. No worktrees are live.
+
+**The one thing you would otherwise rediscover the hard way:** this repo's gates fail in one
+specific family — *green for a reason unrelated to what they claimed* — and it reproduced five
+times in a single day: a red excused by check NAME; a score made unfalsifiable because the extractor
+deleted the trees the eye then credited as a clear road; a test arm that evaporated into
+`else emptyList()` and still reported PASS; a bound used as a FILTER so it dropped the viewpoints it
+should have failed; and a receipt filed under another render's filename. It is not carelessness and
+it does not stay fixed by vigilance — three of the six `assumeTrue` sites closed in charter 28 had
+been introduced HOURS EARLIER by a lane that had read the charter warning about exactly this.
+**So: never accept a new guard until you have pushed it RED and watched it fail.** Charter 28 is the
+worked example of the standard.
+
+**Open, and genuinely undecided:** the surround reads as mist, not farmland, and the taste sheet
+proved no warm land tone is separable from the parcel's own palette — so farmland requires
+re-ruling what the neutral surround IS (texture, or a palette basis that is not one flat lit
+albedo), which is a decision, not a dial. Jim has the sheet.
+
+**Owed to us:** cg-head owes the `eaton-delta-twp` sequencing answer and the five contract gaps —
+the completeness one (surveyed-empty and never-surveyed are the same bytes) is the one that matters
+to our land solvers, because a solver reading absence as permission is confidently wrong.
+
+**Owed by us:** nothing outstanding. Two board messages to cg-head and one to gen-head are sent and
+unanswered; they are asks, not debts.
