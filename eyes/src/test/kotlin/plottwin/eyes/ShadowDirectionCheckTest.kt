@@ -28,7 +28,9 @@ class ShadowDirectionCheckTest {
             expected,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(scene, lit, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
+        val population = populationAt(scene, viewer, viewpoint)
+        assertTrue(population.hasPrincipalCaster, "the toy plot must keep a principal caster: ${population.stated()}")
+        val finding = shadowFinding(viewpoint.name, sample(scene, lit, anchor.x.toDouble(), anchor.y.toDouble()), expected, population)
         assertTrue(finding.passed, "sun-aligned shadow was rejected: ${finding.line()}")
         assertTrue(finding.measured <= SHADOW_AZIMUTH_TOLERANCE_DEGREES, "azimuth error ${finding.measured} deg")
     }
@@ -51,7 +53,9 @@ class ShadowDirectionCheckTest {
             expected + PI / 2,
             SHADOW_OUTER_RADIUS_PX,
         )
-        val finding = shadowFinding(viewpoint.name, sample(scene, wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected, advisory = false)
+        val population = populationAt(scene, viewer, viewpoint)
+        val finding = shadowFinding(viewpoint.name, sample(scene, wrongWay, anchor.x.toDouble(), anchor.y.toDouble()), expected, population)
+        assertTrue(!finding.advisory, "a one-caster plot must gate, not self-suppress: ${population.stated()}")
         assertTrue(!finding.passed, "a shadow 90 deg off the sun should fail: ${finding.line()}")
     }
 
@@ -71,6 +75,17 @@ class ShadowDirectionCheckTest {
         assertTrue(morningAzimuth < 180.0, "a 9am August sun should stand east of south, got $morningAzimuth")
         assertTrue(eveningAzimuth > 180.0, "a 6:30pm August sun should stand west of south, got $eveningAzimuth")
     }
+
+    private fun populationAt(scene: PlotScene, viewer: PlotViewer, viewpoint: Viewpoint): CasterPopulation =
+        requireNotNull(
+            shadowReadingAt(
+                scene,
+                viewer,
+                viewpoint,
+                viewer.capture(viewpoint.pose),
+                skyClassifierOf(scene.spec, scene.daylight),
+            ),
+        ).population
 
     private fun sample(scene: PlotScene, image: java.awt.image.BufferedImage, centerX: Double, centerY: Double): ShadowEstimate =
         estimateShadowDirection(

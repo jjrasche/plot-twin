@@ -42,7 +42,7 @@ class RealParcelContactSheetTest {
         )
         val failures = inspections
             .flatMap { failedFindings(it.findings) }
-            .filterNot { it.check == "shadow-direction" || it.advisory }
+            .filterNot { it.advisory }
         assertTrue(failures.isEmpty(), "pixel checks failed:\n${failures.joinToString("\n") { it.line() }}")
     }
 
@@ -84,7 +84,7 @@ class RealParcelContactSheetTest {
         println("[real-parcel] wrote ${sheet.absolutePath}")
         val failures = inspections
             .flatMap { failedFindings(it.findings) }
-            .filterNot { it.check == "shadow-direction" || it.advisory }
+            .filterNot { it.advisory }
         assertTrue(failures.isEmpty(), "pixel checks failed:\n${failures.joinToString("\n") { it.line() }}")
     }
 

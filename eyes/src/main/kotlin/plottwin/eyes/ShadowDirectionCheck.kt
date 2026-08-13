@@ -15,6 +15,8 @@ const val SHADOW_CONTRAST_FLOOR = 0.08
 const val SHADOW_AZIMUTH_TOLERANCE_DEGREES = 20.0
 const val SHADOW_PROBE_METERS = 6.0f
 const val DEEP_SHADOW_SHARE = 0.6
+const val SHADOW_ANNULUS_INNER_FRACTION = 0.2
+const val SHADOW_ANNULUS_OUTER_FRACTION = 1.15
 
 data class ShadowEstimate(val screenRadians: Double, val contrast: Double) {
     val hasSignal: Boolean get() = contrast >= SHADOW_CONTRAST_FLOOR
@@ -121,8 +123,8 @@ fun expectedShadowScreenRadians(
 // The shadow the reading is about is the caster's own, so the annulus is sized to it: a fixed
 // pixel ring reads mostly open ground from an orbit and mostly building from a walking eye.
 fun shadowAnnulusOf(lengthPx: Double): Pair<Double, Double> {
-    val inner = (0.2 * lengthPx).coerceIn(6.0, 60.0)
-    val outer = (1.15 * lengthPx).coerceIn(inner + 8.0, 220.0)
+    val inner = (SHADOW_ANNULUS_INNER_FRACTION * lengthPx).coerceIn(6.0, 60.0)
+    val outer = (SHADOW_ANNULUS_OUTER_FRACTION * lengthPx).coerceIn(inner + 8.0, 220.0)
     return inner to outer
 }
 
@@ -136,23 +138,15 @@ fun angleErrorDegrees(left: Double, right: Double): Double {
     return Math.toDegrees(if (difference > PI) 2 * PI - difference else difference)
 }
 
+// A bearing is only a claim where one body owns the shade the annulus is made of, so the
+// measured caster population decides whether this reading gates or merely reports.
 fun shadowFinding(
     subject: String,
     estimate: ShadowEstimate,
-    expectedScreenRadians: Double?,
-    advisory: Boolean,
+    expectedScreenRadians: Double,
+    population: CasterPopulation,
 ): EyeFinding {
-    if (expectedScreenRadians == null) {
-        return EyeFinding(
-            check = "shadow-direction",
-            subject = subject,
-            measured = estimate.contrast,
-            bound = SHADOW_CONTRAST_FLOOR,
-            passed = false,
-            detail = "the sampled ground point does not project into this view",
-            advisory = advisory,
-        )
-    }
+    val advisory = !population.hasPrincipalCaster
     if (!estimate.hasSignal) {
         return EyeFinding(
             check = "shadow-direction",
@@ -160,7 +154,7 @@ fun shadowFinding(
             measured = estimate.contrast,
             bound = SHADOW_CONTRAST_FLOOR,
             passed = false,
-            detail = "no directional darkening above the floor â€” no shadow to compare with the sun",
+            detail = "no directional darkening above the floor — no shadow to compare with the sun",
             advisory = advisory,
         )
     }
@@ -171,10 +165,11 @@ fun shadowFinding(
         measured = error,
         bound = SHADOW_AZIMUTH_TOLERANCE_DEGREES,
         passed = error <= SHADOW_AZIMUTH_TOLERANCE_DEGREES,
-        detail = "contrast %.3f, image says %.1f deg, sun says %.1f deg".format(
+        detail = "contrast %.3f, image says %.1f deg, sun says %.1f deg; %s".format(
             estimate.contrast,
             Math.toDegrees(estimate.screenRadians),
             Math.toDegrees(expectedScreenRadians),
+            population.stated(),
         ),
         advisory = advisory,
     )
