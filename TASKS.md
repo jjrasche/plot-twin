@@ -2,12 +2,14 @@
 
 ## Now
 
-- The rendered square is NOT the parcel boundary: `compile_parcel.py` cuts a fixed 90m×90m
-  square (900 cells @ 10cm) centered on the geocoded point — it never ingests the actual
-  property line. Jim flagged this 2026-08-11 looking at the render. Fix needs a real boundary
-  polygon (the exact gap Q-013's seam contract closes — common-ground's `parcels.geojson` is
-  named as the source plot-twin would consume) OR a stopgap pull from Eaton County's own GIS.
-  Until fixed, the render is an arbitrary crop around the address point, not the parcel shape.
+- The property line is now in the log (`parcel_boundary` row, interim pull from Eaton County's
+  open parcel service) but the GRID is still the 90m×90m square: `compile_parcel.py` cuts 900
+  cells @ 10cm centered on the geocoded point. Measured: the parcel is a 30.9m × 241m strip of
+  7445.4 m², and the old square held 1283.4 m² — 17.2% of the parcel, 15.8% of the square. The
+  address point itself sits 3.4 m SOUTH of the south line, in the Jolly Hwy right-of-way, so it
+  is an address, not the extent. Next: clip the grid to the boundary row.
+- Replace the interim county boundary with a seam-delivered one once common-ground's parcel
+  layer covers eaton-delta-twp; the row says `interim-county-service` so the swap is a new row.
 - Walk Isaac's parcel in true 3D (97 lidar trees, road, real light):
   `bash gradlew :app:run --args="C:/Users/rasche_j/Documents/workspace/plot-twin/capture/data/compiled/parcel.json"`;
   see a stage diff: `bash gradlew :app:run --args="--stage-diff berm"`

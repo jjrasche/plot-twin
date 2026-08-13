@@ -1,0 +1,93 @@
+{
+ "parcel_id": "04003630009000",
+ "low_parcel_id": "040-036-300-090-00",
+ "site_address": "11157 JOLLY HWY, LANSING, MI 48911",
+ "owner_name": "UPDIKE, ISAAC",
+ "acres_county_stated": 1.83922805,
+ "acres_state_equalized": 2,
+ "area_square_meters_derived": 7445.432505736744,
+ "ring_wgs84_closed": [
+  [
+   -84.6193867145248,
+   42.6853768190889
+  ],
+  [
+   -84.6193837608642,
+   42.6832071533345
+  ],
+  [
+   -84.6197605888545,
+   42.6832070080545
+  ],
+  [
+   -84.6197635568882,
+   42.6853770535098
+  ],
+  [
+   -84.6193867145248,
+   42.6853768190889
+  ]
+ ],
+ "ring_utm_closed": [
+  [
+   695031.5812837938,
+   4728625.182535938
+  ],
+  [
+   695038.6142577798,
+   4728384.24788289
+  ],
+  [
+   695007.7405689687,
+   4728383.361642388
+  ],
+  [
+   695000.7063054924,
+   4728624.338423743
+  ],
+  [
+   695031.5812837938,
+   4728625.182535938
+  ]
+ ],
+ "ring_local_closed": [
+  [
+   54.85741286096163,
+   289.84395408444107
+  ],
+  [
+   61.89038684696425,
+   48.909301036037505
+  ],
+  [
+   31.016698035877198,
+   48.02306053414941
+  ],
+  [
+   23.982434559613466,
+   288.9998418893665
+  ],
+  [
+   54.85741286096163,
+   289.84395408444107
+  ]
+ ],
+ "plot_local_origin": {
+  "crs": "EPSG:26916",
+  "easting_meters": 694976.7238709328,
+  "northing_meters": 4728335.338581854,
+  "derived_from": "site 42.68317626142, -84.619591093007 reprojected to EPSG:26916, minus 45.0 m on each axis (compile_parcel.py grid half-width)"
+ },
+ "provenance": {
+  "source": "https://services2.arcgis.com/c9l1e4fKpsCnqD7H/arcgis/rest/services/Parcels_AGO/FeatureServer/0 PARCELID=04003630009000",
+  "pulled_at_utc": "2026-08-13T04:05:35.356021Z",
+  "observed_at": "2026-07-21T18:51:44.545000Z",
+  "observed_at_absent_reason": null,
+  "observed_at_scope": "layer-level editingInfo.dataLastEditDate; no per-feature currency field exists",
+  "sha256": "2fe5f8588f1ecdca38f9fc191ba51132969e81352b599c02467301d906066190",
+  "response_bytes": 5245,
+  "contract": "interim-county-service",
+  "horizontal_crs": "EPSG:26916",
+  "source_crs": "EPSG:4326"
+ }
+}

@@ -22,6 +22,7 @@ data class CurrentState(
     val earthworks: List<LoggedEarthwork> = emptyList(),
     val stages: Map<String, StageRow> = emptyMap(),
     val site: SiteRow? = null,
+    val parcelBoundary: ParcelBoundaryRow? = null,
 ) {
     val pendingOps: List<OpRow> get() = pendingOpsBySeq.values.toList()
 
@@ -48,6 +49,7 @@ private fun applyRow(state: CurrentState, logged: LoggedRow): CurrentState = whe
     is EntityRow -> placeEntity(state, row.entityName, row.footprint, row.height)
     is PositionDiffRow -> placeEntity(state, row.entityName, row.footprint, row.height)
     is SiteRow -> state.copy(site = row)
+    is ParcelBoundaryRow -> state.copy(parcelBoundary = row)
     is RuleRow -> state.copy(rules = state.rules + (row.ruleName to row))
     is LockRow -> state.copy(locks = state.locks + (row.targetName to row.kind))
     is OpRow -> state.copy(pendingOpsBySeq = state.pendingOpsBySeq + (logged.seq to row))
