@@ -175,3 +175,31 @@ lies south of the south line, the southern rows inside the line carry 4.8–10 m
 old "brightest gray band" detector was reading sunlit treetops (CHM 9–16 m) as pavement over a
 242 m strip. The detector now also requires bare ground, and reports absence — like class-6
 structures, an absence finding rather than a silence.
+
+## D-024 - the drawn ground IS the property line, and a pose is a bearing the plot's own box sizes (2026-08-13, defaults taken) #renderer #eyes
+scene3d's batched painter can only draw a rectangular heightfield, so the render grid's rows
+become the ring's own horizontal cuts: every drawn vertex sits on or inside the line, the
+neighbours' land is never drawn as ground, and the batched painter keeps its speed. The line
+itself is a low unlit kerb laid inside the ring - an annotation like a violation marker, not a
+structure claimed to exist. Poses stop carrying distances: one rule, asked twice, solves the
+nearest distance at which named corners still hold inside a named share of the frame.
+| option | silhouette exact | keeps the batched painter | verdict |
+|---|---|---|---|
+| render heightfield warped to the ring's row cuts | yes | yes | CHOSEN |
+| ground as a generic per-triangle mesh with outside cells dropped | yes | no - 115K triangles back on the 6.9fps path D-008 rejected | rejected |
+| outside cells painted the background colour | no - ground drawn and disguised as sky | yes | rejected |
+
+Three defaults taken, all reversible:
+- **one interval per row.** The cut assumes each row meets the ring twice; a ring that breaks
+  it fails at the mesh rather than painting the gap between two lobes as ground. True of every
+  convex parcel. Reversal: clip cells against the ring and drop the fringe into a small generic
+  mesh - one new mesh, no truth change.
+- **the orbit sweep turns half a step off the axes when a square-on frame would leave the land
+  under nine tenths of the frame's width.** A 1:6.4 ribbon seen down its own axis fills at most
+  0.292 of the width at any distance, so two of four frames were slivers; measured, not assumed,
+  so the square toy plot keeps its square-on sweep. Cost: nobody now sees straight down the
+  parcel's length. Reversal: one constant, or a named seventh pose.
+- **the painter's far-to-near chunk order reads vertex row 0 as representative**, which on a
+  tapered ring is a near-degenerate row, so chunk ordering is approximate by up to the taper's
+  own offset. Harmless at this parcel's 6 m of relief; it would matter on a steep one. Reversal:
+  order chunks from the ring's own bounding box - a factored-ui change, so the owner's.

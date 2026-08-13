@@ -21,10 +21,11 @@ const val EYE_HEIGHT_METERS = 1.7f
 const val STANDOFF_METERS = 14.0
 const val ORBIT_STEPS = 4
 const val ORBIT_PITCH_RADIANS = 0.20f
-// Half a step of offset, because an axis-aligned sweep of an elongated parcel spends two of its
-// four frames looking down the parcel's own axis, where the land can fill at most 29% of the
-// frame's width no matter where the eye stands. Off the axis every frame is a diagonal.
-const val ORBIT_START_YAW_RADIANS = 0.7854f
+// An orbit frame looking straight down a plot's longer axis wastes itself: on a 31 x 242 m
+// ribbon the land fills at most 29% of the frame's width from there, at any distance. A sweep
+// that would produce such a frame is turned half a step off the axes; a plot with no such
+// frame keeps its square-on sweep.
+const val ORBIT_AXIS_FILL_SHARE = 0.9f
 // the shape shot keeps a margin so no crown is clipped; the orbits go edge to edge, because a
 // ribbon that must also hold its own length has no frame left to spare
 const val OVERHEAD_FRAME_SHARE = 0.90f
@@ -130,15 +131,26 @@ fun walkHeightViewpoint(entityName: String, placed: PlacedEntity, terrain: Terra
 // The orbit owes the land, not the crowns: it comes in until the ground itself reaches the
 // frame's edges, so the broadside views hold the ribbon end to end and the end-on views look
 // down its whole length with the near ground still in frame.
-fun orbitViewpoints(plot: PlotBox): List<Viewpoint> =
-    (0 until ORBIT_STEPS).map { step ->
-        val yaw = ORBIT_START_YAW_RADIANS + (2.0 * Math.PI * step / ORBIT_STEPS).toFloat()
-        Viewpoint(
-            "orbit-${step + 1}-of-$ORBIT_STEPS",
-            nearestPoseHolding(plot, plot.groundCorners, ORBIT_FRAME_SHARE, yaw, ORBIT_PITCH_RADIANS),
-            null,
-        )
+fun orbitViewpoints(plot: PlotBox): List<Viewpoint> {
+    val startYaw = orbitStartYawOf(plot)
+    return (0 until ORBIT_STEPS).map { step ->
+        Viewpoint("orbit-${step + 1}-of-$ORBIT_STEPS", orbitPoseAt(plot, startYaw + orbitYawOfStep(step)), null)
     }
+}
+
+fun orbitStartYawOf(plot: PlotBox): Float {
+    val squareOnFill = (0 until ORBIT_STEPS).map { step ->
+        framedShareOf(plot.groundCorners, orbitPoseAt(plot, orbitYawOfStep(step))).acrossFrame
+    }
+    return if (squareOnFill.min() >= ORBIT_AXIS_FILL_SHARE) 0f else halfOrbitStepYaw()
+}
+
+private fun orbitPoseAt(plot: PlotBox, yawRadians: Float): Scene3dCameraPose =
+    nearestPoseHolding(plot, plot.groundCorners, ORBIT_FRAME_SHARE, yawRadians, ORBIT_PITCH_RADIANS)
+
+private fun orbitYawOfStep(step: Int): Float = (2.0 * Math.PI * step / ORBIT_STEPS).toFloat()
+
+private fun halfOrbitStepYaw(): Float = (Math.PI / ORBIT_STEPS).toFloat()
 
 // A pose stated as a bearing, not a distance: the plot's own corner box decides how far back
 // the eye must stand, so a 31 x 242 m ribbon frames the same way a square plot does. Two corner

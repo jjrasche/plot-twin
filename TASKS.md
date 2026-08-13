@@ -4,11 +4,13 @@
 
 - The grid IS the property line's bounding box: 380 × 2419 cells @ 10cm = 919,220 cells, origin
   695000.700 E 4728383.300 N (EPSG:26916), and the mask measures 7444 m² against the county's
-  7443.1. Two camera assumptions still hold the old square: framing a 1:6.4 strip by its long
-  axis puts the plot in 11–14% of the frame columns, so `skyline-coverage` fails its 0.5 bound
-  from overhead, orbit-1 and orbit-3 (agreement is 0.92–1.00 at all six poses), and the orbit-1
-  canopy-roughness baseline reads 3.455 wooded vs 3.667 bare on 82 drawn columns. The coverage
-  bound is unreachable by construction: the plot's own aspect caps it at 38/242 = 0.157.
+  7443.1. The render now draws only inside it — ground silhouette 0.8068 of the bbox against the
+  mask's 0.8095 true-share — with the county's line standing as a kerb from the boundary row.
+  Every pose is re-framed and `skyline-coverage` is green at all six (0.74–1.00).
+- The omission leaves the parcel in void: 0.65–0.76 of the below-skyline frame carries no
+  geometry at every orbit pose (0.13 at walk height, where crowns fill it), so no orbit frame
+  has a horizon. Ruled omitted; the alternative on the table is a neutral, visibly-not-mine
+  surround that carries a horizon while the overhead keeps the silhouette.
 - The road is NOT on Isaac's land. W Jolly Rd's right-of-way lies south of the south line (the
   address point sits 2.961 m south of the frame origin) and the southern rows inside the line
   carry 4.8–10 m of canopy. The old extraction only found a road because the 90m square reached
@@ -23,6 +25,9 @@
   seam-pushback-for-cg-head.md); ingest work starts only after Jim ratifies cg's D-009 — this
   ALSO unblocks the boundary-polygon fix above, so it's now double-motivated
 - Shadow-direction check self-suppresses in a many-caster forest — the one red banner left
+- The toy plot's half-plane assertion gates readings the caster-population floor already made
+  advisory: turn one orbit down-sun and the annulus catches 0 shaded samples, the bearing is
+  noise, and the assertion still reads it. Surfaced by re-framing, not resolved.
 
 ## Next
 

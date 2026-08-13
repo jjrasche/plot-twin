@@ -142,6 +142,34 @@ class PropertyLineRenderGateTest {
         assertTrue(outside == 0, "$outside drawn ground cells fall outside the property line")
     }
 
+    // Omitting the neighbours' land leaves the parcel standing in void wherever their ground
+    // would have carried the horizon. This measures how much of each frame that is, so the
+    // omission ruling can be re-read against a number instead of an impression.
+    @Test
+    fun the_void_the_omission_leaves_under_each_frame_is_measured() {
+        val scene = parcelScene()
+        val viewer = PlotViewer(scene.spec)
+        val meshes = terrainAndEntityMeshesOf(scene.spec)
+        for (viewpoint in plotViewpoints(scene.state)) {
+            val surface = rasterizeVisibleSurfaces(meshes, viewer.projectorFor(viewpoint.pose))
+            val skyline = predictedSkylineOf(surface)
+            var belowSkyline = 0
+            var voidBelowSkyline = 0
+            for (column in 0 until surface.width) {
+                if (skyline[column] == NOTHING_DRAWN) continue
+                for (row in skyline[column] until surface.height) {
+                    belowSkyline++
+                    if (surface.owner[row * surface.width + column] == NO_SURFACE) voidBelowSkyline++
+                }
+            }
+            val voidShare = if (belowSkyline == 0) 0.0 else voidBelowSkyline.toDouble() / belowSkyline
+            println(
+                "[line] %-22s void under the skyline %.3f (%d of %d pixels below the drawn silhouette)"
+                    .format(viewpoint.name, voidShare, voidBelowSkyline, belowSkyline),
+            )
+        }
+    }
+
     @Test
     fun every_pose_frames_the_plot_without_hitting_the_cameras_own_distance_ceiling() {
         val scene = parcelScene()
