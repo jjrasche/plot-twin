@@ -271,3 +271,37 @@ next run re-litigating this.
 `eaton-delta-twp` under the contract. The swap is then one source change, and the log shows honestly
 which rows predate the seam. It does not generalize — no other county service is authorized by this,
 and plot-twin builds no scheduled collector for a layer common-ground owns (D-009 stands).
+
+## D-028 — a missing input fails loudly, the fixture names the cut, and a judged sheet owns its address (2026-08-13, defaults taken) #process #eyes #provenance
+Three closures of one bug: a green gate that never ran. `capture/data` is gitignored, so a fresh
+clone had three tests skip and a fourth silently drop its full-resolution arm and still report PASS.
+Absence now throws through one reader (`CaptureCache`) that names the command that cures it, the
+caster measurement is unconditional, and the build itself fails on any skipped test rather than a
+human counting skips off a log — run 5 read 1, run 8 read 0, both by hand.
+The tracked 1m fixture now carries the sha256, extent and elevation envelope of the untracked 10cm
+cut `compile_parcel.py` wrote beside it in the same pass, and the full-resolution gate asserts that
+binding before it draws a pixel: the artifact a human scores cannot drift from the artifact every
+other test measures. The two provenance blocks disagreeing on elevation (1m 262.3048/268.2345,
+10cm 262.2638/268.2613) is benign — both reproduce exactly from the cached DEM, the 10cm grid
+samples the same bilinear field 100x denser, and re-running the compiler rewrote the fixture
+byte-identical apart from the new binding.
+| option | a lost image is detectable | verdict |
+|---|---|---|
+| judged sheet at `capture/receipts/run-N/cycle-M/`, address refuses a second write | yes, and the image survives | CHOSEN |
+| sha256 of every judged sheet in its ledger line only | detectable, not recoverable | CHOSEN as well — every sheet prints its sha256 whether or not it is committed |
+| keep one overwritable tracked path | no — run 6's acceptance is already unrecoverable | rejected |
+
+Three defaults taken, all reversible:
+- **an unstamped run writes to `build/` and judges nothing.** The stamp is opt-in
+  (`-Dplottwin.receipt.run` / `.cycle`), so the routine gate does not accrete images; a run that
+  means to score writes where a later run cannot reach. Reversal: default the stamp on.
+- **the mislabelled receipt is addressed by commit, not by run.** It was byte-identical to the
+  full-resolution sheet while carrying the fixture sheet's name; it is provably the sheet main
+  produces at `aaa448b` and NOT provably run 8 cycle 3's, because the dome, surround and scene
+  projection all changed after that cycle closed. It now sits at
+  `capture/receipts/main-aaa448b/real_parcel_full_res_contact_sheet.png`, sha256
+  6d1ed31b3260e2174232d56efcb424cb651452c2a768d0c0fd5143294ea00345. Reversal: re-render at
+  `54177b1` and, if the bytes match, move it under `run-8/cycle-3/`.
+- **the compiled cut stays untracked.** The cache is 512 MB, 500 of it the DEM tile; the cut alone
+  is 8.5 MB and a judged sheet 0.6 MB, so a three-cycle visual run costs ~1.9 MB of tracked PNG.
+  Reversal if that weight is unwanted: keep only the sha256 lines, which are printed either way.
