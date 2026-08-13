@@ -33,8 +33,8 @@ fun terrainMeshOf(
         for (column in 0 until terrain.columns) {
             val cell = terrain.indexOf(column, row)
             val corner = row * vertexCountX + column
-            triColors.add(litCellColor(vertices, corner, corner + 1, corner + vertexCountX + 1, cell, albedo, shading))
-            triColors.add(litCellColor(vertices, corner, corner + vertexCountX + 1, corner + vertexCountX, cell, albedo, shading))
+            triColors.add(litTriangleColor(vertices, corner, corner + 1, corner + vertexCountX + 1, cell, albedo, shading))
+            triColors.add(litTriangleColor(vertices, corner, corner + vertexCountX + 1, corner + vertexCountX, cell, albedo, shading))
         }
     }
     return Scene3dMesh(
@@ -45,7 +45,7 @@ fun terrainMeshOf(
     )
 }
 
-private fun litCellColor(
+internal fun litTriangleColor(
     vertices: List<Float>,
     first: Int,
     second: Int,
@@ -74,7 +74,7 @@ private fun vertexHeightAt(terrain: TerrainGrid, vertexX: Int, vertexZ: Int): Fl
 }
 
 // water collects low, so the low ground grows the lusher grass
-private fun grassAlbedoOf(terrain: TerrainGrid): List<Rgb> {
+internal fun grassAlbedoOf(terrain: TerrainGrid): List<Rgb> {
     val lowest = terrain.surfaceHeights.min()
     val span = terrain.surfaceHeights.max() - lowest
     return terrain.surfaceHeights.map { height ->

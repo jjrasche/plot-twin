@@ -38,7 +38,16 @@ fun projectWalkableScene(
     val reflectanceTriples = terrainAlbedoTriples?.let { deshadowedAlbedo(it) }
     val groundTriples = reflectanceTriples?.let { forestFloorAlbedo(it, terrain, state.entities) }
     val albedoOverride = groundTriples?.let { averagedAlbedoOf(it, terrain, RENDER_DOWNSAMPLE_FACTOR) }
-    meshes[TERRAIN_ENTITY_ID] = terrainMeshOf(downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR), frame, shading, albedoOverride)
+    val renderTerrain = downsampleForRender(terrain, RENDER_DOWNSAMPLE_FACTOR)
+    val boundaryRing = state.parcelBoundary?.ring
+    meshes[TERRAIN_ENTITY_ID] = if (boundaryRing == null) {
+        terrainMeshOf(renderTerrain, frame, shading, albedoOverride)
+    } else {
+        parcelGroundMeshOf(boundaryRing, renderTerrain, frame, shading, albedoOverride)
+    }
+    if (boundaryRing != null) {
+        meshes[PROPERTY_LINE_ENTITY_ID] = propertyLineMeshOf(boundaryRing, renderTerrain, frame)
+    }
     for ((entityName, placed) in state.entities) {
         val canopyAlbedo = if (isTreeEntity(entityName)) naipAlbedoUnder(placed, terrain, reflectanceTriples) else null
         meshes[entityName] = entityMeshOf(entityName, placed, terrain, frame, daylight, canopyAlbedo)
