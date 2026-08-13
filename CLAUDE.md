@@ -1,8 +1,9 @@
 # plot-twin
 
-A decade-maintainable digital twin of Jim's 2-acre plot: 10+ spaces ("rooms" — garden terraces,
-compost network, greenhouse, pergola, shop) co-edited by Jim and AI. Proves that AI can build and
-verify 3D spaces through tight symbolic edit cycles.
+A decade-maintainable digital twin of a plot of land, first parcel Isaac's 1.839 acres at
+11157 W Jolly Rd, Delta Twp, MI — a 31 × 241 m strip by county record, not a square. 10+ spaces
+("rooms" — garden terraces, compost network, greenhouse, pergola, shop) co-edited by Jim and AI.
+Proves that AI can build and verify 3D spaces through tight symbolic edit cycles.
 
 ## Architecture (locked)
 
@@ -15,8 +16,9 @@ verify 3D spaces through tight symbolic edit cycles.
 - **LLM altitude**: outer loop only. Compiles intent → typed constraints, proposes room-level ops
   and constraint relaxations, interprets violation text. Never computes geometry, never inner-loop
   positioning — solvers measure, optimizers place.
-- **Terrain**: 10cm grid (~810K cells for 2 acres), 2.5D heightmap + per-entity heights.
-  Entities are exact vectors (polygons), not cells.
+- **Terrain**: 10cm grid over the property line's bounding box — 919,220 cells (380 × 2419) for
+  the first parcel; the figure is approximate scale, not a budget. 2.5D heightmap + per-entity
+  heights. Entities are exact vectors (polygons), not cells.
 - **Renderer v1**: factored-ui `scene3d` (Kotlin/Skiko — already has meshes, camera, headless
   render tests). three.js is the fallback only if terrain perf tanks. State is renderer-agnostic.
 - **Standalone now, Genesis-shaped**: typed rows + append-only log + derived views so the port to
@@ -35,7 +37,7 @@ every change and why. The owner walks the result — on screen now, through a ph
 actual ground later — and what they see is always derived from state that machines can check.
 The twin is where a long build gets designed, argued with, and kept honest: every structure
 placed before it's bought, every constraint (drainage, sun, access, permit) enforced before a
-shovel moves. First plot: the home 2 acres. Next: the common-ground corridor parcels — the
+shovel moves. First plot: Isaac's 1.839 acres on W Jolly Rd. Next: the common-ground corridor parcels — the
 design tool that turns "which land" (common-ground's job) into "what grows here." Success = a
 plot's next decade of decisions each ran through the loop first.
 

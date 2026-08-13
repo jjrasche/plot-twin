@@ -6,18 +6,19 @@ append-only log remembers every change and why. The owner walks the result — o
 on the ground through a phone later. Every structure is placed before it's bought; every
 constraint (drainage, sun, access, permit) is enforced before a shovel moves.
 
-**Verdict so far:** architecture locked and adversarially reviewed; research answered
-(optimizer design · free LiDAR/NAIP covers the first parcel · renderer rebuild specced,
-effort M); build charters staged; no code yet.
+**Verdict so far:** architecture locked and adversarially reviewed; the loop is built and green —
+typed log, solver kit, op pipeline, earthworks stages, and the real parcel walkable in 3D from
+LiDAR terrain and trees inside its own property line, gated by headless render checks.
 
 ## Stage map
 
-1. **now** — world-state schema, solver kit, op pipeline, renderer rebuild (charters staged)
-2. **next** — 2D truth-view with violation overlays; real terrain + rooms
+1. **now** — the real parcel: boundary row, derived grid mask, eye-gated walkable render
+2. **next** — 2D truth-view with violation overlays; real rooms replace the toy fixture
 3. **later** — CP-SAT optimizer, capture agent, AR walkthrough
 
-First plot: a 2-acre home parcel (Delta Twp, MI). Next: the common-ground corridor parcels —
-this repo designs one plot; the sibling common-ground project selects which land.
+First plot: Isaac's 1.839-acre parcel, 11157 W Jolly Rd, Delta Twp, MI — a 31 × 241 m strip.
+Next: the common-ground corridor parcels — this repo designs one plot; the sibling
+common-ground project selects which land.
 
 ## Navigation
 
