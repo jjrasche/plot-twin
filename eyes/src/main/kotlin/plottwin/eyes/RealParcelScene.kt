@@ -15,6 +15,7 @@ import plottwin.capture.appendRealParcel
 import plottwin.capture.readCapturedBoundary
 import plottwin.capture.readCompiledParcel
 import plottwin.capture.readParcelFeatures
+import plottwin.render.LooksTaste
 import plottwin.render.daylightOverPlot
 import plottwin.render.projectWalkableScene
 import plottwin.render.withSkyDome
@@ -30,6 +31,7 @@ fun realParcelScene(
     features: ParcelFeatures? = null,
     boundary: CapturedBoundary? = null,
     moment: ZonedDateTime = realParcelMidday(parcel),
+    taste: LooksTaste = LooksTaste(),
 ): PlotScene {
     val state = WorldLog.openInMemory().use { log ->
         appendRealParcel(log, parcel)
@@ -39,17 +41,21 @@ fun realParcelScene(
     }
     val daylight = daylightOverPlot(state, moment)
     val terrain = requireNotNull(state.terrain) { "the real parcel scene needs a base-terrain row" }.grid
-    val spec = withSkyDome(projectWalkableScene(state, emptyList(), daylight, albedoTriplesOf(parcel)), terrain, daylight)
+    val spec = withSkyDome(projectWalkableScene(state, emptyList(), daylight, albedoTriplesOf(parcel), taste), terrain, daylight, taste)
     return PlotScene(state, spec, daylight)
 }
 
-fun realParcelSceneFromFile(parcelPath: Path, moment: ZonedDateTime? = null): PlotScene {
+fun realParcelSceneFromFile(
+    parcelPath: Path,
+    moment: ZonedDateTime? = null,
+    taste: LooksTaste = LooksTaste(),
+): PlotScene {
     val parcel = readCompiledParcel(parcelPath)
     val featuresPath = parcelPath.resolveSibling("features.json")
     val features = if (Files.exists(featuresPath)) readParcelFeatures(featuresPath) else null
     val boundaryPath = boundaryPathBesideCompiled(parcelPath)
     val boundary = if (Files.exists(boundaryPath)) readCapturedBoundary(boundaryPath) else null
-    return realParcelScene(parcel, features, boundary, moment ?: realParcelMidday(parcel))
+    return realParcelScene(parcel, features, boundary, moment ?: realParcelMidday(parcel), taste)
 }
 
 // the capture cache lays the boundary pull beside the compiled cut, one directory over

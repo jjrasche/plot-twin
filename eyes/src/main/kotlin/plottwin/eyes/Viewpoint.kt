@@ -105,6 +105,45 @@ fun roadViewpoint(state: CurrentState, terrain: TerrainGrid, frame: SceneFrame):
 private fun distanceMeters(first: GroundPoint, second: GroundPoint): Double =
     kotlin.math.hypot(first.east.value - second.east.value, first.north.value - second.north.value)
 
+// How far in from the near end the owner stands, as a share of the plot's own length: inside the
+// line, with the whole length still ahead of him.
+const val DOWN_THE_LENGTH_STANDOFF_SHARE = 0.03
+
+// The view an owner asks for by walking to one end of his land and looking down it. Level, at
+// eye height, from inside the line. The look is turned a stated angle off the plot's long axis
+// because a bearing exactly along it puts the far end on the vanishing point and leaves the land
+// a thin wedge up the middle of the frame; off the axis, both side lines stay in view and the
+// ribbon runs across the frame instead of into it.
+fun downTheLengthViewpoint(
+    name: String,
+    terrain: TerrainGrid,
+    frame: SceneFrame,
+    offAxisDegrees: Double,
+): Viewpoint {
+    val east = terrain.columns * terrain.cellSize.value
+    val north = terrain.rows * terrain.cellSize.value
+    val length = maxOf(east, north)
+    val alongEast = if (east >= north) 1.0 else 0.0
+    val alongNorth = if (east >= north) 0.0 else 1.0
+    val standing = GroundPoint(
+        east = Meters(if (east >= north) length * DOWN_THE_LENGTH_STANDOFF_SHARE else east / 2.0),
+        north = Meters(if (east >= north) north / 2.0 else length * DOWN_THE_LENGTH_STANDOFF_SHARE),
+    )
+    val turn = Math.toRadians(offAxisDegrees)
+    val lookEast = alongEast * kotlin.math.cos(turn) - alongNorth * kotlin.math.sin(turn)
+    val lookNorth = alongNorth * kotlin.math.cos(turn) + alongEast * kotlin.math.sin(turn)
+    val eyeHeight = groundHeightAt(terrain, standing) + EYE_HEIGHT_METERS
+    val eye = Vec3(frame.sceneX(standing.east.value), eyeHeight, frame.sceneZ(standing.north.value))
+    // level: the target sits at the eye's own height, so nothing about the pose but its bearing
+    // changes between two off-axis angles
+    val target = Vec3(
+        frame.sceneX(standing.east.value + lookEast * length),
+        eyeHeight,
+        frame.sceneZ(standing.north.value + lookNorth * length),
+    )
+    return Viewpoint(name, Scene3dCameraPose(eye = eye, target = target), subject = null)
+}
+
 // The one pose that owes the whole parcel, crowns included, with a margin around it.
 fun overheadViewpoint(plot: PlotBox): Viewpoint = Viewpoint(
     name = "overhead",
