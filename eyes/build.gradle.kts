@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     api(project(":render"))
+    implementation(project(":geometry"))
     api(project(":capture"))
     api(project(":oppipeline"))
     implementation(testFixtures(project(":solvers")))
