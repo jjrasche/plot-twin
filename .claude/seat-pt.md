@@ -457,3 +457,44 @@ with the bound raised 0.2 -> 0.9. Strictly stronger than what it replaced.
 Run 8 closed at 233 tests, 0 failures, 0 skips on merged main, gate re-run fresh by the lead with
 the regenerated capture cache in place - the stale 90m-square cache would have failed the new
 derived-extent assertion, which is why the cache was replaced before the verdict.
+
+### RETRACTIONS from runs 3/5/7, found by post-run audit (2026-08-13)
+
+**The two shadow exemptions were NOT the same act, and the run-8 morning report was wrong to
+call them one.** a1d9d61 (2026-08-06 22:12, run 3, "the shadow check starts gating") added the
+by-name exclusion to the TOY contact-sheet gate AND, in the same commit, a substitute:
+`no_viewpoint_throws_the_shadow_into_the_suns_own_half_plane_and_most_land_on_it` - 2/3 of
+viewpoints within tolerance, none pointing more than 90 degrees off. A deliberate weaker gate,
+defensible, and undocumented (the ledger audit separately flagged that this promotion has no
+decision entry). 4ff6c1c (2026-08-08 23:45, run 5, "real parcel walkable") COPIED the exclusion
+into RealParcelContactSheetTest with NO substitute of any kind. The real-parcel path then ran
+ungated through runs 5, 6 and 7 - about 4.5 days - which is where the 173.7-degree error lived.
+The failure mode to date is not concealment: it is a reasoned exemption copy-pasted into a context
+that did not inherit its justification.
+
+**Run 7's road is retracted.** Its footprint was north 48-56 m in the old frame, whose origin was
+the site point minus 45 m, so the band ran from 0.4 m SOUTH of the property line to 7.6 m NORTH of
+it - almost entirely inside Isaac's land, on ground run 8 measured at 4.8-10 m of canopy. Run 8's
+detector, required to find bare ground, returns `road: []`. There is no road on this parcel; the
+Jolly Hwy right-of-way is south of the south line and was never in it.
+Retracted with it: the run-7 report headline "the road cuts the woods"; the receipt line naming a
+road under the sky; the required `on-road` pose and the assertion that it must exist; and
+**S3 road = 2 in the run-7 D-019 cycle ledger**, which inflates that run's cycle total.
+
+**S3 was unfalsifiable by construction, and that is the sharper lesson.** `extract_trees`
+suppressed crown maxima inside the road band ("no trunk grows from asphalt"), so the on-road pose
+stood on ground guaranteed tree-free, and the eye then scored "the road corridor is clear of trees
+and reads as a road" a 2. The extractor manufactured the clearing the eye credited.
+
+**The tree deletion is not recoverable from run 7's receipts.** `extract_trees` filters maxima
+before counting and returns the post-filter length, so `crown_maxima_count: 105` was computed
+AFTER the road suppression - the instrument was blind to its own deletion by construction. The
+105-to-97 gap is proximity merging, not the road. The band was 8 of 90 rows in canopy-bearing
+ground, so the order of magnitude is 5-10 real crowns, but that is an estimate and no run-7 number
+can settle it.
+
+**What stands:** run 6's "NAIP shows the road junction, field and canopy" is an observation of the
+photograph, not of the detector, and the real road IS in the imagery south of the parcel.
+
+Common root of both: a check whose scope was narrowed to what it could pass - the exemption
+narrowed the assertion, the road band narrowed the tree population.
