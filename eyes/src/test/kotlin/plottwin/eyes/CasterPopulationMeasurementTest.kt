@@ -10,7 +10,7 @@ import plottwin.solvers.ToyPlotFixture
 class CasterPopulationMeasurementTest {
 
     @Test
-    fun the_caster_population_is_measured_on_both_arms_before_any_threshold_is_chosen() {
+    fun the_frozen_floor_still_separates_the_toy_plots_one_caster_from_the_woodlots_ninety_seven() {
         val toyMoments = listOf(
             "toy-morning" to ToyPlotFixture.toyMorning,
             "toy-midday" to ToyPlotFixture.toyMidday,
@@ -22,9 +22,20 @@ class CasterPopulationMeasurementTest {
         val fullResShares =
             if (Files.exists(compiled)) report("real-parcel-full-res", realParcelSceneFromFile(compiled)) else emptyList()
 
+        val realArm = realShares + fullResShares
         println("[population] toy arm assumed-shares: ${toyShares.map { "%.3f".format(it) }}")
-        println("[population] real arm assumed-shares: ${(realShares + fullResShares).map { "%.3f".format(it) }}")
-        assertTrue(toyShares.isNotEmpty() && realShares.isNotEmpty(), "both arms must produce measurements")
+        println("[population] real arm assumed-shares: ${realArm.map { "%.3f".format(it) }}")
+        assertTrue(toyShares.isNotEmpty() && realArm.isNotEmpty(), "both arms must produce measurements")
+
+        val toyWithShade = toyShares.filter { it > 0.0 }
+        assertTrue(
+            toyWithShade.min() >= PRINCIPAL_CASTER_SHARE_FLOOR,
+            "the toy plot fell below the frozen floor: ${toyWithShade.min()} < $PRINCIPAL_CASTER_SHARE_FLOOR",
+        )
+        assertTrue(
+            realArm.max() < PRINCIPAL_CASTER_SHARE_FLOOR,
+            "the woodlot rose above the frozen floor: ${realArm.max()} >= $PRINCIPAL_CASTER_SHARE_FLOOR",
+        )
     }
 
     private fun report(label: String, scene: PlotScene): List<Double> {
@@ -39,8 +50,11 @@ class CasterPopulationMeasurementTest {
                 shadowedGround.size,
             ),
         )
-        return plotViewpoints(scene.state).mapNotNull { viewpoint ->
-            val population = populationAt(scene, viewer, viewpoint, assumed, shadowedGround) ?: return@mapNotNull null
+        val classifier = skyClassifierOf(scene.spec, scene.daylight)
+        return plotViewpoints(scene.state).map { viewpoint ->
+            val image = viewer.capture(viewpoint.pose)
+            val population = shadowReadingAt(scene, viewer, viewpoint, image, classifier, shadowedGround)
+                ?.population ?: CasterPopulation.NONE
             println(
                 "[population] $label/${viewpoint.name} assumed-share %.3f casters %d shaded %d top %s".format(
                     population.assumedShare,
@@ -51,40 +65,5 @@ class CasterPopulationMeasurementTest {
             )
             population.assumedShare
         }
-    }
-
-    private fun populationAt(
-        scene: PlotScene,
-        viewer: PlotViewer,
-        viewpoint: Viewpoint,
-        assumed: String?,
-        shadowedGround: List<ShadowedGroundPoint>,
-    ): CasterPopulation? {
-        val projector = viewer.projectorFor(viewpoint.pose)
-        val casterHeight = assumed?.let { scene.state.entities.getValue(it).height.value } ?: 0.0
-        val groundPoint = groundSampleOf(scene.state, viewpoint)
-        val anchor = projector.project(groundPoint)
-        val shadow = projectShadow(
-            projector,
-            groundPoint,
-            scene.daylight.sun.azimuthDegrees,
-            castShadowMetersOf(casterHeight, scene.daylight.sun.altitudeDegrees),
-        ) ?: return null
-        if (!anchor.visible) return null
-        val (innerRadius, outerRadius) = shadowAnnulusOf(shadow.lengthPx)
-        val image = viewer.capture(viewpoint.pose)
-        return casterPopulationInView(
-            shadowedGround,
-            assumed,
-            projector,
-            image,
-            anchor.x.toDouble(),
-            anchor.y.toDouble(),
-            innerRadius,
-            outerRadius,
-            assumed?.takeIf { scene.spec.meshesByEntity.containsKey(it) }
-                ?.let { renderedEntityMaskOf(image, viewer.captureWithout(it, viewpoint.pose)) },
-            skyPixelOf(skyClassifierOf(scene.spec, scene.daylight)),
-        )
     }
 }

@@ -18,6 +18,12 @@ import plottwin.worldstate.Meters
 import plottwin.worldstate.PlacedEntity
 import plottwin.worldstate.TerrainGrid
 
+// Frozen 2026-08-12 against sampled output from both arms, before any suppression existed:
+// the toy plot's greenhouse held 0.963-1.000 of the shade in its annulus across three moments
+// and seven poses; Isaac's 97-tree woodlot gave its tallest tree 0.129-0.533 across the same
+// poses on both the fixture and the full-res compiled parcel. 0.75 sits 0.213 above the toy
+// floor and 0.217 below the woodlot ceiling. Moving it is a new experiment, not a fix.
+const val PRINCIPAL_CASTER_SHARE_FLOOR = 0.75
 const val SHADOW_GROUND_SAMPLE_METERS = 0.5
 const val SHADOW_RAY_MAXIMUM_METERS = 200.0
 const val SHADOW_RAY_MINIMUM_ALTITUDE_DEGREES = 1.0
@@ -57,9 +63,13 @@ data class CasterPopulation(
     val shadowSamples: Int,
     val shares: List<CasterShare>,
 ) {
+    val hasPrincipalCaster: Boolean
+        get() = assumedCaster != null && assumedShare >= PRINCIPAL_CASTER_SHARE_FLOOR
+
     fun stated(): String =
-        "%d casters shade this annulus, %s holds %.3f of %d shaded samples".format(
+        "%d %s shade this annulus, %s holds %.3f of %d shaded samples".format(
             casterCount,
+            if (casterCount == 1) "caster" else "casters",
             assumedCaster ?: "no caster",
             assumedShare,
             shadowSamples,
