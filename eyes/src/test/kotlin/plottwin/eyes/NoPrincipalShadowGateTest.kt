@@ -24,7 +24,7 @@ class NoPrincipalShadowGateTest {
             "a 97-caster woodlot still gated a bearing:\n${readings.filterNot { it.advisory }.joinToString("\n") { it.line() }}",
         )
         assertTrue(
-            readings.all { "shade this annulus" in it.detail },
+            readings.all { "shade in this annulus comes from" in it.detail },
             "an advisory reading did not state the distribution it rests on:\n${readings.joinToString("\n") { it.line() }}",
         )
     }

@@ -105,3 +105,42 @@ resembling ground: pixel checks bound correctness, only an eye bounds resemblanc
 ## D-020 — the first parcel is Isaac's, 11157 W Jolly Rd, Delta Twp; coordinates are public (2026-08-10, ruled) #state #scope
 The shared-case parcel is public record and ratified for tracked fixtures — the run-6 privacy
 hold is lifted. The fixture and geocode gate carry the true point.
+
+## D-021 — the property line is a `parcel_boundary` row carrying its own frame and receipt (2026-08-13, defaults taken) #state #provenance #land
+Measured ground, so a CAPTURE row (D-013): the ring in plot-local metres stored open (the
+closing vertex is the wrap, and a repeated one makes the ring non-simple), the county's stated
+acreage, and the pull's receipt. Interim source is Eaton County's open parcel service, named on
+the row as `interim-county-service` — when the shared parcel-layer seam delivers, it appends a
+new boundary row and this one stays as history.
+| option | log holds truth | verdict |
+|---|---|---|
+| boundary as a typed log row | yes | CHOSEN |
+| boundary as a side file the renderer/compiler reads | no — the extent would live outside the log | rejected (D-001, D-011) |
+
+Two defaults taken, both reversible:
+- **the frame rides on the boundary row** (`GroundFrame`: CRS + origin easting/northing). Every
+  other row's ground coordinates are metres against an origin that exists only inside
+  `compile_parcel.py`, so the log could not put its own coordinates back on Earth; the boundary
+  is the first row that must survive a regrid, so it says where its origin is. Reversal: move
+  the frame to the site row where georeferencing already lives — one field move plus the
+  fixture, no data loss.
+- **the row carries its own provenance** — the first row in the log to do so. Base-terrain rows
+  drop the DEM receipt at the log boundary today (it stays in `parcel.json`). Reversal: a shared
+  provenance row referenced by seq, once a second source needs the same shape.
+
+## D-022 � a shadow-direction reading gates only where one caster owns the shade it reads (2026-08-13, ruled) #eyes #renderer
+The check estimates a principal shadow bearing from one occluder. On a 97-tree woodlot that
+quantity does not exist, so the check now measures whether it exists before claiming it:
+each ground sample is attributed to the first body its ray to the sun meets, the shares are
+counted inside the check's own screen annulus past its own sky and caster masks, and a
+reading gates only when the caster it assumed holds at least 0.75 of that shade. Below the
+floor the reading is ADVISORY and states the distribution that suppressed it.
+Floor frozen against sampled output from both arms before any suppression existed: the toy
+plot's greenhouse held 0.963-1.000 across three moments and seven poses; Isaac's parcel gave
+its tallest tree 0.129-0.533 across the same poses on both the fixture and the full-res
+compiled grid. 0.75 sits 0.213 above the toy floor and 0.217 below the woodlot ceiling.
+| option | trains the lead to trust the banner | verdict |
+|---|---|---|
+| measure the caster population, suppress where no principal caster exists | yes - red still means wrong | CHOSEN |
+| widen the bearing tolerance until the woodlot passes | no - the toy plot stops catching wrong bearings too | rejected |
+| drop the check on real parcels | no - a check that cannot fail is not a check | rejected |

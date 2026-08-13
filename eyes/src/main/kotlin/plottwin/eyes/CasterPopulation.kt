@@ -67,7 +67,7 @@ data class CasterPopulation(
         get() = assumedCaster != null && assumedShare >= PRINCIPAL_CASTER_SHARE_FLOOR
 
     fun stated(): String =
-        "%d %s shade this annulus, %s holds %.3f of %d shaded samples".format(
+        "shade in this annulus comes from %d %s; %s holds %.3f of %d shaded samples".format(
             casterCount,
             if (casterCount == 1) "caster" else "casters",
             assumedCaster ?: "no caster",
