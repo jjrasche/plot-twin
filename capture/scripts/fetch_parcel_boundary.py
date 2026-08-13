@@ -5,8 +5,9 @@ GET-only against the county's open ArcGIS layer; no auth, no writes upstream.
 
 Interim source: this does NOT come through the shared parcel-layer seam, so the file says so
 in `contract`. The ring is kept three ways - the county's WGS84 vertices unmodified, absolute
-EPSG:26916 metres, and plot-local metres against the same origin the 90m grid uses
-(site UTM minus half the grid width), which is the frame every log row already speaks.
+EPSG:26916 metres, and plot-local metres against the frame this file itself defines: the ring's
+own bounding-box south-west corner snapped outward to a whole 10cm cell. Every other plot-local
+coordinate in the log is measured against that origin, so this pull authors the frame.
 """
 
 import argparse
@@ -17,14 +18,12 @@ import json
 from pyproj import Transformer
 
 from capture_paths import DATA_DIR, http_get, write_json
-from compile_parcel import CELL_SIZE_METERS, CELLS_PER_SIDE, UTM_ZONE_16N, site_utm
+from parcel_frame import CELL_SIZE_METERS, UTM_ZONE_16N, WGS84, ParcelFrame, site_utm, snapped_origin_of
 
 PARCEL_LAYER_URL = (
     "https://services2.arcgis.com/c9l1e4fKpsCnqD7H/arcgis/rest/services/Parcels_AGO/FeatureServer/0"
 )
-HALF_WIDTH_METERS = CELLS_PER_SIDE * CELL_SIZE_METERS / 2.0
 INTERIM_CONTRACT = "interim-county-service"
-WGS84 = "EPSG:4326"
 SQUARE_METERS_PER_ACRE = 4046.8564224
 AREA_AGREEMENT_SHARE = 0.01
 
@@ -128,14 +127,14 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
 
     closed_ring = closed_ring_of(feature)
     utm_ring = utm_ring_of(closed_ring)
-    site_east, site_north = site_utm(latitude, longitude)
-    origin_east = site_east - HALF_WIDTH_METERS
-    origin_north = site_north - HALF_WIDTH_METERS
+    origin_east, origin_north = snapped_origin_of(utm_ring)
 
     local_ring = local_ring_of(utm_ring, origin_east, origin_north)
     derived_square_meters = ring_area_square_meters(local_ring)
     refuse_unless_simple(local_ring)
     refuse_unless_area_agrees(derived_square_meters, attributes["Acreage"])
+    frame = ParcelFrame(local_ring, origin_east, origin_north, CELL_SIZE_METERS)
+    site_east, site_north = site_utm(latitude, longitude)
 
     return {
         "parcel_id": attributes["PARCELID"],
@@ -153,9 +152,19 @@ def boundary_of(parcel_id: str, latitude: float, longitude: float) -> dict:
             "easting_meters": origin_east,
             "northing_meters": origin_north,
             "derived_from": (
-                f"site {latitude}, {longitude} reprojected to {UTM_ZONE_16N}, "
-                f"minus {HALF_WIDTH_METERS} m on each axis (compile_parcel.py grid half-width)"
+                f"the ring's own bounding-box south-west corner in {UTM_ZONE_16N}, "
+                f"snapped outward to a whole {CELL_SIZE_METERS} m cell"
             ),
+        },
+        "grid_extent_at_cell_size": {
+            "cell_size_meters": frame.cell_size,
+            "columns": frame.columns,
+            "rows": frame.rows,
+        },
+        "address_point_local": {
+            "east_meters": site_east - origin_east,
+            "north_meters": site_north - origin_north,
+            "derived_from": f"site {latitude}, {longitude} reprojected to {UTM_ZONE_16N}, minus the origin",
         },
         "provenance": {
             "source": f"{PARCEL_LAYER_URL} PARCELID={parcel_id}",
@@ -190,12 +199,22 @@ def receipt_lines(boundary: dict) -> list[str]:
         f"pulled_at_utc: {provenance['pulled_at_utc']}",
         f"observed_at: {provenance['observed_at']} ({provenance['observed_at_scope']})",
         f"sha256: {provenance['sha256']} over {provenance['response_bytes']} response bytes",
-        "plot-local origin: %.3f E, %.3f N %s"
+        "plot-local origin: %.3f E, %.3f N %s (%s)"
         % (
             boundary["plot_local_origin"]["easting_meters"],
             boundary["plot_local_origin"]["northing_meters"],
             boundary["plot_local_origin"]["crs"],
+            boundary["plot_local_origin"]["derived_from"],
         ),
+        "grid extent at %.2f m cells: %d columns x %d rows = %d cells"
+        % (
+            boundary["grid_extent_at_cell_size"]["cell_size_meters"],
+            boundary["grid_extent_at_cell_size"]["columns"],
+            boundary["grid_extent_at_cell_size"]["rows"],
+            boundary["grid_extent_at_cell_size"]["columns"] * boundary["grid_extent_at_cell_size"]["rows"],
+        ),
+        "address point in frame: %.3f E, %.3f N"
+        % (boundary["address_point_local"]["east_meters"], boundary["address_point_local"]["north_meters"]),
     ]
 
 
