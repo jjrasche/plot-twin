@@ -535,3 +535,42 @@ to our land solvers, because a solver reading absence as permission is confident
 
 **Owed by us:** nothing outstanding. Two board messages to cg-head and one to gen-head are sent and
 unanswered; they are asks, not debts.
+
+### Handoff addendum — the two charters Jim ruled for tonight, and what the file was missing
+Audited the handoff above against these two and it could not have supported either without
+rediscovery. Both gaps recorded here rather than left for the next instance to hit.
+
+**Charter A — land the taste sheet through the repaired receipt path.**
+The mechanism is already wired: charter 28 retrofitted `TasteSheetTest` to call
+`judgedSheetFile("taste_sheet")` and `announceSheet(...)`. What has never happened is a STAMPED run.
+- Stamping is `-Dplottwin.receipt.run` / `-Dplottwin.receipt.cycle`; Gradle does NOT forward `-D` to
+  the test JVM on its own and charter 28 fixed that in the new root `build.gradle.kts`. An unstamped
+  run writes to `build/` and reports success — that silence was itself a green that lied once.
+- The address REFUSES a second write, so choose run and cycle deliberately; a re-take is an error by
+  design, not an accident to work around.
+- **`docs/taste-sheet-2026-08-13.png` is a hand-committed duplicate** the lane created before the
+  receipt path existed, and `capture/receipts/` holds only `main-aaa448b/`. Do not end the night
+  with the sheet at two addresses: either it becomes the receipt at a run/cycle address, or it goes.
+- The sheet's CONTENT already passed the lead's eye and Jim has ruled from it; this charter is about
+  where it lives, not what it shows. Do not regenerate it into something different.
+
+**Charter B — the first proposed stage on Isaac's actual terrain.**
+Stage-diff has only ever rendered `stageDiffDemoSceneOf(dig|foundation|berm)` — a demo scene. It has
+never touched the real parcel. In likely order of biting:
+1. **D-023's terrain-diff guard has never been exercised by a real proposed stage.** A diff past the
+   property line is rejected with a typed violation naming the stolen cell and its area. The first
+   real stage is the first genuine test of that guard — if it fires, that is the guard working, not
+   a bug to route around.
+2. **Where a stage can even go.** 99 trees on a 30.9 x 241 m strip; the overhead render shows woods
+   on the west half and open ground east. Earthworks want the open east half. Anything in the woods
+   implies felling, which is a decision nobody has made and which is NOT a lead default.
+3. **D-013 as amended:** proposed ground ⇒ OPTIMIZER writer, surface id `proposed(<name>)` carrying
+   the measured baseline seq it branched from. The log rejects any other pairing.
+4. **One frame per log** — the projection throws on frame disagreement, so a proposed surface
+   declares the same frame as the measured one.
+5. **Violation markers are fixed world size** and already swamp the toy's pergola at walk height; on
+   a 241 m strip they will be worse. Already in TASKS, now it matters.
+6. Eyes rails bind: judged sheets stamped, and **every new guard pushed RED before it is trusted.**
+
+The stage's location and shape are reversible defaults for the lead to take and record — not
+questions for Jim, and under D-029 not questions the lead may queue to him at all.
