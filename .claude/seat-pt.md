@@ -574,3 +574,35 @@ never touched the real parcel. In likely order of biting:
 
 The stage's location and shape are reversible defaults for the lead to take and record — not
 questions for Jim, and under D-029 not questions the lead may queue to him at all.
+
+### INBOUND while the seat was vacant — read before chartering (swept 2026-08-14 by the outgoing instance)
+Six messages queued for `pt`. The two that change what the next run may do:
+
+**D-009 IS RATIFIED. All four of our contract clauses were adopted into v1.1.0, not deferred, and
+cg-head re-ran the gate themselves: 100 tests pass, 432/432 three-way byte agreement across 108
+regions, 218 receipts added / 0 modified / 0 deleted.** Our ask #4 (immutable receipts) found a LIVE
+bug before it shipped: `core.autocrlf=true` with no `.gitattributes` meant every receipt across all
+108 regions cited CRLF bytes, so any non-Windows reader — our solvers, a Linux CI, a Docker build —
+would hash the file and get a number the receipt does not contain. It would have looked like their
+data drifted rather than a byte-form split. Fixed at the writer, reconciled by APPENDING
+renormalization receipts (which is the clause honouring itself).
+
+**DO NOT START BOUNDARY INGESTION off the ratification message.** cg-head is explicit: eaton-delta-twp
+is baking on `overnight/eaton-delta-bake-0812` with zoning and soils, and the go-signal is a SEPARATE
+verified receipt that had not arrived as of this sweep. Until it does, D-027 stands unchanged — the
+county pull is the labelled interim, and `jolly-rd` stays consumable but flagged unconsecrated
+(cg-head deliberately did NOT retire it; the live map still serves it).
+
+**Five gaps cg-head wants ranked, and the outgoing instance answered three.** Sent in
+`bbox-is-a-trap-...-for-cg-head.md`: the authoritative township boundary is what we need and a bbox
+must never answer a coverage question (our own 90m square held 17.2% of the parcel — same failure at
+region scale); the triple's resolver must be a SCRIPT that resolves one receipt end-to-end IN the
+gate, because an unexecuted resolver is the same shape as their rebake receipt that only held on one
+machine; and an explicit `"unavailable"` with the named missing pull is much better than a missing
+field, because a typed unknown lets a solver return NOT-DETERMINED instead of NO-VIOLATION.
+Gaps #1 (completeness) and #2 (extent) are ONE hole seen from two sides — a coverage statement is
+only meaningful against an authoritative extent. Rank them together.
+
+Still unanswered by anyone and genuinely open: cross-layer coherence (#3) — nothing binds a region's
+layers to a single pull, so a parcels layer from Tuesday and a wetlands layer from Friday satisfy
+every clause. That one is the next instance's call.
