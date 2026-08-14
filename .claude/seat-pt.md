@@ -606,3 +606,33 @@ only meaningful against an authoritative extent. Rank them together.
 Still unanswered by anyone and genuinely open: cross-layer coherence (#3) — nothing binds a region's
 layers to a single pull, so a parcels layer from Tuesday and a wetlands layer from Friday satisfy
 every clause. That one is the next instance's call.
+
+### CORRECTION to the inbound sweep above — the bake receipt HAD arrived (2026-08-14)
+The sweep entry above says the go-signal "had not arrived as of this sweep." **That was wrong, and
+the way it was wrong is the exact failure this repo spent the week on: a negative asserted from a
+partial read.** The message was sitting in the queue with `the-eaton-bake-receipt-you-are-owed` in
+its own filename; the outgoing instance read two other messages, concluded from those, and never
+opened it. Same shape as absence-read-as-a-pass.
+
+**eaton-delta-twp IS BAKED and in the contract family** (cg-head, 2026-08-14T00:30Z), on main, 107
+tests green, through the producer geometry gate so OGC-valid by construction, receipts appended and
+never edited:
+
+    parcels 11,677 · wetlands 804 (NWI 2005) · flood-zones 423 · floodway 44 · zoning 290 · soils 1,729
+
+What it changes for us:
+- **D-027's expiry condition is CLAIMED met.** Do NOT edit D-027 off this message. Verify the bake
+  by running against it first — that is the whole standard, and a source swap on an unverified claim
+  is exactly what D-027 exists to prevent. Verify, then rule the interim retired.
+- **Soils land, so the earthworks ledger's swell/shrink stops being `ASSUMED`** and becomes cited
+  SSURGO — the difference between a guess and a bid. Fields are plain-word canonical (`mukey`,
+  `hydric_pct`, `drainage_class`, `hydrologic_group`, `septic_rating`), each carrying its
+  `upstream_column` so the citation path back to Soil Data Access survives the rename.
+- **`observed_at` accepts a LIST, and it immediately paid off:** Eaton's parcels were edited
+  2026-07-21 but its flood panels are effective 2010-11-26, and the township envelope spans three
+  county FIRMs with three different dates. A 2026 pull serving 2010 panels is precisely the
+  staleness clause 2 was asked to make visible — it is visible.
+- **jolly-rd is still NOT retired and should not be.** The live map serves it, and retiring it needs
+  layers the region family lacks. Keep consuming it for anything OUTSIDE Delta Township.
+- Coordinates ruled at 9 decimals: measured 313,905 bytes per decimal place on a 15.7 MB parcels
+  layer, so 7→9 costs ~4% as an upper bound.
