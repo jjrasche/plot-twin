@@ -1,10 +1,30 @@
-merge: eyes learn sky — the dome joins the gated spec
+merge: one sheet Jim rules three taste questions from, and the coverage filter dies
 
-Charter 15: a sky classifier reads the palette from the spec's own sky mesh (Chebyshev-10
-bucketed nearest-neighbour), so the skyline check knows sky from terrain and the dome enters
-the gated spec. The dome is rebuilt polar — rings uniform in the blend parameter, 256 spokes,
-below-horizon skirt, background set to the horizon tint — which kills both defects the lead
-found by eye: sky-above-skyline 0.89/0.11 -> 0.9995/0.9996, worst banding step 37.0 -> 1.9.
-The old square-lattice dome survives inside the banding test as its permanent prey, and the
-skyline predictor now takes any heightfield from the log. Lead gate: fresh cleanTest in the
-lane worktree, 130 tests 0 failures; contact sheets reviewed by the lead's eye.
+Charter 26, PASS on the sheet and an honest WEAK on question 1 - where the weakness IS the finding.
+
+Three rows, one variable per question, every panel labelled with what it is and what it costs, no
+companion document needed. Questions are phrased for the owner, not the gate: how much of the
+neighbouring land do you want to see; a soft bloom or a disk with an edge; standing at the road end
+looking up your land, how far off the axis.
+
+Question 1 ships three legal options and none of them is the farmland Jim asked for, because the
+lane measured that no farmland option EXISTS: a stubble surround sits 7 from a colour the parcel
+itself draws, dry field 10, mown pasture 6, against the classifier's 10-point tolerance and today's
+neutral tone at 16. Rather than manufacture a third look to fill the row, the lane made the absence
+falsifiable - `no_warm_land_tone_can_be_told_from_the_parcel_it_would_surround` fails the day a warm
+surround becomes separable. The lead's own eye confirms the row: the three options are nearly
+indistinguishable, which is exactly what 2.6 luma of separation predicts.
+
+The coverage filter is gone. `SKYLINE_COVERAGE_BOUND` had been used to DROP viewpoints before
+asserting agreement; coverage is now a FAIL bound and agreement is asserted over every viewpoint.
+Behaviour-preserving today - all five poses sit 0.197 to 0.380 above the bound, so nothing was being
+filtered - but NOT assertion-preserving, and that is the point: the test previously proved only that
+the viewpoints which happened to have coverage agreed, and could have passed on one of five. It now
+proves every viewpoint carries enough skyline to compare AND that every one agrees.
+
+Two things the lane did that are worth keeping as practice. It wrote a measurement test that
+asserted nothing - sixteen printed rows with no way to fail - noticed, deleted it, and folded its
+one real conclusion into a test that can fail. And it held Q2 at a different moment (19:30, sun
+13.3 degrees up) than the sheet's standard 13:00, because at midday the sun sits 61.7 degrees up and
+no level frame contains it, so a tight-vs-soft comparison there would have shown two identical
+skies. Held constant within the question, and stated on the sheet.
