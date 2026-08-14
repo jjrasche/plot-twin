@@ -348,3 +348,12 @@ files or from subagents means it is already past the line.
 The seat file is the memory, which makes a restart also the TEST of the seat file: if a restart
 loses something, the file was incomplete, and the fix is the file, never keeping the old instance
 alive. Every renewal is logged in the seat file with a one-line handoff note.
+
+## D-031 — the first earthworks stage lands on the open east half; no stage may imply felling (2026-08-13, ruled by Jim) #land #scope #law
+The parcel is a 30.9 x 241 m strip: woods on the west half, 99 lidar trees; open ground east. The
+first proposed stage lands **east only**.
+**No stage may imply tree removal. Felling is Isaac's decision and is never a lead default** — not
+in an optimizer's search space, not as a side effect of a stage whose footprint happens to overlap a
+trunk. A proposal that would require a tree to come down is rejected at the same edge D-023 rejects
+a diff past the property line: the land's standing trees are not the lead's to spend.
+This is law for this parcel, not a default awaiting ratification. It is lifted only by Isaac.
