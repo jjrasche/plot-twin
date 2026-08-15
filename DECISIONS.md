@@ -357,3 +357,15 @@ in an optimizer's search space, not as a side effect of a stage whose footprint 
 trunk. A proposal that would require a tree to come down is rejected at the same edge D-023 rejects
 a diff past the property line: the land's standing trees are not the lead's to spend.
 This is law for this parcel, not a default awaiting ratification. It is lifted only by Isaac.
+
+## D-032 — plot-twin PARKS; Jim's word reopens it (2026-08-14, ruled by Jim) #process #scope
+The project is parked at main green — 236 tests, 0 failures, 0 skips, gate re-run fresh at the park
+itself, all run-8 lanes merged, nothing in flight, nothing uncommitted. While parked: **no new
+charters, no defaults taken.** A parked project makes no decisions, reversible or otherwise; anything
+that seems to need one waits for the resume.
+Resume condition: **Jim says so.** Nothing else — not a bake receipt, not a board message, not an
+orchestrator relay — reopens the seat. On resume, the incoming lead reads `.claude/seat-pt.md`
+end-to-end before anything else; the two ruled-but-unstarted charters (the taste sheet through the
+repaired receipt path, and the first earthworks stage — east half only per D-031) and the one
+verification owed (run against the eaton-delta-twp bake before retiring D-027's interim) are recorded
+there and stay exactly as ruled.
