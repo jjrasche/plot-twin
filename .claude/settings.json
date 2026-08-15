@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "_classification": "Tracked allowlist, classified by reversibility (board-converged shape, 2026-08-10). allow = read-only + one-commit-reversible writes inside the repo. deny = the irreversible tail; deny prefix-matches, which is why blanket 'git -C *' is deliberately ABSENT from allow — it would carry irreversible verbs past every deny prefix. Subagents (whose cwd resets between calls) use 'bash tools/wt.sh <worktree> <verbs>', which refuses the irreversible tail in code.",
+    "_classification": "Tracked allowlist, classified by reversibility (board-converged shape, 2026-08-10). allow = read-only + one-commit-reversible writes inside the repo. deny = the irreversible tail; deny prefix-matches, which is why blanket 'git -C *' is deliberately ABSENT from allow \u00e2\u20ac\u201d it would carry irreversible verbs past every deny prefix. Subagents (whose cwd resets between calls) use 'bash tools/wt.sh <worktree> <verbs>', which refuses the irreversible tail in code.",
     "allow": [
       "Bash(git status*)",
       "Bash(git log*)",
@@ -35,7 +35,9 @@
       "Bash(wc*)"
     ],
     "deny": [
-      "Bash(git push*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push --delete*)",
       "Bash(git reset --hard*)",
       "Bash(git clean*)",
       "Bash(git checkout --*)",
