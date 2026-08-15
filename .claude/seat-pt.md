@@ -636,3 +636,40 @@ What it changes for us:
   layers the region family lacks. Keep consuming it for anything OUTSIDE Delta Township.
 - Coordinates ruled at 9 decimals: measured 313,905 bytes per decimal place on a 15.7 MB parcels
   layer, so 7→9 costs ~4% as an upper bound.
+
+## PARKED (2026-08-14, D-032) — read this section first on resume
+
+Jim parked the project. Main is green at the park itself — 236 tests / 0 failures / 0 skips, gate
+re-run fresh, per-module [gate] lines printed, main pushed to origin. Nothing in flight, nothing
+uncommitted, no live workers. **While parked: no new charters, no defaults. Jim's word reopens it.**
+
+### The resume queue, in order
+1. **Verify the eaton-delta-twp bake by RUNNING against it, then retire D-027's interim.** The bake
+   receipt is real (cg-head, 2026-08-14T00:30Z: parcels 11,677 · soils 1,729 · OGC-valid by
+   construction, 107 green) but D-027's expiry fires on verification, not on a claim. This is the
+   first thing the resumed seat does, because the boundary source swap unblocks everything else.
+2. **Land the taste sheet through the repaired receipt path** — a STAMPED run
+   (-Dplottwin.receipt.run/-Dplottwin.receipt.cycle; the -D forwarding is fixed in the root build).
+   The sheet's CONTENT is ruled on; this is about where it lives. Kill the docs/ duplicate address.
+   Jim's picks from the sheet: tight sun disk, 15-degree off-axis owner pose (graduates into the
+   pose set, one line + pose-count expectation). Surround stays 0.45 unless Jim re-rules what the
+   surround IS.
+3. **First earthworks stage on the real parcel** — east half ONLY, no felling implied (D-031, law,
+   lifted only by Isaac). Soils are now cited SSURGO, so swell/shrink enters the earthworks ledger
+   as a citation, not an ASSUMED. Charter and gaps are in the handoff addendum above.
+
+### Decade-vision gaps, already known, unlanded (from the record, run-8 close)
+NAVD88 retires end-2026 and the vertical datum lives only in compile_parcel.py, outside the log
+(Q-002a); observation time is landed on the boundary row ONLY — base-terrain rows still drop the DEM
+receipt at the log boundary (D-021's own words); snapshot forks open (Q-006, no snapshot-row entry);
+no support-distance field on interpolated cells; the citable triple has no executed resolver
+(cg gap #4). A log written today cannot yet be honestly re-read in 2036 — the spine is sound, the
+provenance stops at the boundary row. These are RESUME candidates, not parked work.
+
+### Board state at park
+cg-head owes nothing; we owe cg-head nothing. Gap #3 (cross-layer coherence — nothing binds a
+region's layers to one pull) is flagged to them and is theirs or the resumed seat's. The orchestrator
+routing gap (no transport can carry board or repo to claude.ai) is raised with gen-head + cg-head,
+unanswered, and is NOT plot-twin's to solve. Four labelled worktrees remain under
+../.git-worktrees/pt-* — all four branches are merged; the trees hold only gitignored capture-cache
+copies and build output, safe to prune whenever, kept only because removal was not worth a force.
